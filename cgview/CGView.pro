@@ -7,7 +7,8 @@ CONFIG += \
 
 QT += opengl
 
-INCLUDEPATH += ../../lib/vcglib
+INCLUDEPATH += . \
+               ../../lib/vcglib
 
 HEADERS = \
           opengl/glwindow.h \

@@ -8,7 +8,7 @@ CONFIG += \
 QT += opengl
 
 INCLUDEPATH += . \
-               ../../lib/vcglib
+               ../../vcglib
 
 HEADERS = \
           opengl/glwindow.h \
@@ -37,4 +37,4 @@ SOURCES = \
           opengl/mesh/glmesh.cpp \
           statusbar.cpp \
           convex_hull/my_convhull.cpp \
-          ../../lib/vcglib/wrap/ply/plylib.cpp
+          ../../vcglib/wrap/ply/plylib.cpp

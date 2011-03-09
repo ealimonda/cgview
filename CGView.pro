@@ -23,7 +23,8 @@ HEADERS = \
           opengl/scene/scene.h \
           opengl/mesh/glmesh.h \
           convex_hull/my_convhull.h \
-          statusbar.h
+          statusbar.h \
+    mesh_handler.h
 
 SOURCES = \
           opengl/glwindow.cpp \
@@ -37,4 +38,5 @@ SOURCES = \
           opengl/mesh/glmesh.cpp \
           statusbar.cpp \
           convex_hull/my_convhull.cpp \
-          ../../vcglib/wrap/ply/plylib.cpp
+          ../../vcglib/wrap/ply/plylib.cpp \
+    mesh_handler.cpp

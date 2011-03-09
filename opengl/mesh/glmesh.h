@@ -12,7 +12,7 @@ class GLMesh
 
 public:
     //Constructor
-    inline GLMesh() { Reset(); }
+    inline GLMesh() { _active = false; Reset(); }
     inline GLMesh(CGMesh* m) { Reset(); setMesh(m); }
     //Deconstructor
     inline ~GLMesh()
@@ -71,6 +71,7 @@ public:
         _m = m;
 
         _load = true;
+        _active = false;
 
         //Make everything needed for the mesh
         if(_vis.isBoxEnabled())       _meshGL[BOX] = makeProp(BOX);
@@ -96,6 +97,26 @@ public:
     inline bool isSelected()
     {
         return _select;
+    }
+
+    //Setta la flag _select della classe.
+
+    inline void setSelect(bool value)
+    {
+        _select = value;
+    }
+
+
+    // rende vero se la mesh è attiva
+    inline bool isActive()
+    {
+        return _active;
+    }
+
+    // setta il flag _active della mesh
+    inline void setActive(bool value)
+    {
+        _active = value;
     }
 
     /// BOX
@@ -446,6 +467,8 @@ protected:
 
     bool _load;
     bool _select;
+    bool _active;
+    bool _draw;
 
 //signals:
 

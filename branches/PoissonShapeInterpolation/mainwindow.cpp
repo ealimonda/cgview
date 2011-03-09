@@ -11,7 +11,7 @@ MainWindow::MainWindow()
     _engine = new Engine(NULL);
 
     //Setting the title of the main windows
-    this->setWindowTitle(QString("CGView - Convex Hull version"));
+    this->setWindowTitle(QString("CGView - PSI version 0.1 beta"));
 
     //Setting the minimum height and width and the initial height and width
     //this->setMinimumSize(500, 500);

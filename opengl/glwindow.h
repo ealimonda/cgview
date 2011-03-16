@@ -13,6 +13,7 @@
 
 #include <QtOpenGL/QGLWidget>
 #include "mesh_definition.h"
+#include "mesh_handler.h"
 #include "opengl/scene/scene.h"
 
 class GLWindow : public QGLWidget
@@ -22,6 +23,7 @@ class GLWindow : public QGLWidget
 public:
     //Constructor
     GLWindow(QWidget *parent = 0);
+    GLWindow(QWidget *parent = 0, MeshHandler* = NULL );
     //Deconstructor
     inline ~GLWindow()
     {
@@ -52,6 +54,9 @@ protected:
     vcg::Box3<double> _box;
     //Draws the background gradient
     void drawGradient();
+
+    // puntatore al gestore delle mesh nel box
+    MeshHandler *_handler;
 
     //Scene camera
     GLCamera _camera;

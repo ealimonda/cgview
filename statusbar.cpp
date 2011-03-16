@@ -22,6 +22,7 @@ StatusBar::StatusBar()
     _e = new QLabel("");
     _t = new QLabel("");
 
+
     _layout->addWidget(_v, 0, 1);
     _layout->addWidget(_f, 0, 3);
     _layout->addWidget(_e, 0, 5);

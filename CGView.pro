@@ -3,7 +3,8 @@ TEMPLATE = app
 CONFIG += \
           opengl \
           thread \
-          debug
+          debug \
+console
 
 QT += opengl
 
@@ -24,7 +25,9 @@ HEADERS = \
           opengl/mesh/glmesh.h \
           convex_hull/my_convhull.h \
           statusbar.h \
-    mesh_handler.h
+    mesh_handler.h \
+    subwindows/psi_dialog.h \
+    sidebar.h
 
 SOURCES = \
           opengl/glwindow.cpp \
@@ -39,4 +42,6 @@ SOURCES = \
           statusbar.cpp \
           convex_hull/my_convhull.cpp \
           ../../vcglib/wrap/ply/plylib.cpp \
-    mesh_handler.cpp
+    mesh_handler.cpp \
+    subwindows/psi_dialog.cpp \
+    sidebar.cpp

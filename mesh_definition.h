@@ -29,6 +29,8 @@
 
 #include <vcg/complex/trimesh/base.h>
 
+#include <QString>
+
 //class CGEdge;
 class CGFace;
 class CGVertex;
@@ -51,8 +53,46 @@ vcg::face::BitFlags,
 vcg::vertex::Color4b,
 vcg::vertex::Qualityf> {};
 
-class CGMesh : public vcg::tri::TriMesh<
-   std::vector<CGVertex>, std::vector<CGFace> > {};
+class CGMesh : public vcg::tri::TriMesh<std::vector<CGVertex>, std::vector<CGFace> >
+{
+public:
+    inline CGMesh() : vcg::tri::TriMesh<std::vector<CGVertex>, std::vector<CGFace> >()
+    {
+        _select = false;
+        _draw   = true;
+        _active = false;
+
+        _name = "new_mesh";
+    }
+
+    inline void set_name(QString name)
+    {
+        _name = name;
+    }
+
+    inline const QString get_name()
+    {
+        return _name;
+    }
+
+    inline bool is_select(){return _select;}
+    inline bool is_active(){return _active;}
+    inline bool is_drawn(){return _draw;}
+
+    inline void set_drawn(bool state) { _draw = state;}
+
+private:
+
+    // True if the mesh is selected
+    bool _select;
+    // True if the mesh has to be rendered
+    bool _draw;
+    // True if the mesh is active
+    bool _active;
+
+    QString _name;
+
+};
 
 typedef CGMesh::CoordType CGPoint;
 

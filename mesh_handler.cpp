@@ -31,38 +31,40 @@ void MeshHandler::clear()
 // questo aggiunge una nuove mesh in coda
 void MeshHandler::add(GLMesh mesh)
 {
-    mesh_list.append(mesh);
 
-    i = mesh_list.size()-1;
+
+    mesh_list.push_back(mesh);
+    int i = mesh_list.size()-1;
 
     // la nuova mesh viene automaticamente attivata e selezionata.
     select(i);
     activate(i);
 }
+
 
 // se si specifica un indice la mesh verrà inserita in quella posizione
-void MeshHandler::add(GLMesh mesh, int i)
-{
-    /*
-        il metodo insert della classe QVector fa si che
-        se i = 0 il la nuova mesh venga messa per prima, mentre
-        se i è più grande della dimensione del vettore viene accodato.
-    */
+//void MeshHandler::add(GLMesh mesh, int i)
+//{
+//    /*
+//        il metodo insert della classe QVector fa si che
+//        se i = 0 il la nuova mesh venga messa per prima, mentre
+//        se i è più grande della dimensione del vettore viene accodato.
+//    */
 
-    // se l'indice inserito è <0, è stata messa in testa, quindi aggiorno i a dovere.
-    if (i<0) i = 0;
+//    // se l'indice inserito è <0, è stata messa in testa, quindi aggiorno i a dovere.
+//    if (i<0) i = 0;
 
-    // se invece l'indice esce dal range degli indici, la mesh viene messa in coda
-    if (i>mesh_list.size()) i = mesh_list.size();
+//    // se invece l'indice esce dal range degli indici, la mesh viene messa in coda
+//    if (i>mesh_list.size()) i = mesh_list.size();
 
-    mesh_list.insert(i,mesh);
+//    mesh_list.insert(i,mesh_list,mesh);
 
-    // la nuova mesh viene automaticamente attivata e selezionata.
-    select(i);
-    activate(i);
+//    // la nuova mesh viene automaticamente attivata e selezionata.
+//    select(i);
+//    activate(i);
 
 
-}
+//}
 
 // questo aggiunge nuove mesh in coda impostando i parametri sul byte param
 // i parametri sono _NO_ACTIVE se non si vuole che la nuova mesh sia attiva quando
@@ -72,7 +74,7 @@ void MeshHandler::add(GLMesh mesh, char par)
 {
     int i;
 
-    mesh_list.append(mesh);
+    mesh_list.push_back(mesh);
 
     // se non si è usato il parametro _NO_SELECT la mesh viene selezionata
     if(!is_par_noselect(par))
@@ -94,34 +96,34 @@ void MeshHandler::add(GLMesh mesh, char par)
 
 // stessa cosa del precedente ma in posizione mesh_index-esima
 
-void MeshHandler::add(GLMesh mesh, int i, char par)
-{
+//void MeshHandler::add(GLMesh mesh, int i, char par)
+//{
 
-    // se l'indice inserito è <0, è stata messa in testa, quindi aggiorno i a dovere.
-    if (i<0) i = 0;
+//    // se l'indice inserito è <0, è stata messa in testa, quindi aggiorno i a dovere.
+//    if (i<0) i = 0;
 
-    // se invece l'indice esce dal range degli indici, la mesh viene messa in coda
-    if (i>mesh_list.size()) i = mesh_list.size();
+//    // se invece l'indice esce dal range degli indici, la mesh viene messa in coda
+//    if (i>mesh_list.size()) i = mesh_list.size();
 
-    mesh_list.insert(i,mesh);
-
-
-    // se non si è usato il parametro _NO_SELECT la mesh viene selezionata
-    if(!is_par_noselect(par))
-    {
-        select(i);
-    }
-
-    //se non si è usato il parametro _NO_ACTIVE la mesh viene attivata
-    if(!is_par_noactive(par))
-    {
-        i = mesh_list.size()-1;
-        activate(i);
-    }
+//    mesh_list.insert(i,mesh_list,mesh);
 
 
+//    // se non si è usato il parametro _NO_SELECT la mesh viene selezionata
+//    if(!is_par_noselect(par))
+//    {
+//        select(i);
+//    }
 
-}
+//    //se non si è usato il parametro _NO_ACTIVE la mesh viene attivata
+//    if(!is_par_noactive(par))
+//    {
+//        i = mesh_list.size()-1;
+//        activate(i);
+//    }
+
+
+
+//}
 
 
 // il metodo count restituisce il numero di mesh nel vettore
@@ -217,6 +219,14 @@ bool MeshHandler::deselect(int mesh_index)
 
     return true;
 }
+
+
+GLMesh MeshHandler::get_mesh ( int i )
+{
+    return mesh_list[i];
+}
+
+
 
 
 /*** metodi privati ***/

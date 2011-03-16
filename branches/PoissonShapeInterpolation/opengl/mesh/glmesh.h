@@ -13,7 +13,8 @@ class GLMesh
 public:
     //Constructor
     inline GLMesh() { _active = false; Reset(); }
-    inline GLMesh(CGMesh* m) { Reset(); setMesh(m); }
+    inline GLMesh(CGMesh* m) {  Reset(); setMesh(m); }
+
     //Deconstructor
     inline ~GLMesh()
     {
@@ -26,14 +27,18 @@ public:
     //Draws the mesh and its properties
     inline void drawMesh()
     {
-        glPushMatrix();
-        if(_vis.isAxisEnabled())      glCallList(_meshGL[AXIS]);
-        if(_vis.isMeshEnabled())      glCallList(_meshGL[MESH]);
-        if(_vis.isNormalEnabled())    glCallList(_meshGL[NORMAL]);
-        if(_vis.isWireframeEnabled()) glCallList(_meshGL[WIRE]);
-        if(_vis.isGridEnabled())      glCallList(_meshGL[GRID]);
-        if(_vis.isBoxEnabled())       glCallList(_meshGL[BOX]);
-        glPopMatrix();
+
+        if(_m->is_drawn())
+        {
+            glPushMatrix();
+            if(_vis.isAxisEnabled())      glCallList(_meshGL[AXIS]);
+            if(_vis.isMeshEnabled())      glCallList(_meshGL[MESH]);
+            if(_vis.isNormalEnabled())    glCallList(_meshGL[NORMAL]);
+            if(_vis.isWireframeEnabled()) glCallList(_meshGL[WIRE]);
+            if(_vis.isGridEnabled())      glCallList(_meshGL[GRID]);
+            if(_vis.isBoxEnabled())       glCallList(_meshGL[BOX]);
+            glPopMatrix();
+        }
     }
     //Remake the mesh for visualization purposes
     inline void remakeMesh()
@@ -71,7 +76,7 @@ public:
         _m = m;
 
         _load = true;
-        _active = false;
+        _active = true;
 
         //Make everything needed for the mesh
         if(_vis.isBoxEnabled())       _meshGL[BOX] = makeProp(BOX);
@@ -97,6 +102,11 @@ public:
     inline bool isSelected()
     {
         return _select;
+    }
+
+    inline bool isDrawn()
+    {
+        return _m->is_drawn();
     }
 
     //Setta la flag _select della classe.
@@ -422,6 +432,20 @@ public:
         }
     }
 
+    inline int get_nvertex()
+    {
+        return _m->vn;
+    }
+
+    inline int get_nfaces()
+    {
+        return _m->fn;
+    }
+
+    inline CGMesh* get_mesh()
+    {
+        return _m;
+    }
 
 private:
 

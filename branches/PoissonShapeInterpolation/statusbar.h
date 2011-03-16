@@ -18,14 +18,15 @@ protected:
     void refreshInfo();
 
     QGridLayout* _layout;
-    QLabel* _vertLabel;
-    QLabel* _faceLabel;
-    QLabel* _edgeLabel;
-    QLabel* _timeLabel;
-    QLabel* _v;
-    QLabel* _f;
-    QLabel* _e;
-    QLabel* _t;
+    QLabel*      _vertLabel;
+    QLabel*      _faceLabel;
+    QLabel*      _edgeLabel;
+    QLabel*      _timeLabel;
+    QLabel*      _v;
+    QLabel*      _f;
+    QLabel*      _e;
+    QLabel*      _t;
+
     unsigned int _vert;
     unsigned int _face;
     unsigned int _edge;

@@ -38,8 +38,6 @@ public:
         void add(GLMesh, char);
         void add(GLMesh, int, char);
 
-
-
         // Rimuove la msh selezionata dall'elenco, o l'i-esima
         void remove();
         void remove(int);
@@ -64,9 +62,25 @@ public:
         // Permette di deselezionare una mesh
         bool deselect(int);
 
+        // restituisce una mesh
+
+        GLMesh get_mesh(int);
+
+
+
+        // disegna una mesh
+
+        void inline draw_mesh( int i)
+        {
+            mesh_list[i].drawMesh();
+        }
+
 private:
         //vettore delle mesh aperte:
-        QVector<GLMesh> mesh_list;
+        std::vector<GLMesh> mesh_list;
+
+        // vettore delle VERE mesh
+        std::vector<CGMesh> cgmeshes;
 
         //indice della mesh attiva:
         // ( -1 se nessuna mesh è attiva)

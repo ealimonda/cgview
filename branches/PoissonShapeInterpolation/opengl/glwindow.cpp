@@ -13,8 +13,24 @@ GLWindow::GLWindow(QWidget *parent) : QGLWidget(parent)
     _camera = GLCamera();
     _camera.setAspect((float)this->width() / (float)this->height());
 
+    _handler = NULL;
+
     _mouseSens = 0.5f;
 }
+
+GLWindow::GLWindow(QWidget *parent, MeshHandler *h) : QGLWidget(parent)
+{
+    _load = false;
+    _anaglyph = false;
+
+    _camera = GLCamera();
+    _camera.setAspect((float)this->width() / (float)this->height());
+
+    _handler = h;
+
+    _mouseSens = 0.5f;
+}
+
 
 //Inizializza i parametri che non cambieranno durante la visualizzazione delle mesh
 void GLWindow::initializeGL()
@@ -72,6 +88,8 @@ void GLWindow::paintGL()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+
+//    printf("Numero di Mesh Presenti nella scena: %d", _mesh.size());
     if(_load)
     {
         if(!_anaglyph)
@@ -83,7 +101,10 @@ void GLWindow::paintGL()
             glPushMatrix();
             for(unsigned int i = 0; i < _mesh.size(); i++)
             {
-                _mesh[i].drawMesh();
+//                std::cout << "Disegno la mesh numero:" << i << std::endl;
+                if(_mesh[i].isDrawn() == true)
+                     _mesh[i].drawMesh();
+//                _handler->draw_mesh(i);
             }
             glPopMatrix();
         }
@@ -101,7 +122,8 @@ void GLWindow::paintGL()
 
             for(unsigned int i = 0; i < _mesh.size(); i++)
             {
-                _mesh[i].drawMesh();
+                if(_mesh[i].isDrawn() == true)
+                    _mesh[i].drawMesh();
             }
 
             glFlush();
@@ -119,7 +141,8 @@ void GLWindow::paintGL()
 
             for(unsigned int i = 0; i < _mesh.size(); i++)
             {
-                _mesh[i].drawMesh();
+                if(_mesh[i].isDrawn() == true)
+                   _mesh[i].drawMesh();
             }
 
             glFlush();
@@ -276,13 +299,16 @@ void GLWindow::Reset()
 void GLWindow::addMesh(CGMesh* m)
 {
     //If there is already a mesh, reset
-    if(_load)
-    {
-        Reset();
-    }
+//    if(_load)
+//    {
+//        Reset();
+//    }
     _load = true;
 
+
+
     _mesh.push_back(GLMesh(m));
+
     _box.Add(m->bbox);
 
 

@@ -2,7 +2,17 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QDialog>
+#include <QtGui>
+#include <QtOpenGL/QtOpenGL>
+#include "opengl/intro/glintro.h"
+#include "opengl/glwindow.h"
+#include "statusbar.h"
+#include "sidebar.h"
 #include "engine.h"
+#include "mesh_handler.h"
+
+#include "subwindows/psi_dialog.h"
 
 QT_BEGIN_NAMESPACE
 class QAction;
@@ -31,12 +41,24 @@ protected:
         VIEWER,
         STATUS,
         PALETTE,
+        SIDEBAR,
 
         /// Number of areas --- THIS MUST BE THE LAST ELEMENT
         AREA_NUM
     };
     //Number of area in the main window
     static const int _AreaDim = AREA_NUM;
+
+    // Types of subwindows
+    enum DialogType
+    {
+        PSI,
+
+        /// Number of subwindows -- THIS MUST BE THE LAST
+        DIALOG_NUM
+    };
+    //Number of subwindows
+    static const int _DialogDim = DIALOG_NUM;
 
     //Type of menu in the main menu
     enum MenuType
@@ -139,6 +161,8 @@ protected:
         ACTION_TOOL_VOXEL_DISABLE,
         ACTION_TOOL_VOXEL_EXTERN,
         ACTION_TOOL_VOXEL_ALL,
+        /// Tool per l'interpolazione di poisson
+        ACTION_TOOL_SHAPE_INTERPOLATION,
 
         /// Window actions
         ACTION_WINDOW_BAR_STATUS,
@@ -165,6 +189,9 @@ protected:
     void createViewer();
     //create the status bar
     void createStatus();
+    //create the side bar
+    void createSide();
+
 
     //Main widget
     QWidget *_mainWidget;
@@ -173,6 +200,10 @@ protected:
     //Actions of the menu
     QAction *_action[_ActionDim];
 
+    //Subwindows
+    QDialog *_dialog[_DialogDim];
+
+
     //Layout of the main window
     QGridLayout *_layout;
 
@@ -180,12 +211,16 @@ protected:
     QScrollArea *_area[_AreaDim];
 
     /// areas
-    GLIntro *_glIntro;
-    GLWindow *_glWindow;
+    GLIntro   *_glIntro;
+    GLWindow  *_glWindow;
     StatusBar *_statusBar;
+    SideBar   *_sideBar;
 
     /// Engine
     Engine *_engine;
+
+    /// Gestore delle mesh
+    MeshHandler *_handler;
 
 signals:
 
@@ -198,6 +233,9 @@ private slots:
     void endIntro();
 
     void Normals();
+
+    //create the PSI subwindow
+    void PSI_create_interface();
 };
 
 #endif // MAINWINDOW_H

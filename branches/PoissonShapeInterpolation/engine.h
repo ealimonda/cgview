@@ -14,10 +14,36 @@
  * By Fabio "Guga" Guggeri && Stefano Marras
  *************************/
 
+#include <QtGui>
+#include <QFileDialog>
+#include <QFile>
+#include <QByteArray>
+#include <stdio.h>
+#include <stdlib.h>
+#include <QColor>
+//#include "engine.h"
+#include <cmath>
+#include <string.h>
+
+#include <wrap/io_trimesh/import.h>
+#include <wrap/io_trimesh/import_OFF.h>
+#include <wrap/io_trimesh/import_PLY.h>
+#include <wrap/io_trimesh/export.h>
+#include <vcg/complex/trimesh/allocate.h>
+#include <vcg/complex/trimesh/update/normal.h>
+#include <vcg/complex/trimesh/update/color.h>
+#include <vcg/complex/trimesh/update/bounding.h>
+
+
 #include <QWidget>
 #include <QBrush>
 #include <QString>
 #include "mesh_definition.h"
+
+#include "convex_hull/my_convhull.h"
+
+
+#include "mesh_handler.h"
 
 
 /**
@@ -47,9 +73,18 @@ class Engine : public QObject
 	/**
 	* La DCEL che verrà creata in seguito agli input dell'utente
 	**/
-        CGMesh d;
+        std::vector<CGMesh*> meshes;
 
- 	public:
+        /// la mesh attiva:
+        CGMesh *d;
+
+        /**
+        * La classe che gestsce tutte le mesh create.
+        **/
+        MeshHandler *_handler;
+
+
+        public:
 
         enum NewType
         {
@@ -63,6 +98,10 @@ class Engine : public QObject
 	**/
      	Engine(QObject *parent = 0);
 
+        // costruttore che inizializza anche l'handler
+
+        Engine(QObject *parent = 0, MeshHandler* h = NULL);
+
 	/**
 	* Carica un file dal nome specificato (noto a priori).
 	*/
@@ -75,6 +114,8 @@ class Engine : public QObject
         void sendDcel(CGMesh* dc);
         void sendInfo(const unsigned int v, const unsigned int f, const unsigned int t);
         void Loaded(bool tf);
+        void sendName(CGMesh*);
+        void sendInfoToSidebar(CGMesh*);
 
         void UpdateWindow();
 
@@ -101,6 +142,18 @@ class Engine : public QObject
         void facetovert_q();
 
         void newObject();
+
+        inline void respond_for_name(int i)
+        {
+            std::cout << "Sono Engine, rispondo alla richiesta mandando la mesh " << i << std::endl ;
+            emit (sendInfoToSidebar(meshes[i]));
+        }
+
+        inline void change_draw_state(int i, bool state)
+        {
+            meshes[i]->set_drawn(state);
+            emit UpdateWindow();
+        }
 
 	private:
 	/**

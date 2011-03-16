@@ -1,14 +1,11 @@
 #include "mainwindow.h"
 
-#include <QtGui>
-#include <QtOpenGL/QtOpenGL>
-#include "opengl/intro/glintro.h"
-#include "opengl/glwindow.h"
-#include "statusbar.h"
 
 MainWindow::MainWindow()
 {
-    _engine = new Engine(NULL);
+    _handler = new MeshHandler();
+    _engine = new Engine(NULL,_handler);
+
 
     //Setting the title of the main windows
     this->setWindowTitle(QString("CGView - PSI version 0.1 beta"));
@@ -25,11 +22,13 @@ MainWindow::MainWindow()
 
     createIntro();
     createStatus();
+    createSide();
     createViewer();
 
     _area[INTRO]->setVisible(true);
     _area[STATUS]->setVisible(false);
     _area[VIEWER]->setVisible(false);
+    _area[SIDEBAR]->setVisible(false);
 
     //Creating the layout
     _layout = new QGridLayout;
@@ -37,6 +36,7 @@ MainWindow::MainWindow()
 
     _layout->addWidget(_area[INTRO], 0, 0);
     _layout->addWidget(_area[VIEWER], 1, 0);
+    _layout->addWidget(_area[SIDEBAR], 1, 1);
     _layout->addWidget(_area[STATUS], 2, 0);
 
     _mainWidget->setLayout(_layout);
@@ -167,7 +167,7 @@ void MainWindow::createMenus()
 
     //Adding submenus and action
     _menu[MENU_TOOL]->addAction(_action[ACTION_TOOL_CONVEXHULL]);
-
+    _menu[MENU_TOOL]->addAction(_action[ACTION_TOOL_SHAPE_INTERPOLATION]);
     /*_menu[MENU_TOOL]->addMenu(_menu[MENU_TOOL_VOXEL]);
 
     _menu[MENU_TOOL_VOXEL]->addAction(_action[ACTION_TOOL_VOXEL_DISABLE]);
@@ -222,7 +222,7 @@ void MainWindow::createActions()
     _action[ACTION_EDIT_UPDATE_FACE_NORMAL]          = new QAction(tr("Update Face Normals"), this);
     _action[ACTION_EDIT_UPDATE_ALL_NORMAL]           = new QAction(tr("Update All Normals"), this);
     _action[ACTION_EDIT_INVERT_VERT_NORMAL]          = new QAction(tr("Invert Vertex Normals"), this);
-    _action[ACTION_EDIT_INVERT_FACE_NORMAL]          = new QAction(tr("Invert Face Normals"), this);
+    _action[ACTION_EDIT_INVERT_FACE_NORMAL]           = new QAction(tr("Invert Face Normals"), this);
     _action[ACTION_EDIT_INVERT_ALL_NORMAL]           = new QAction(tr("Invert All Normals"), this);
     _action[ACTION_EDIT_RESET_QUALITY]               = new QAction(tr("Reset Quality"), this);
     _action[ACTION_EDIT_RANDOM_VERT_QUALITY]         = new QAction(tr("Random Vertex Quality"), this);
@@ -280,6 +280,7 @@ void MainWindow::createActions()
 
     /// TOOL ----------------------------------------------
     _action[ACTION_TOOL_CONVEXHULL] = new QAction(tr("Convex Hull"), this);
+     _action[ACTION_TOOL_SHAPE_INTERPOLATION] = new QAction(tr("Shape Interpolation"), this);
 
     //TOOL SUBMENU
     /*_action[ACTION_TOOL_VOXEL_DISABLE]     = new QAction(tr("Delete Voxels"), this);
@@ -312,6 +313,8 @@ void MainWindow::createConnections()
     connect(_engine, SIGNAL(sendInfo(const unsigned int, const unsigned int, const unsigned int)), _statusBar, SLOT(setInfo(const unsigned int, const unsigned int, const unsigned int)));
     connect(_engine, SIGNAL(sendDcel(CGMesh*)), this, SLOT(endIntro()));
     connect(_engine, SIGNAL(UpdateWindow()),    _glWindow, SLOT(UpdateWindow()));
+    connect(_engine, SIGNAL(sendName(CGMesh*)), _sideBar, SLOT(add_mesh(CGMesh*)));
+    connect(_engine, SIGNAL(sendInfoToSidebar(CGMesh*)), _sideBar, SLOT(update_mesh_info(CGMesh*)));
 
 
 
@@ -387,6 +390,7 @@ void MainWindow::createConnections()
 
     /// TOOL ----------------------------------------------
     connect(_action[ACTION_TOOL_CONVEXHULL], SIGNAL(triggered()), _engine, SLOT(calculate_ch()));
+    connect(_action[ACTION_TOOL_SHAPE_INTERPOLATION], SIGNAL(triggered()), this, SLOT(PSI_create_interface()));
 
     //TOOL SUBMENU
 
@@ -403,6 +407,11 @@ void MainWindow::createConnections()
     //connect(_action[ACTION_ABOUT_HELP], SIGNAL(triggered()), , SLOT());
 
     //ABOUT SUBMENU
+
+    /// SIDEBAR
+    connect(_sideBar,SIGNAL(ask_info(int)),_engine,SLOT( respond_for_name(int)));
+    connect(_sideBar,SIGNAL(engine_change_draw_state(int,bool)),_engine,SLOT( change_draw_state(int,bool)));
+
 }
 
 void MainWindow::createIntro()
@@ -424,7 +433,7 @@ void MainWindow::createIntro()
 void MainWindow::createViewer()
 {
     //Creating the viewer
-    _glWindow = new GLWindow();
+    _glWindow = new GLWindow(NULL, _handler);
     _glWindow->setMinimumSize(500, 500);
     _glWindow->grabKeyboard();
 
@@ -454,6 +463,18 @@ void MainWindow::createStatus()
     _area[STATUS]->setMaximumHeight(20);
 }
 
+void MainWindow::createSide()
+{
+    _sideBar = new SideBar();
+
+    _area[SIDEBAR] = new QScrollArea;
+    _area[SIDEBAR]->setWidget(_sideBar);
+    _area[SIDEBAR]->setWidgetResizable(false);
+    _area[SIDEBAR]->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
+    _area[SIDEBAR]->setMaximumWidth(200);
+
+}
+
 //Enable/Disable the status bar
 void MainWindow::ToggleStatus()
 {
@@ -474,10 +495,19 @@ void MainWindow::endIntro()
     _glIntro->stopCube();
     _area[VIEWER]->setVisible(true);
     _area[STATUS]->setVisible(true);
+    _area[SIDEBAR]->setVisible(true);
 }
 
 void MainWindow::Normals()
 {
     _action[ACTION_VIEW_NORMAL_VERT]->setChecked(false);
     _action[ACTION_VIEW_NORMAL_FACE]->setChecked(false);
+}
+
+void MainWindow::PSI_create_interface()
+{
+    _dialog[PSI] = new PSI_dialog();
+
+    _dialog[PSI]->show();
+
 }

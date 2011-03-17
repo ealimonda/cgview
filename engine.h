@@ -21,7 +21,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <QColor>
-//#include "engine.h"
+#include <QRegExp>
 #include <cmath>
 #include <string.h>
 

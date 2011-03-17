@@ -178,17 +178,22 @@ bool Engine::create_from_file( QString filename )
         vcg::tri::UpdateNormals<CGMesh>::NormalizeVertex(*tmp_d);
         vcg::tri::UpdateNormals<CGMesh>::NormalizeFace(*tmp_d);
 
-        tmp_d->set_name(filename.section('/',-1));
+        // ripulisce il nome dall'estensione ply, lento e brutto ma per ora va.
+        tmp_d->set_name(QString(filename.section('/',-1)).remove(QRegExp(".ply$")));
 
-        // Aggiungo la mesh all'handler.
-        _handler->add(GLMesh(tmp_d));
+        // Aggiungo la mesh all'handler. (inutile ora)
+//        _handler->add(GLMesh(tmp_d));
 
         meshes.push_back(tmp_d);
 
-        emit sendDcel(tmp_d);
+//        emit sendDcel(tmp_d);
+//        emit Loaded(true);
+//        emit sendInfo(tmp_d->vn, tmp_d->fn, 0);
+//        emit sendName(tmp_d);
+        emit sendDcel(meshes.back());
         emit Loaded(true);
-        emit sendInfo(tmp_d->vn, tmp_d->fn, 0);
-        emit sendName(tmp_d);
+        emit sendInfo(meshes.back()->vn, meshes.back()->fn, 0);
+        emit sendName(meshes.back());
 	return true;
 }
 

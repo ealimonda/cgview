@@ -12,6 +12,8 @@
 #define GLWINDOW_H
 
 #include <QtOpenGL/QGLWidget>
+#include <QtGui>
+#include <QtOpenGL/QtOpenGL>
 #include "mesh_definition.h"
 #include "mesh_handler.h"
 #include "opengl/scene/scene.h"

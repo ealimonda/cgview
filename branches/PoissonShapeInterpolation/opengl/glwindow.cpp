@@ -1,7 +1,6 @@
 #include "glwindow.h"
 
-#include <QtGui>
-#include <QtOpenGL/QtOpenGL>
+
 
 //Costruttore
 //Inizializza tutte le variabili.
@@ -101,7 +100,7 @@ void GLWindow::paintGL()
             glPushMatrix();
             for(unsigned int i = 0; i < _mesh.size(); i++)
             {
-//                std::cout << "Disegno la mesh numero:" << i << std::endl;
+
                 if(_mesh[i].isDrawn() == true)
                      _mesh[i].drawMesh();
 //                _handler->draw_mesh(i);

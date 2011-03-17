@@ -1,6 +1,7 @@
 #ifndef GLMESH_H
 #define GLMESH_H
 
+
 #include <QtOpenGL/QtOpenGL>
 #include "mesh_definition.h"
 #include "opengl/mesh/mode/visualmode.h"
@@ -30,6 +31,7 @@ public:
 
         if(_m->is_drawn())
         {
+            std::cout << "Disegno la mesh: " << _m << std::endl;
             glPushMatrix();
             if(_vis.isAxisEnabled())      glCallList(_meshGL[AXIS]);
             if(_vis.isMeshEnabled())      glCallList(_meshGL[MESH]);

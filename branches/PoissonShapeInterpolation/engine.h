@@ -107,6 +107,19 @@ class Engine : public QObject
 	*/
 	void load_file( QString filename );
 
+        /// restituisce il numero di mesh presenti nella scena
+
+        inline int get_mesh_number()
+        {
+            return meshes.size();
+        }
+
+        inline std::vector<CGMesh*> get_meshes()
+        {
+            return meshes;
+        }
+
+
 	signals:
 	/**
 	* Consente la visualizzazione della DCEL, inviandola al visualizzatore
@@ -146,6 +159,9 @@ class Engine : public QObject
         inline void respond_for_name(int i)
         {
             std::cout << "Sono Engine, rispondo alla richiesta mandando la mesh " << i << std::endl ;
+            // questo cambia la mesh attiva:
+            d->set_active(false);
+            d = meshes[i];
             emit (sendInfoToSidebar(meshes[i]));
         }
 

@@ -59,6 +59,17 @@ public:
         _status = (_status & VIS_BOX_DISABLE) | VIS_BOX_SOLID;
     }
 
+    //Enable the active bounding box
+    inline void Enable_Box_Active()
+    {
+        _status = _status | VIS_BOX_ACTIVE;
+    }
+    //Disable the active bounding box
+    inline void Disable_Box_Active()
+    {
+        _status = _status & ~VIS_BOX_ACTIVE;
+    }
+
     //Return true if the box is disabled
     inline bool isBoxDisabled()
     {
@@ -84,6 +95,13 @@ public:
     {
         return ((_status & VIS_BOX_WIRED) && (_status & VIS_BOX_TRANS));
     }
+
+    //Return true if the solid box is enabled
+    inline bool isBoxActive()
+    {
+        return _status & VIS_BOX_ACTIVE;
+    }
+
 
     /// MESH
     //Disable the mesh visualization
@@ -361,6 +379,7 @@ protected:
     static const unsigned int VIS_BOX_WIRED       = 0x10000000; //0001 0000 0000 0000 0000 0000 0000 0000
     static const unsigned int VIS_BOX_TRANS       = 0x20000000; //0010 0000 0000 0000 0000 0000 0000 0000
     static const unsigned int VIS_BOX_SOLID       = 0x30000000; //0011 0000 0000 0000 0000 0000 0000 0000
+    static const unsigned int VIS_BOX_ACTIVE      = 0x40000000; //0100 0000 0000 0000 0000 0000 0000 0000
     static const unsigned int VIS_MESH_POINT      = 0x01000000; //0000 0001 0000 0000 0000 0000 0000 0000
     static const unsigned int VIS_MESH_FLAT       = 0x02000000; //0000 0010 0000 0000 0000 0000 0000 0000
     static const unsigned int VIS_MESH_SMOOTH     = 0x03000000; //0000 0011 0000 0000 0000 0000 0000 0000

@@ -12,6 +12,8 @@ Engine::Engine(QObject *parent) : QObject(parent)
 	// Inizializza le variabili
         s = INPUT_M;
 	srand(time(NULL));
+        // non ci sono mesh attive;
+        d = NULL;
 }
 
 
@@ -20,6 +22,9 @@ Engine::Engine(QObject *parent, MeshHandler *h) : QObject(parent)
         // Inizializza le variabili
         s = INPUT_M;
         srand(time(NULL));
+
+        // non ci sono mesh attive
+        d = NULL;
 
         // passo l'indirizzo dell'handler esistente
 
@@ -185,6 +190,12 @@ bool Engine::create_from_file( QString filename )
 //        _handler->add(GLMesh(tmp_d));
 
         meshes.push_back(tmp_d);
+
+        // se esiste già una mesh attiva la imposto come non attiva
+        if(d) d->set_active(false);
+        // rendo la nuova mesh quella attiva
+        d = meshes.back();
+        d->set_active(true);
 
 //        emit sendDcel(tmp_d);
 //        emit Loaded(true);

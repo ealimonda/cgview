@@ -33,12 +33,14 @@ public:
         {
             std::cout << "Disegno la mesh: " << _m << std::endl;
             glPushMatrix();
+            glTranslatef(_m->get_x(),_m->get_y(),_m->get_z());
             if(_vis.isAxisEnabled())      glCallList(_meshGL[AXIS]);
             if(_vis.isMeshEnabled())      glCallList(_meshGL[MESH]);
             if(_vis.isNormalEnabled())    glCallList(_meshGL[NORMAL]);
             if(_vis.isWireframeEnabled()) glCallList(_meshGL[WIRE]);
             if(_vis.isGridEnabled())      glCallList(_meshGL[GRID]);
             if(_vis.isBoxEnabled())       glCallList(_meshGL[BOX]);
+            if(_vis.isBoxActive())        glCallList(_meshGL[BOX]);
             glPopMatrix();
         }
     }
@@ -51,6 +53,7 @@ public:
         if(_vis.isWireframeEnabled()) remakeProp(WIRE);
         if(_vis.isGridEnabled())      remakeProp(GRID);
         if(_vis.isBoxEnabled())       remakeProp(BOX);
+        if(_vis.isBoxActive())        remakeProp(BOX);
     }
     //Reset the mesh visual setting
     inline void Reset()
@@ -88,6 +91,21 @@ public:
         if(_vis.isGridEnabled())      _meshGL[GRID] = makeProp(GRID);
         if(_vis.isAxisEnabled())      _meshGL[AXIS] = makeProp(AXIS);
     }
+
+    inline void set_mesh_centre(GLfloat x, GLfloat y, GLfloat z)
+    {
+        _m->set_x(x);
+        _m->set_y(y);
+        _m->set_z(z);
+    }
+
+    inline void add_mesh_centre(GLfloat x, GLfloat y, GLfloat z)
+    {
+        _m->add_x(x);
+        _m->add_y(y);
+        _m->add_z(z);
+    }
+
     //Return the bounding box of the mesh
     inline vcg::Box3d Box()
     {
@@ -103,7 +121,7 @@ public:
     //Return true if the mesh is selected
     inline bool isSelected()
     {
-        return _select;
+        return _m->is_select();
     }
 
     inline bool isDrawn()
@@ -115,20 +133,20 @@ public:
 
     inline void setSelect(bool value)
     {
-        _select = value;
+        _m->set_select(value);
     }
 
 
     // rende vero se la mesh è attiva
     inline bool isActive()
     {
-        return _active;
+        return _m->is_active();
     }
 
     // setta il flag _active della mesh
     inline void setActive(bool value)
     {
-        _active = value;
+        _m->set_active(value);;
     }
 
     /// BOX
@@ -166,6 +184,24 @@ public:
         if(_load)
         {
             _vis.Enable_Box_Solid();
+            remakeProp(BOX);
+        }
+    }
+
+    inline void EnableActiveBoundingBox()
+    {
+        if(_load)
+        {
+            _vis.Enable_Box_Active();
+            remakeProp(BOX);
+        }
+    }
+
+    inline void DisableActiveBoundingBox()
+    {
+        if(_load)
+        {
+            _vis.Disable_Box_Active();
             remakeProp(BOX);
         }
     }

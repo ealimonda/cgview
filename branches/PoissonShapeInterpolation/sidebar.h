@@ -7,6 +7,7 @@
 #include <QGroupBox>
 #include <QCheckBox>
 #include <QLayout>
+#include <QPushButton>
 #include "mesh_handler.h"
 
 class SideBar : public QWidget
@@ -28,6 +29,8 @@ private:
     QCheckBox   *_mesh_flag_active;
     QCheckBox   *_mesh_flag_draw;
 
+    QPushButton *_center_camera_button;
+
     void create_main_layout();
 
     void create_mesh_box();
@@ -42,6 +45,7 @@ signals:
 
     void ask_info(int);
     void engine_change_draw_state(int,bool);
+    void center_camera(int);
 
 public slots:
 
@@ -52,6 +56,8 @@ public slots:
     void update_mesh_info(CGMesh*);
 
     void draw_set(bool);
+
+    void camera_button_action();
 
 };
 

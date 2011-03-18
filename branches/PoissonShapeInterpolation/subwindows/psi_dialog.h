@@ -17,6 +17,7 @@ class PSI_dialog : public QDialog
     Q_OBJECT
 public:
     PSI_dialog(QDialog *parent = 0);
+    PSI_dialog(QDialog*, std::vector<CGMesh*>);
 
 
 private:
@@ -63,13 +64,16 @@ private:
     // Comboboxes
     QComboBox *_combobox[_combobox_num];
 
-
     // Edit Lines
     QLineEdit *_edit[_edit_num];
 
 
     // The layout of the dialog
     QGridLayout *_main_layout;
+
+    // meshes in the scene
+    std::vector<CGMesh*> meshes;
+
 
     // Create buttons
     void create_buttons();

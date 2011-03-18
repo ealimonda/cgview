@@ -80,10 +80,17 @@ protected:
     /// INTERACTION
     //Keyboard event handler
     void keyPressEvent(QKeyEvent *event);
+    void keyReleaseEvent(QKeyEvent *event);
     //Mouse event handler
     void mousePressEvent(QMouseEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
     void wheelEvent(QWheelEvent *event);
+
+    /// INTERACTION FLAGS
+
+    bool _shift_mode;
+    bool _rotate_mode;
+
 
 signals:
     void hasReset();
@@ -95,7 +102,8 @@ public slots:
     {
         for(unsigned int i = 0; i < _mesh.size(); i++)
         {
-            if(_mesh[i].isSelected()) _mesh[i].DisableBoundingBox();
+            if(_mesh[i].isActive())
+                _mesh[i].DisableBoundingBox();
         }
         updateGL();
     }
@@ -104,7 +112,7 @@ public slots:
     {
         for(unsigned int i = 0; i < _mesh.size(); i++)
         {
-            if(_mesh[i].isSelected()) _mesh[i].EnableWiredBoundingBox();
+            if(_mesh[i].isActive()) _mesh[i].EnableWiredBoundingBox();
         }
         updateGL();
     }
@@ -113,7 +121,7 @@ public slots:
     {
         for(unsigned int i = 0; i < _mesh.size(); i++)
         {
-            if(_mesh[i].isSelected()) _mesh[i].EnableTransBoundingBox();
+            if(_mesh[i].isActive()) _mesh[i].EnableTransBoundingBox();
         }
         updateGL();
     }
@@ -122,8 +130,22 @@ public slots:
     {
         for(unsigned int i = 0; i < _mesh.size(); i++)
         {
-            if(_mesh[i].isSelected()) _mesh[i].EnableSolidBoundingBox();
+            if(_mesh[i].isActive())
+                _mesh[i].EnableSolidBoundingBox();
         }
+        updateGL();
+    }
+
+    //Set the solid bounding box
+    inline void EnableActiveBoundingBox()
+    {
+        // disable every other active bounding box
+        for(unsigned int i = 0; i < _mesh.size(); i++)
+            if(_mesh[i].isActive())
+                _mesh[i].EnableActiveBoundingBox();
+            else
+                _mesh[i].DisableActiveBoundingBox();
+
         updateGL();
     }
 
@@ -133,7 +155,7 @@ public slots:
     {
         for(unsigned int i = 0; i < _mesh.size(); i++)
         {
-            if(_mesh[i].isSelected()) _mesh[i].DisableMesh();
+            if(_mesh[i].isActive()) _mesh[i].DisableMesh();
         }
         updateGL();
     }
@@ -142,7 +164,7 @@ public slots:
     {
         for(unsigned int i = 0; i < _mesh.size(); i++)
         {
-            if(_mesh[i].isSelected()) _mesh[i].EnablePointMesh();
+            if(_mesh[i].isActive()) _mesh[i].EnablePointMesh();
         }
         updateGL();
     }
@@ -151,7 +173,7 @@ public slots:
     {
         for(unsigned int i = 0; i < _mesh.size(); i++)
         {
-            if(_mesh[i].isSelected()) _mesh[i].EnableFlatMesh();
+            if(_mesh[i].isActive()) _mesh[i].EnableFlatMesh();
         }
         updateGL();
     }
@@ -160,7 +182,7 @@ public slots:
     {
         for(unsigned int i = 0; i < _mesh.size(); i++)
         {
-            if(_mesh[i].isSelected()) _mesh[i].EnableSmoothMesh();
+            if(_mesh[i].isActive()) _mesh[i].EnableSmoothMesh();
         }
         updateGL();
     }
@@ -169,7 +191,7 @@ public slots:
     {
         for(unsigned int i = 0; i < _mesh.size(); i++)
         {
-            if(_mesh[i].isSelected()) _mesh[i].EnableVoxel();
+            if(_mesh[i].isActive()) _mesh[i].EnableVoxel();
         }
         updateGL();
     }
@@ -180,7 +202,7 @@ public slots:
     {
         for(unsigned int i = 0; i < _mesh.size(); i++)
         {
-            if(_mesh[i].isSelected()) _mesh[i].DisableColor();
+            if(_mesh[i].isActive()) _mesh[i].DisableColor();
         }
         updateGL();
     }
@@ -189,7 +211,7 @@ public slots:
     {
         for(unsigned int i = 0; i < _mesh.size(); i++)
         {
-            if(_mesh[i].isSelected()) _mesh[i].EnableVertexColor();
+            if(_mesh[i].isActive()) _mesh[i].EnableVertexColor();
         }
         updateGL();
     }
@@ -198,7 +220,7 @@ public slots:
     {
         for(unsigned int i = 0; i < _mesh.size(); i++)
         {
-            if(_mesh[i].isSelected()) _mesh[i].EnableFaceColor();
+            if(_mesh[i].isActive()) _mesh[i].EnableFaceColor();
         }
         updateGL();
     }
@@ -207,7 +229,7 @@ public slots:
     {
         for(unsigned int i = 0; i < _mesh.size(); i++)
         {
-            if(_mesh[i].isSelected()) _mesh[i].EnableTexture();
+            if(_mesh[i].isActive()) _mesh[i].EnableTexture();
         }
         updateGL();
     }
@@ -216,7 +238,7 @@ public slots:
     {
         for(unsigned int i = 0; i < _mesh.size(); i++)
         {
-            if(_mesh[i].isSelected()) _mesh[i].EnableQualityVertex();
+            if(_mesh[i].isActive()) _mesh[i].EnableQualityVertex();
         }
         updateGL();
     }
@@ -225,7 +247,7 @@ public slots:
     {
         for(unsigned int i = 0; i < _mesh.size(); i++)
         {
-            if(_mesh[i].isSelected()) _mesh[i].EnableQualityFace();
+            if(_mesh[i].isActive()) _mesh[i].EnableQualityFace();
         }
         updateGL();
     }
@@ -234,7 +256,7 @@ public slots:
     {
         for(unsigned int i = 0; i < _mesh.size(); i++)
         {
-            if(_mesh[i].isSelected()) _mesh[i].EnableMaterial();
+            if(_mesh[i].isActive()) _mesh[i].EnableMaterial();
         }
         updateGL();
     }
@@ -245,7 +267,7 @@ public slots:
     {
         for(unsigned int i = 0; i < _mesh.size(); i++)
         {
-            if(_mesh[i].isSelected()) _mesh[i].DisableNormal();
+            if(_mesh[i].isActive()) _mesh[i].DisableNormal();
         }
         updateGL();
     }
@@ -254,7 +276,7 @@ public slots:
     {
         for(unsigned int i = 0; i < _mesh.size(); i++)
         {
-            if(_mesh[i].isSelected()) _mesh[i].ToggleNormalVertex();
+            if(_mesh[i].isActive()) _mesh[i].ToggleNormalVertex();
         }
         updateGL();
     }
@@ -263,7 +285,7 @@ public slots:
     {
         for(unsigned int i = 0; i < _mesh.size(); i++)
         {
-            if(_mesh[i].isSelected()) _mesh[i].ToggleNormalFace();
+            if(_mesh[i].isActive()) _mesh[i].ToggleNormalFace();
         }
         updateGL();
     }
@@ -274,7 +296,7 @@ public slots:
     {
         for(unsigned int i = 0; i < _mesh.size(); i++)
         {
-            if(_mesh[i].isSelected()) _mesh[i].ToggleWireframe();
+            if(_mesh[i].isActive()) _mesh[i].ToggleWireframe();
         }
         updateGL();
     }
@@ -285,7 +307,7 @@ public slots:
     {
         for(unsigned int i = 0; i < _mesh.size(); i++)
         {
-            if(_mesh[i].isSelected()) _mesh[i].ToggleGrid();
+            if(_mesh[i].isActive()) _mesh[i].ToggleGrid();
         }
         updateGL();
     }
@@ -296,7 +318,7 @@ public slots:
     {
         for(unsigned int i = 0; i < _mesh.size(); i++)
         {
-            if(_mesh[i].isSelected()) _mesh[i].ToggleAxis();
+            if(_mesh[i].isActive()) _mesh[i].ToggleAxis();
         }
         updateGL();
     }
@@ -307,7 +329,7 @@ public slots:
     {
         for(unsigned int i = 0; i < _mesh.size(); i++)
         {
-            if(_mesh[i].isSelected()) _mesh[i].setGrid(side);
+            if(_mesh[i].isActive()) _mesh[i].setGrid(side);
         }
     }
 
@@ -342,6 +364,7 @@ public slots:
         {
             _mesh[i].remakeMesh();
         }
+        EnableActiveBoundingBox();
         updateGL();
     }
 
@@ -350,6 +373,14 @@ public slots:
     inline void useAnaglyph()
     {
         if(_load) _anaglyph = !_anaglyph;
+        updateGL();
+    }
+
+    inline void update_camera(int i)
+    {
+        CGMesh *m;
+        m = _mesh[i].get_mesh();
+        _camera.setCenterXYZ(m->get_x(),m->get_y(),m->get_z());
         updateGL();
     }
 

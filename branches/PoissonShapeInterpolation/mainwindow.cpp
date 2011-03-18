@@ -8,7 +8,7 @@ MainWindow::MainWindow()
 
 
     //Setting the title of the main windows
-    this->setWindowTitle(QString("CGView - PSI version 0.1 beta"));
+    this->setWindowTitle(QString("CGView - PSI version 0.2 beta"));
 
     //Setting the minimum height and width and the initial height and width
     //this->setMinimumSize(500, 500);
@@ -410,6 +410,9 @@ void MainWindow::createConnections()
 
     /// SIDEBAR
     connect(_sideBar,SIGNAL(ask_info(int)),_engine,SLOT( respond_for_name(int)));
+    connect(_sideBar,SIGNAL(ask_info(int)),_glWindow,SLOT(EnableActiveBoundingBox()));
+    connect(_sideBar,SIGNAL(ask_info(int)),_glWindow,SLOT(update_camera(int)));
+    connect(_sideBar,SIGNAL(center_camera(int)),_glWindow,SLOT(update_camera(int)));
     connect(_sideBar,SIGNAL(engine_change_draw_state(int,bool)),_engine,SLOT( change_draw_state(int,bool)));
 
 }
@@ -506,8 +509,21 @@ void MainWindow::Normals()
 
 void MainWindow::PSI_create_interface()
 {
-    _dialog[PSI] = new PSI_dialog();
 
-    _dialog[PSI]->show();
+    if(_engine->get_mesh_number() > 1)
+    {
+        _dialog[PSI] = new PSI_dialog(0,_engine->get_meshes());
+
+        _dialog[PSI]->show();
+    }
+    else
+    {
+        QMessageBox *messagebox = new QMessageBox;
+        messagebox->setWindowTitle("Warning");
+        messagebox->setText("You need at least two meshes to interpolate");
+        messagebox->show();
+
+    }
+
 
 }

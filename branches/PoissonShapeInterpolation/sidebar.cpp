@@ -8,6 +8,7 @@ SideBar::SideBar(QWidget *parent) :
     create_mesh_box();
     create_mesh_info();
 
+    _center_camera_button = new QPushButton("Center Camera");
 
     create_main_layout();
 
@@ -38,6 +39,7 @@ void SideBar::create_main_layout()
 
     _main_layout->addWidget(_mesh_box,0,0);
     _main_layout->addWidget(_mesh_info_box,1,0);
+    _main_layout->addWidget(_center_camera_button,2,0);
 
 }
 
@@ -77,6 +79,8 @@ void SideBar::update_mesh_info(CGMesh *m)
 {
     _mesh_info_box->setTitle(m->get_name());
 
+    m->set_active(true);
+
     _mesh_flag_select->setChecked(m->is_select());
     _mesh_flag_active->setChecked(m->is_active());
     _mesh_flag_draw->setChecked(m->is_drawn());
@@ -87,6 +91,7 @@ void SideBar::create_connections()
 {
     connect(_mesh_box,SIGNAL(activated(int)),this,SLOT(info_handler(int)));
     connect(_mesh_flag_draw,SIGNAL(toggled(bool)),this,SLOT(draw_set(bool)));
+    connect(_center_camera_button,SIGNAL(clicked()),this,SLOT(camera_button_action()));
 }
 
 /// SLOTS
@@ -100,4 +105,10 @@ void SideBar::info_handler(int i)
 void SideBar::draw_set(bool state)
 {
     emit engine_change_draw_state(_mesh_box->currentIndex(),state);
+}
+
+void SideBar::camera_button_action()
+{
+    emit center_camera(_mesh_box->currentIndex());
+
 }

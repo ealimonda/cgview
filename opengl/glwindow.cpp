@@ -15,6 +15,10 @@ GLWindow::GLWindow(QWidget *parent) : QGLWidget(parent)
     _handler = NULL;
 
     _mouseSens = 0.5f;
+
+    // initialize the control status to normal camera control
+    _shift_mode = false;
+    _rotate_mode = false;
 }
 
 GLWindow::GLWindow(QWidget *parent, MeshHandler *h) : QGLWidget(parent)
@@ -28,6 +32,9 @@ GLWindow::GLWindow(QWidget *parent, MeshHandler *h) : QGLWidget(parent)
     _handler = h;
 
     _mouseSens = 0.5f;
+    // initialize the control status to normal camera control
+    _shift_mode = false;
+    _rotate_mode = false;
 }
 
 
@@ -218,10 +225,35 @@ void GLWindow::keyPressEvent(QKeyEvent *event)
             }
             break;
 
+            case Qt::Key_S:
+            {
+                _shift_mode = true;
+            }
+            break;
+
             default: break;
         }
 
         updateGL();
+    }
+}
+
+void GLWindow::keyReleaseEvent(QKeyEvent *event)
+{
+    if(_load)
+    {
+        switch(event->key())
+        {
+            case Qt::Key_S:
+            {
+                _shift_mode = false;
+            }
+            break;
+
+            default: break;
+        }
+
+    updateGL();
     }
 }
 
@@ -246,18 +278,37 @@ void GLWindow::mouseMoveEvent(QMouseEvent *event)
 
     if(_load)
     {
-        if (event->buttons() & Qt::LeftButton)
+        if(_shift_mode)
         {
-            _camera.rotateVR(vcg::math::ToRad((float)-dy * _mouseSens));
-            _camera.rotateVUp(vcg::math::ToRad((float)-dx * _mouseSens));
-        }
+            std::cout << "Sono in shift mode" << std::endl;
+            _mouseSens = _mouseSens/20;
+            for(int i=0 ; i < _mesh.size(); i++)
+            {
+                if(_mesh[i].isActive())
+                  if (event->buttons() & Qt::LeftButton)
+                    {
+                    std::cout << "Dovrei muovere la mesh" << std::endl;
+                     _mesh[i].add_mesh_centre(dx*_mouseSens,dy*(-_mouseSens),0);
+                    }
 
-        if (event->buttons() & Qt::RightButton)
+
+            }
+            _mouseSens = _mouseSens*20;
+        }
+        else
         {
-            _camera.rotateVR(vcg::math::ToRad((float)-dy * _mouseSens));
-            _camera.rotateDir(vcg::math::ToRad((float)dx * _mouseSens));
-        }
+            if (event->buttons() & Qt::LeftButton)
+         {
+             _camera.rotateVR(vcg::math::ToRad((float)-dy * _mouseSens));
+             _camera.rotateVUp(vcg::math::ToRad((float)-dx * _mouseSens));
+         }
 
+         if (event->buttons() & Qt::RightButton)
+         {
+             _camera.rotateVR(vcg::math::ToRad((float)-dy * _mouseSens));
+             _camera.rotateDir(vcg::math::ToRad((float)dx * _mouseSens));
+         }
+        }
         _lastPos = event->pos();
 
         updateGL();
@@ -319,5 +370,7 @@ void GLWindow::addMesh(CGMesh* m)
     UpdateWindow();
     UpdateWindow();
 }
+
+
 
 

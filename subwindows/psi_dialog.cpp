@@ -1,7 +1,7 @@
 #include "psi_dialog.h"
 
 PSI_dialog::PSI_dialog(QDialog *parent) : QDialog(parent)
-{
+{    
     //Setting the title of the main windows
     this->setWindowTitle(QString("Shape Interpolation"));
 
@@ -30,6 +30,37 @@ PSI_dialog::PSI_dialog(QDialog *parent) : QDialog(parent)
 
 }
 
+PSI_dialog::PSI_dialog(QDialog *parent, std::vector<CGMesh*> m) : QDialog(parent)
+{
+    meshes = m;
+
+    //Setting the title of the main windows
+    this->setWindowTitle(QString("Shape Interpolation"));
+
+    this->setModal(true);
+
+    //Setting the minimum height and width and the initial height and width
+    this->setFixedSize(400,200);
+    this->setContentsMargins(0, 0, 0, 0);
+
+    // create dialog buttons
+    create_buttons();
+
+//    // create the line edits to read the file names
+//    create_edits();
+
+    create_combobox();
+
+    // set up the layout
+    create_main_layout();
+
+    this->setLayout(_main_layout);
+
+    // create the connections
+
+//    createConnections();
+
+}
 
 void PSI_dialog::create_buttons()
 {
@@ -79,8 +110,16 @@ void PSI_dialog::createConnections()
 
 void PSI_dialog::create_combobox()
 {
+    int i;
+
     _combobox[C_SELECT_1] = new QComboBox;
     _combobox[C_SELECT_2] = new QComboBox;
+
+    for ( i = 0; i < meshes.size() ; i++)
+    {
+        _combobox[C_SELECT_1]->addItem(meshes[i]->get_name(),NULL);
+        _combobox[C_SELECT_2]->addItem(meshes[i]->get_name(),NULL);
+    }
 }
 
 void PSI_dialog::choose_mesh_file()

@@ -26,11 +26,15 @@ GLuint GLMesh::makeProp(MeshProp p = MESH)
             */
 
             //WIRED BOUNDING BOX
-            if(_vis.isBoxWired())
+            if(_vis.isBoxWired()  || _vis.isBoxActive())
             {
                 glPushMatrix();
                 glDisable(GL_LIGHTING);
-                glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+
+                if(_vis.isBoxActive())
+                    glColor4f(1.0f, 1.0f, 0.0f, 1.0f);
+                else
+                    glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 
                 glLineWidth(1.5f);
 

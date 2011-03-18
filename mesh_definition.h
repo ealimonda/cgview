@@ -30,6 +30,7 @@
 #include <vcg/complex/trimesh/base.h>
 
 #include <QString>
+#include <GL/gl.h>
 
 //class CGEdge;
 class CGFace;
@@ -62,7 +63,13 @@ public:
         _draw   = true;
         _active = false;
 
+        // set a default name
         _name = "new_mesh";
+
+        // set the centre as the origin
+        _x = 0.0f;
+        _y = 0.0f;
+        _z = 0.0f;
     }
 
     inline void set_name(QString name)
@@ -79,7 +86,21 @@ public:
     inline bool is_active(){return _active;}
     inline bool is_drawn(){return _draw;}
 
+    inline GLfloat get_x() {return _x;}
+    inline GLfloat get_y() {return _y;}
+    inline GLfloat get_z() {return _z;}
+
+    inline void set_x(GLfloat x) { _x = x;}
+    inline void set_y(GLfloat y) { _y = y;}
+    inline void set_z(GLfloat z) { _z = z;}
+
+    inline void add_x(GLfloat x) { _x = _x + x;}
+    inline void add_y(GLfloat y) { _y = _y + y;}
+    inline void add_z(GLfloat z) { _z = _z + z;}
+
     inline void set_drawn(bool state) { _draw = state;}
+    inline void set_select(bool state){ _select = state;}
+    inline void set_active(bool state){ _active = state;}
 
 private:
 
@@ -90,7 +111,14 @@ private:
     // True if the mesh is active
     bool _active;
 
+    // mesh name for GUI reference
     QString _name;
+
+    // center coordinates
+    GLfloat _x;
+    GLfloat _y;
+    GLfloat _z;
+
 
 };
 

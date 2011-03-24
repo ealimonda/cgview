@@ -352,5 +352,63 @@ void Engine::my_filter()
 
 }
 
+void Engine::sigma_coord(CGMesh* m)
+{
+    // creo un iteratore per i vertici
+    CGMesh::VertexIterator vi;
+    // ciclo su ogni vertice
+    for(vi = m->vert.begin(); vi!=m->vert.end(); ++vi )
+        {
+           // itero sulle facce che contengono quel vertice
+           vcg::face::VFIterator<CGFace> f_it(&(*vi));
+           // marco il vertice comune a tutte le facce
+           vcg::tri::Mark(*m,f_it.V());
+           // conto il grado di valenza
+           int d = 0;
+           for(;!f_it.End();++f_it)
+             {
 
+               for(int i = 0; i < 3 ; i++)
+               {
+                // se il vertice non è marcato
+                if(!vcg::tri::IsMarked(*m,f_it.F()->V(i)))
+                   {
+                    // Aumento il grado di valenza
+                    d++;
+                    // Marco il vertice
+                    vcg::tri::Mark(*m,f_it.F()->V(i));
+                   }
+
+
+             }
+             // smarco tutto
+               vcg::tri::UnMarkAll(*m);
+
+             // ricreo l'iteratore delle facce
+               vcg::face::VFIterator<CGFace> f_it(&(*vi));
+
+             // ora calcolo le coordinate effettive
+               for(;!f_it.End();++f_it)
+                 {
+
+                   for(int i = 0; i < 3 ; i++)
+                   {
+                    int sum = 0;
+                    // faccio la somma di tutti i vertici adiacenti
+                    if(!vcg::tri::IsMarked(*m,f_it.F()->V(i)))
+                       {
+//                         sum = sum +
+                       }
+
+
+                 }
+
+
+
+         }
+
+
+
+       }
+}
 

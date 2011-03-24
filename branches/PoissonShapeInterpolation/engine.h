@@ -177,5 +177,7 @@ class Engine : public QObject
 	**/
 	bool create_from_file( QString filename );
 
+        void sigma_coord(CGMesh*);
+
 
 };

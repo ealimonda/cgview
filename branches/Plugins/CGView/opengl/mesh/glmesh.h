@@ -1,5 +1,21 @@
-#ifndef GLMESH_H
-#define GLMESH_H
+/******************************************************************************
+ *        CCCCCCC     GGGGGGG   VV     VV   II   EEEEEEEEE   WW       WW      *
+ *      CC          GG           VV   VV    II   EE          WW       WW      *
+ *      CC          GG     GG     VV VV     II   EEEEEE       WW  W  WW       *
+ *      CC          GG     GG      VVV      II   EE            WW W WW        *
+ *        CCCCCCC     GGGGGGG       V       II   EEEEEEEEE      W   W         *
+ ******************************************************************************
+ * University of Cagliari, Italy - Computer Graphics Group                    *
+ * Filename: glmesh.h                                                         *
+ * Description: OpenGL mesh hadling functions                                 *
+ ******************************************************************************
+ * $Id::                                                       $: SVN Info    *
+ * $Date::                                                     $: Last date   *
+ * $Author::                                                   $: Last author *
+ * $Revision::                                                 $: Revision    *
+ ******************************************************************************/
+#ifndef CGVIEW_OPENGL_MESH_GLMESH_H
+#define CGVIEW_OPENGL_MESH_GLMESH_H
 
 #include <QtOpenGL/QtOpenGL>
 #include "mesh_definition.h"

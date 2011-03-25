@@ -1,15 +1,21 @@
-/**********************************************************************
-*                                                                     *
-*    CCCCCCCCCC  GGGGGGGGGG  VV        VV                             *
-*    CC          GG           VV      VV   II   EEEEE    W       W    *
-*    CC          GG            VV    VV        E     E   W       W    *
-*    CC          GG    GGGG     VV  VV     II  EEEEEE    W   W   W    *
-*    CC          GG      GG      VVVV      II  E         W   W   W    *
-*    CCCCCCCCCC  GGGGGGGGGG       VV       II   EEEEEE    WWW WWW     *
-*                                                                     *
-**********************************************************************/
-#ifndef GLWINDOW_H
-#define GLWINDOW_H
+/******************************************************************************
+ *        CCCCCCC     GGGGGGG   VV     VV   II   EEEEEEEEE   WW       WW      *
+ *      CC          GG           VV   VV    II   EE          WW       WW      *
+ *      CC          GG     GG     VV VV     II   EEEEEE       WW  W  WW       *
+ *      CC          GG     GG      VVV      II   EE            WW W WW        *
+ *        CCCCCCC     GGGGGGG       V       II   EEEEEEEEE      W   W         *
+ ******************************************************************************
+ * University of Cagliari, Italy - Computer Graphics Group                    *
+ * Filename: glwindow.h                                                       *
+ * Description: Definition of the OpenGL window for CGView                    *
+ ******************************************************************************
+ * $Id::                                                       $: SVN Info    *
+ * $Date::                                                     $: Last date   *
+ * $Author::                                                   $: Last author *
+ * $Revision::                                                 $: Revision    *
+ ******************************************************************************/
+#ifndef CGVIEW_OPENGL_GLWINDOW_H
+#define CGVIEW_OPENGL_GLWINDOW_H
 
 #include <QtOpenGL/QGLWidget>
 #include "mesh_definition.h"

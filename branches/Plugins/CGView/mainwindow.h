@@ -1,5 +1,21 @@
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+/******************************************************************************
+ *        CCCCCCC     GGGGGGG   VV     VV   II   EEEEEEEEE   WW       WW      *
+ *      CC          GG           VV   VV    II   EE          WW       WW      *
+ *      CC          GG     GG     VV VV     II   EEEEEE       WW  W  WW       *
+ *      CC          GG     GG      VVV      II   EE            WW W WW        *
+ *        CCCCCCC     GGGGGGG       V       II   EEEEEEEEE      W   W         *
+ ******************************************************************************
+ * University of Cagliari, Italy - Computer Graphics Group                    *
+ * Filename: mainwindow.h                                                     *
+ * Description: Application's MainWindow definition                           *
+ ******************************************************************************
+ * $Id::                                                       $: SVN Info    *
+ * $Date::                                                     $: Last date   *
+ * $Author::                                                   $: Last author *
+ * $Revision::                                                 $: Revision    *
+ ******************************************************************************/
+#ifndef CGVIEW_MAINWINDOW_H
+#define CGVIEW_MAINWINDOW_H
 
 #include <QMainWindow>
 #include "engine.h"

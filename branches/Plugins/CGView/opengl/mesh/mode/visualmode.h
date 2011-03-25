@@ -1,43 +1,53 @@
-#ifndef VISUALMODE_H
-#define VISUALMODE_H
+/******************************************************************************
+ *        CCCCCCC     GGGGGGG   VV     VV   II   EEEEEEEEE   WW       WW      *
+ *      CC          GG           VV   VV    II   EE          WW       WW      *
+ *      CC          GG     GG     VV VV     II   EEEEEE       WW  W  WW       *
+ *      CC          GG     GG      VVV      II   EE            WW W WW        *
+ *        CCCCCCC     GGGGGGG       V       II   EEEEEEEEE      W   W         *
+ ******************************************************************************
+ * University of Cagliari, Italy - Computer Graphics Group                    *
+ * Filename: visualmode.h                                                     *
+ * Description: Visualization modes                                           *
+ ******************************************************************************
+ * $Id::                                                       $: SVN Info    *
+ * $Date::                                                     $: Last date   *
+ * $Author::                                                   $: Last author *
+ * $Revision::                                                 $: Revision    *
+ ******************************************************************************/
+#ifndef CGVIEW_OPENGL_MESH_MODE_VISUALMODE_H
+#define CGVIEW_OPENGL_MESH_MODE_VISUALMODE_H
 
-/*
- Visualization Modes:
-  - BOX       : disable the bounding box visualization, or enable one of its three forms (wired, transparent and solid)
-  - MESH      : disable the mesh visualization, or enable one of its forms (points, flat shaded, smooth shaded, voxel)
-  - COLOR     : disable the colors, or enable one of its forms (vertex, face, texture, vertex quality, face quality, material)
-  - NORMAL    : disable or enable the normals visualization (per vertex or per face)
-  - WIREFRAME : disable or enable the wireframe visualization (used also to make the flat lines visualization)
-  - GRID      : disable or enable the grid visualization
-  - AXIS      : disable or enable the axis visualization
+/**
+ * Visualization Modes:
+ * - BOX       : disable the bounding box visualization, or enable one of its three forms (wired, transparent and solid)
+ * - MESH      : disable the mesh visualization, or enable one of its forms (points, flat shaded, smooth shaded, voxel)
+ * - COLOR     : disable the colors, or enable one of its forms (vertex, face, texture, vertex quality, face quality, material)
+ * - WIREFRAME : disable or enable the wireframe visualization (used also to make the flat lines visualization)
+ *
+ * The representation is the following (4 byte):
+ *	xxBB xMMM xCCC xxxx xWxx xxxx xxxx xxxx
+ * where 'B' is a bit for the bounding box, 'M' a bit for the mesh, 'C' for color, 'W' for wireframe,
+ * The 'x' stands for an unused bit, so there is enough space for futher expantions.
+ */
 
-
- The rappresentation is the following (4 byte):
-
-        xxBB xMMM xCCC xxNN xWGA xxxx xxxx xxxx
-
- where 'B' is a bit for the bounding box, 'M' a bit for the mesh, 'C' for color, 'N' for normal, 'W' for wireframe,
- 'G' for grid and 'A' for axis.
- The 'x' stands for an unused bit, so there is enough space for futher expantions.
-*/
 class VisualMode
 {
 public:
-    //Constructor
-    inline VisualMode() { Reset(); }
-    //Deconstructor
-    inline ~VisualMode() { }
+	/** Constructor */
+	inline VisualMode() { this->reset(); }
+	/** Destructor */
+	inline ~VisualMode() {}
 
-    //Reset the visualization mode
-    inline void Reset()
-    {
-        //Reset the status
-        _status = VIS_RESET;
-        //Setting the mesh to flat shading
-        _status = _status | VIS_MESH_FLAT;
-    }
+	/** Reset the visualization mode */
+	inline void reset(void)
+	{
+		// Reset the status
+		this->_status = kVisReset;
+		// Setting the mesh to flat shading
+		this->_status |= kVisMeshFlat;
+	}
 
-    /// BOUNDING BOX
+	/// BOUNDING BOX
     //Disable the bounding box
     inline void Disable_Box()
     {
@@ -85,7 +95,7 @@ public:
         return ((_status & VIS_BOX_WIRED) && (_status & VIS_BOX_TRANS));
     }
 
-    /// MESH
+	/// MESH
     //Disable the mesh visualization
     inline void Disable_Mesh()
     {
@@ -143,7 +153,7 @@ public:
         return (_status & VIS_MESH_VOXEL);
     }
 
-    /// COLOR
+	/// COLOR
     //Disable the colors visualization
     inline void Disable_Color()
     {
@@ -221,7 +231,7 @@ public:
         return (!(_status & VIS_COLOR_VERTEX) && (_status & VIS_COLOR_FACE) && (_status & VIS_COLOR_QUALITY_V));
     }
 
-    /// NORMAL
+	/// NORMAL
     //Disable the vertex and the face normals
     inline void Disable_Normal()
     {
@@ -269,7 +279,7 @@ public:
         return (_status & VIS_NORMAL_FACE);
     }
 
-    /// WIREFRAME
+	/// WIREFRAME
     //Disable the wireframe visualization
     inline void Disable_Wireframe()
     {
@@ -292,7 +302,7 @@ public:
         return _status & VIS_WIRE_ENABLE;
     }
 
-    /// GRID
+	/// GRID
     //Disable the grid visualization
     inline void Disable_Grid()
     {
@@ -315,7 +325,7 @@ public:
         return _status & VIS_GRID_ENABLE;
     }
 
-    /// AXIS
+	/// AXIS
     //Disable the axis visualization
     inline void Disable_Axis()
     {

@@ -1,43 +1,48 @@
-/**********************************************************************
-*                                                                     *
-*    CCCCCCCCCC  GGGGGGGGGG  VV        VV                             *
-*    CC          GG           VV      VV   II   EEEEE    W       W    *
-*    CC          GG            VV    VV        E     E   W       W    *
-*    CC          GG    GGGG     VV  VV     II  EEEEEE    W   W   W    *
-*    CC          GG      GG      VVVV      II  E         W   W   W    *
-*    CCCCCCCCCC  GGGGGGGGGG       VV       II   EEEEEE    WWW WWW     *
-*                                                                     *
-**********************************************************************/
+/******************************************************************************
+ *        CCCCCCC     GGGGGGG   VV     VV   II   EEEEEEEEE   WW       WW      *
+ *      CC          GG           VV   VV    II   EE          WW       WW      *
+ *      CC          GG     GG     VV VV     II   EEEEEE       WW  W  WW       *
+ *      CC          GG     GG      VVV      II   EE            WW W WW        *
+ *        CCCCCCC     GGGGGGG       V       II   EEEEEEEEE      W   W         *
+ ******************************************************************************
+ * University of Cagliari, Italy - Computer Graphics Group                    *
+ * Filename: glcamera.h                                                       *
+ * Description: OpenGL Camera                                                 *
+ ******************************************************************************
+ * $Id::                                                       $: SVN Info    *
+ * $Date::                                                     $: Last date   *
+ * $Author::                                                   $: Last author *
+ * $Revision::                                                 $: Revision    *
+ ******************************************************************************/
+#ifndef CGVIEW_OPENGL_SCENE_CAMERA_GLCAMERA_H
+#define CGVIEW_OPENGL_SCENE_CAMERA_GLCAMERA_H
 
+/**
+ * La classe GLCamera Ã¨ ancora in fase di costruzione
+ *
+ * La classe definisce un oggetto GLCamera che altro non Ã¨ che
+ * il metodo di proiezione all'interno di OpenGL.
+ * Serve per snellire il codice, e poter gestire meglio e in maniera
+ * piÃ¹ semplice la visuale della scena.
+ *
+ * Per ora fa solo la vista in prospettiva, ma con qualche modifica Ã¨ possibile avere tutte le viste
+ *
+ * Le rotazioni sono solo attorno all'origine. Si potrebbe cambiare e farle anche attorno al centro
+ * oppure attorno a un punto qualsiasi.
+ */
 
-/*
-  La classe GLCamera è ancora in fase di costruzione
-
-  La classe definisce un oggetto GLCamera che altro non è che
-  il metodo di proiezione all'interno di OpenGL.
-  Serve per snellire il codice, e poter gestire meglio e in maniera
-  più semplice la visuale della scena.
-
-
-  Per ora fa solo la vista in prospettiva, ma con qualche modifica è possibile avere tutte le viste
-
-  Le rotazioni sono solo attorno all'origine. Si potrebbe cambiare e farle anche attorno al centro
-  oppure attorno a un punto qualsiasi.
-*/
-
-
-#ifndef GLCAMERA_H
-#define GLCAMERA_H
-
-#include <QtOpenGL/QtOpenGL>
+#include <QtOpenGL>
 #include "mesh_definition.h"
 
 
 class GLCamera
 {
-    public:
-
-            enum EyePosition { EYE_CENTER, EYE_LEFT, EYE_RIGHT };
+public:
+	enum EyePosition {
+		kEyePositionCenter,
+		kEyePositionLeft,
+		kEyePositionRight,
+	};
 
             GLCamera();
             GLCamera(float width);
@@ -160,13 +165,8 @@ class GLCamera
             void rotateVR(float angle);
             void rotateDir(float angle);
 
-
-
-
-
-
-            //----------- RESET -----------//
-            void Reset();
+	/** RESET */
+	void reset(void);
 
      private:
 

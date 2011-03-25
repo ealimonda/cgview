@@ -1,17 +1,21 @@
-/**********************************************************************
-*                                                                     *
-*    CCCCCCCCCC  GGGGGGGGGG  VV        VV                             *
-*    CC          GG           VV      VV   II   EEEEE    W       W    *
-*    CC          GG            VV    VV        E     E   W       W    *
-*    CC          GG    GGGG     VV  VV     II  EEEEEE    W   W   W    *
-*    CC          GG      GG      VVVV      II  E         W   W   W    *
-*    CCCCCCCCCC  GGGGGGGGGG       VV       II   EEEEEE    WWW WWW     *
-*                                                                     *
-**********************************************************************/
-
-
-#ifndef GLLIGHT_H
-#define GLLIGHT_H
+/******************************************************************************
+ *        CCCCCCC     GGGGGGG   VV     VV   II   EEEEEEEEE   WW       WW      *
+ *      CC          GG           VV   VV    II   EE          WW       WW      *
+ *      CC          GG     GG     VV VV     II   EEEEEE       WW  W  WW       *
+ *      CC          GG     GG      VVV      II   EE            WW W WW        *
+ *        CCCCCCC     GGGGGGG       V       II   EEEEEEEEE      W   W         *
+ ******************************************************************************
+ * University of Cagliari, Italy - Computer Graphics Group                    *
+ * Filename: gllight.h                                                        *
+ * Description: OpenGL Lights                                                 *
+ ******************************************************************************
+ * $Id::                                                       $: SVN Info    *
+ * $Date::                                                     $: Last date   *
+ * $Author::                                                   $: Last author *
+ * $Revision::                                                 $: Revision    *
+ ******************************************************************************/
+#ifndef CGVIEW_OPENGL_SCENE_LIGHT_GLLIGHT_H
+#define CGVIEW_OPENGL_SCENE_LIGHT_GLLIGHT_H
 
 #include <QtOpenGL/QtOpenGL>
 #include "mesh_definition.h"
@@ -19,7 +23,17 @@
 
 class GLLight
 {
-    public:
+public:
+	enum ColorChannel
+	{
+		kChannelRed = 0,
+		kChannelGreen,
+		kChannelBlue,
+		kChannelAlpha,
+		kChannelsMax,
+		kChannelsRGB = kChannelBlue+1,
+		kChannelsRGBA = kChannelAlpha+1,
+	};
 
             GLLight();
 

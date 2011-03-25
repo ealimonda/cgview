@@ -49,8 +49,8 @@ public:
     inline void Reset()
     {
         _vis.Reset();
-        _mat.Reset();
-        _mat.setMaterial(GLMaterial::CHROME);
+	_mat.reset();
+	_mat.setMaterial(GLMaterial::kMaterialChrome);
 
         _meshGL[BOX] = 0;
         _meshGL[MESH] = 0;
@@ -271,7 +271,7 @@ public:
         if(_load)
         {
             _vis.Enable_Color_Material();
-            _mat.Reset();
+	    _mat.reset();
             _mat.setMaterial(rand()%20);
             //_mat.setMaterial(GLMaterial::CHROME);
             if(_vis.isMeshEnabled()) remakeProp(MESH);

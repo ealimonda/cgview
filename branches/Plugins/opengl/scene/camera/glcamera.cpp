@@ -2,12 +2,12 @@
 
 GLCamera::GLCamera()
 {
-    Reset();
+	reset();
 }
 
 GLCamera::GLCamera(float width)
 {
-    Reset();
+	reset();
     fitWidth(width);
 }
 
@@ -24,13 +24,13 @@ void GLCamera::camPosition(EyePosition e)
     glLoadIdentity();
     switch(e)
     {
-        case EYE_CENTER:
+	case kEyePositionCenter:
         {
             gluLookAt(eye[0], eye[1], eye[2], center[0], center[1], center[2], vup[0], vup[1], vup[2]);
         }
         break;
 
-        case EYE_LEFT:
+	case kEyePositionLeft:
         {
             gluLookAt(eye[0] + (-distance / 30.0f) * vr[0],
                       eye[1] + (-distance / 30.0f) * vr[1],
@@ -40,7 +40,7 @@ void GLCamera::camPosition(EyePosition e)
         }
         break;
 
-        case EYE_RIGHT:
+	case kEyePositionRight:
         {
             gluLookAt(eye[0] + (distance / 30.0f) * vr[0],
                       eye[1] + (distance / 30.0f) * vr[1],
@@ -122,7 +122,7 @@ void GLCamera::rotateDir(float angle)
     vr  = r * vr;
 }
 
-void GLCamera::Reset()
+void GLCamera::reset(void)
 {
     center = CGPoint(0.0f, 0.0f, 0.0f);
     eye = CGPoint(0.0f, 0.0f, -1.0f);

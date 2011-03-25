@@ -78,7 +78,7 @@ void GLWindow::paintGL()
         {
             drawGradient();
             _camera.camProjection();
-            _camera.camPosition(GLCamera::EYE_CENTER);
+	    _camera.camPosition(GLCamera::kEyePositionCenter);
 
             glPushMatrix();
             for(unsigned int i = 0; i < _mesh.size(); i++)
@@ -97,7 +97,7 @@ void GLWindow::paintGL()
             /* Left eye */
             glColorMask(GL_TRUE,GL_FALSE,GL_FALSE,GL_TRUE);
             _camera.camProjection();
-            _camera.camPosition(GLCamera::EYE_LEFT);
+	    _camera.camPosition(GLCamera::kEyePositionLeft);
 
             for(unsigned int i = 0; i < _mesh.size(); i++)
             {
@@ -115,7 +115,7 @@ void GLWindow::paintGL()
             /* Right eye */
             glColorMask(GL_FALSE,GL_TRUE,GL_TRUE,GL_TRUE);
             _camera.camProjection();
-            _camera.camPosition(GLCamera::EYE_CENTER);
+	    _camera.camPosition(GLCamera::kEyePositionCenter);
 
             for(unsigned int i = 0; i < _mesh.size(); i++)
             {
@@ -259,7 +259,7 @@ void GLWindow::Reset()
     _load = false;
     _anaglyph = false;
 
-    _camera.Reset();
+    _camera.reset();
     _camera.setAspect((float)this->width() / (float)this->height());
 
     for(unsigned int i = 0; i < _mesh.size(); i++)

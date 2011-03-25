@@ -1,68 +1,84 @@
+/******************************************************************************
+ *        CCCCCCC     GGGGGGG   VV     VV   II   EEEEEEEEE   WW       WW      *
+ *      CC          GG           VV   VV    II   EE          WW       WW      *
+ *      CC          GG     GG     VV VV     II   EEEEEE       WW  W  WW       *
+ *      CC          GG     GG      VVV      II   EE            WW W WW        *
+ *        CCCCCCC     GGGGGGG       V       II   EEEEEEEEE      W   W         *
+ ******************************************************************************
+ * University of Cagliari, Italy - Computer Graphics Group                    *
+ * Filename: gllight.cpp                                                      *
+ * Description: OpenGL Lights                                                 *
+ ******************************************************************************
+ * $Id::                                                       $: SVN Info    *
+ * $Date::                                                     $: Last date   *
+ * $Author::                                                   $: Last author *
+ * $Revision::                                                 $: Revision    *
+ ******************************************************************************/
 #include "gllight.h"
 
-GLLight::GLLight()
+GLLight::GLLight(void)
 {
-    reset();
+	this->reset();
 }
 
-void GLLight::getLight()
+void GLLight::getLight(void)
 {
-    glPushMatrix();
+	glPushMatrix();
 
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-    //if(on) glEnable(GL_LIGHT0);
-    //else glDisable(GL_LIGHT0);
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+	//if(on) glEnable(GL_LIGHT0);
+	//else glDisable(GL_LIGHT0);
 
-    glLightfv(GL_LIGHT0, GL_AMBIENT,                ambient);
-    glLightfv(GL_LIGHT0, GL_DIFFUSE,                diffuse);
-    glLightfv(GL_LIGHT0, GL_SPECULAR,               specular);
-    glLightfv(GL_LIGHT0, GL_POSITION,               position);
-    glLightfv(GL_LIGHT0, GL_SPOT_DIRECTION,         direction);
-    glLightfv(GL_LIGHT0, GL_SPOT_EXPONENT,          exponent);
-    glLightfv(GL_LIGHT0, GL_SPOT_CUTOFF,            cutoff);
-    glLightfv(GL_LIGHT0, GL_CONSTANT_ATTENUATION,   att_const);
-    glLightfv(GL_LIGHT0, GL_LINEAR_ATTENUATION,     att_lin);
-    glLightfv(GL_LIGHT0, GL_QUADRATIC_ATTENUATION,  att_quad);
+	glLightfv(GL_LIGHT0, GL_AMBIENT,		this->_ambient);
+	glLightfv(GL_LIGHT0, GL_DIFFUSE,		this->_diffuse);
+	glLightfv(GL_LIGHT0, GL_SPECULAR,		this->_specular);
+	glLightfv(GL_LIGHT0, GL_POSITION,		this->_position);
+	glLightfv(GL_LIGHT0, GL_SPOT_DIRECTION,	this->_direction);
+	glLightfv(GL_LIGHT0, GL_SPOT_EXPONENT,		this->_exponent);
+	glLightfv(GL_LIGHT0, GL_SPOT_CUTOFF,		this->_cutoff);
+	glLightfv(GL_LIGHT0, GL_CONSTANT_ATTENUATION,	this->_att_const);
+	glLightfv(GL_LIGHT0, GL_LINEAR_ATTENUATION,	this->_att_lin);
+	glLightfv(GL_LIGHT0, GL_QUADRATIC_ATTENUATION,	this->_att_quad);
 
-    glPopMatrix();
+	glPopMatrix();
 }
 
-void GLLight::reset()
+void GLLight::reset(void)
 {
-    ambient[0] = 0.0f;
-    ambient[1] = 0.0f;
-    ambient[2] = 0.0f;
-    ambient[3] = 1.0f;
+	this->_ambient[kChannelRed] = 0.0f;
+	this->_ambient[kChannelGreen] = 0.0f;
+	this->_ambient[kChannelBlue] = 0.0f;
+	this->_ambient[kChannelAlpha] = 1.0f;
 
-    diffuse[0] = 1.0f;
-    diffuse[1] = 1.0f;
-    diffuse[2] = 1.0f;
-    diffuse[3] = 1.0f;
+	this->_diffuse[kChannelRed] = 1.0f;
+	this->_diffuse[kChannelGreen] = 1.0f;
+	this->_diffuse[kChannelBlue] = 1.0f;
+	this->_diffuse[kChannelAlpha] = 1.0f;
 
-    specular[0] = 1.0f;
-    specular[1] = 1.0f;
-    specular[2] = 1.0f;
-    specular[3] = 1.0f;
+	this->_specular[kChannelRed] = 1.0f;
+	this->_specular[kChannelGreen] = 1.0f;
+	this->_specular[kChannelBlue] = 1.0f;
+	this->_specular[kChannelAlpha] = 1.0f;
 
-    position[0] = 0.0f;
-    position[1] = 0.0f;
-    position[2] = 1.0f;
-    position[3] = 0.0f;
+	this->_position[kCoordX] = 0.0f;
+	this->_position[kCoordY] = 0.0f;
+	this->_position[kCoordZ] = 1.0f;
+	this->_position[kCoordW] = 0.0f;
 
-    direction[0] = 0.0f;
-    direction[1] = 0.0f;
-    direction[2] = -1.0f;
+	this->_direction[kCoordX] = 0.0f;
+	this->_direction[kCoordY] = 0.0f;
+	this->_direction[kCoordZ] = -1.0f;
 
-    exponent[0] = 0.0f;
+	this->_exponent[0] = 0.0f;
 
-    cutoff[0] = 180.0f;
+	this->_cutoff[0] = 180.0f;
 
-    att_const[0] = 1.0f;
+	this->_att_const[0] = 1.0f;
 
-    att_lin[0] = 0.0f;
+	this->_att_lin[0] = 0.0f;
 
-    att_quad[0] = 0.0f;
+	this->_att_quad[0] = 0.0f;
 
-    on = false;
+	this->_on = false;
 }

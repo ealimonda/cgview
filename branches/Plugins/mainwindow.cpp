@@ -308,17 +308,17 @@ void MainWindow::createConnections()
 {
     /// GENERAL -------------------------------------------
     connect(_engine, SIGNAL(sendDcel(CGMesh*)), _glWindow, SLOT(addMesh(CGMesh*)));
-    connect(_engine, SIGNAL(sendDcel(CGMesh*)), _statusBar, SLOT(Reset()));
+    connect(_engine, SIGNAL(sendDcel(CGMesh*)), _statusBar, SLOT(reset()));
     connect(_engine, SIGNAL(sendInfo(const unsigned int, const unsigned int, const unsigned int)), _statusBar, SLOT(setInfo(const unsigned int, const unsigned int, const unsigned int)));
     connect(_engine, SIGNAL(sendDcel(CGMesh*)), this, SLOT(endIntro()));
-    connect(_engine, SIGNAL(UpdateWindow()),    _glWindow, SLOT(UpdateWindow()));
+    connect(_engine, SIGNAL(updateWindow()),    _glWindow, SLOT(UpdateWindow()));
 
 
 
     /// FILE ----------------------------------------------
-    connect(_action[ACTION_FILE_OPEN],   SIGNAL(triggered()), _engine, SLOT(open_file()));
-    //connect(_action[ACTION_FILE_ADD],   SIGNAL(triggered()), _engine, SLOT(open_file()));
-    connect(_action[ACTION_FILE_SAVEAS], SIGNAL(triggered()), _engine, SLOT(save_file()));
+    connect(_action[ACTION_FILE_OPEN],   SIGNAL(triggered()), _engine, SLOT(openFile()));
+    //connect(_action[ACTION_FILE_ADD],   SIGNAL(triggered()), _engine, SLOT(openFile()));
+    connect(_action[ACTION_FILE_SAVEAS], SIGNAL(triggered()), _engine, SLOT(saveFile()));
     //connect(_action[ACTION_FILE_SAVE],   SIGNAL(triggered()), , SLOT());
     //connect(_action[ACTION_FILE_CLOSE],  SIGNAL(triggered()), , SLOT());
     //connect(_action[ACTION_FILE_CLOSE],  SIGNAL(triggered()), this, SLOT(endIntro()));
@@ -386,7 +386,7 @@ void MainWindow::createConnections()
 
 
     /// TOOL ----------------------------------------------
-    connect(_action[ACTION_TOOL_CONVEXHULL], SIGNAL(triggered()), _engine, SLOT(calculate_ch()));
+    connect(_action[ACTION_TOOL_CONVEXHULL], SIGNAL(triggered()), _engine, SLOT(calculateCH()));
 
     //TOOL SUBMENU
 

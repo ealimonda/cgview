@@ -17,9 +17,8 @@
 #ifndef CGVIEW_OPENGL_SCENE_LIGHT_GLLIGHT_H
 #define CGVIEW_OPENGL_SCENE_LIGHT_GLLIGHT_H
 
-#include <QtOpenGL/QtOpenGL>
-#include "mesh_definition.h"
-
+#include <QtOpenGL> // GL_*
+#include "mesh_definition.h" // CGPoint
 
 class GLLight
 {
@@ -35,181 +34,215 @@ public:
 		kChannelsRGBA = kChannelAlpha+1,
 	};
 
-            GLLight();
+	GLLight();
 
-            void getLight();
+	void getLight(void);
 
-            //----------- LIT -----------//
-            //inline bool isOn() { return on; }
-            //inline void TurnLight(bool b) { on = b; }
-            inline void TurnLight(bool b) { if(b) glEnable(GL_LIGHT0); else glEnable(GL_LIGHT0); }
+	/** LIT */
+	//inline bool isOn(void) { return this->on; }
+	inline void turnLight(bool b) { if (b) glEnable(GL_LIGHT0); else glEnable(GL_LIGHT0); }
 
-            //----------- AMBIENT -----------//
-            inline float getAmbientRed()   { return ambient[0]; }
-            inline float getAmbientGreen() { return ambient[1]; }
-            inline float getAmbientBlue()  { return ambient[2]; }
-            inline float getAmbientAlpha() { return ambient[3]; }
-            inline CGPoint getAmbientRGB() { return CGPoint(ambient[0], ambient[1], ambient[2]); }
+	/** AMBIENT */
+	inline float getAmbientRed(void) const   { return this->_ambient[kChannelRed]; }
+	inline float getAmbientGreen(void) const { return this->_ambient[kChannelGreen]; }
+	inline float getAmbientBlue(void) const  { return this->_ambient[kChannelBlue]; }
+	inline float getAmbientAlpha(void) const { return this->_ambient[kChannelAlpha]; }
+	inline CGPoint getAmbientRGB(void) const
+	{
+		return CGPoint(this->_ambient[kChannelRed], this->_ambient[kChannelGreen], this->_ambient[kChannelBlue]);
+	}
 
-            inline void setAmbientRed(float v)   { ambient[0] = v; }
-            inline void setAmbientGreen(float v) { ambient[1] = v; }
-            inline void setAmbientBlue(float v)  { ambient[2] = v; }
-            inline void setAmbientAlpha(float v) { ambient[3] = v; }
+	inline void setAmbientRed(float v)   { this->_ambient[kChannelRed] = v; }
+	inline void setAmbientGreen(float v) { this->_ambient[kChannelGreen] = v; }
+	inline void setAmbientBlue(float v)  { this->_ambient[kChannelBlue] = v; }
+	inline void setAmbientAlpha(float v) { this->_ambient[kChannelAlpha] = v; }
 
-            inline void setAmbientRGB(float r, float g, float b) { ambient[0] = r;
-                                                                   ambient[1] = g;
-                                                                   ambient[2] = b; }
+	inline void setAmbientRGB(float r, float g, float b)
+	{
+		this->_ambient[kChannelRed] = r;
+		this->_ambient[kChannelGreen] = g;
+		this->_ambient[kChannelBlue] = b;
+	}
 
-            inline void setAmbientRGB(CGPoint p) { ambient[0] = p[0];
-                                                   ambient[1] = p[1];
-                                                   ambient[2] = p[2]; }
+	inline void setAmbientRGB(CGPoint p)
+	{
+		this->setAmbientRGB(p[kChannelRed], p[kChannelGreen], p[kChannelBlue]);
+	}
 
-            inline void setAmbientRGBA(float r, float g, float b, float a) { ambient[0] = r;
-                                                                             ambient[1] = g;
-                                                                             ambient[2] = b;
-                                                                             ambient[3] = a; }
+	inline void setAmbientRGBA(float r, float g, float b, float a)
+	{
+		this->_ambient[kChannelRed] = r;
+		this->_ambient[kChannelGreen] = g;
+		this->_ambient[kChannelBlue] = b;
+		this->_ambient[kChannelAlpha] = a;
+	}
 
-            inline void setAmbientWhite(float v) { ambient[0] = v;
-                                                   ambient[1] = v;
-                                                   ambient[2] = v; }
+	inline void setAmbientWhite(float v) { this->setAmbientRGB(v, v, v); }
 
-            //----------- DIFFUSE -----------//
-            inline float getDiffuseRed()   { return diffuse[0]; }
-            inline float getDiffuseGreen() { return diffuse[1]; }
-            inline float getDiffuseBlue()  { return diffuse[2]; }
-            inline float getDiffuseAlpha() { return diffuse[3]; }
-            inline CGPoint getDiffuseRGB() { return CGPoint(diffuse[0], diffuse[1], diffuse[2]); }
+	/** DIFFUSE */
+	inline float getDiffuseRed(void) const   { return this->_diffuse[kChannelRed]; }
+	inline float getDiffuseGreen(void) const { return this->_diffuse[kChannelGreen]; }
+	inline float getDiffuseBlue(void) const  { return this->_diffuse[kChannelBlue]; }
+	inline float getDiffuseAlpha(void) const { return this->_diffuse[kChannelAlpha]; }
+	inline CGPoint getDiffuseRGB(void) const
+	{
+		return CGPoint(this->_diffuse[kChannelRed],
+				this->_diffuse[kChannelGreen],
+				this->_diffuse[kChannelBlue]);
+	}
 
-            inline void setDiffuseRed(float v)   { diffuse[0] = v; }
-            inline void setDiffuseGreen(float v) { diffuse[1] = v; }
-            inline void setDiffuseBlue(float v)  { diffuse[2] = v; }
-            inline void setDiffuseAlpha(float v) { diffuse[3] = v; }
+	inline void setDiffuseRed(float v)   { this->_diffuse[kChannelRed] = v; }
+	inline void setDiffuseGreen(float v) { this->_diffuse[kChannelGreen] = v; }
+	inline void setDiffuseBlue(float v)  { this->_diffuse[kChannelBlue] = v; }
+	inline void setDiffuseAlpha(float v) { this->_diffuse[kChannelAlpha] = v; }
 
-            inline void setDiffuseRGB(float r, float g, float b) { diffuse[0] = r;
-                                                                   diffuse[1] = g;
-                                                                   diffuse[2] = b; }
-            inline void setDiffuseRGB(CGPoint p) { diffuse[0] = p[0];
-                                                   diffuse[1] = p[1];
-                                                   diffuse[2] = p[2]; }
+	inline void setDiffuseRGB(float r, float g, float b)
+	{
+		this->_diffuse[kChannelRed] = r;
+		this->_diffuse[kChannelGreen] = g;
+		this->_diffuse[kChannelBlue] = b;
+	}
+	inline void setDiffuseRGB(CGPoint p)
+	{
+		this->setDiffuseRGB(p[kChannelRed], p[kChannelGreen], p[kChannelBlue]);
+	}
 
-            inline void setDiffuseRGBA(float r, float g, float b, float a) { diffuse[0] = r;
-                                                                             diffuse[1] = g;
-                                                                             diffuse[2] = b;
-                                                                             diffuse[3] = a; }
+	inline void setDiffuseRGBA(float r, float g, float b, float a)
+	{
+		this->_diffuse[kChannelRed] = r;
+		this->_diffuse[kChannelGreen] = g;
+		this->_diffuse[kChannelBlue] = b;
+		this->_diffuse[kChannelAlpha] = a;
+	}
 
-            inline void setDiffuseWhite(float v) { diffuse[0] = v;
-                                                   diffuse[1] = v;
-                                                   diffuse[2] = v; }
+	inline void setDiffuseWhite(float v) { this->setDiffuseRGB(v, v, v); }
 
-            //----------- SPECULAR -----------//
-            inline float getSpecularRed()   { return specular[0]; }
-            inline float getSpecularGreen() { return specular[1]; }
-            inline float getSpecularBlue()  { return specular[2]; }
-            inline float getSpecularAlpha() { return specular[3]; }
-            inline CGPoint getSpecularRGB() { return CGPoint(specular[0], specular[1], specular[2]); }
+	/** SPECULAR */
+	inline float getSpecularRed(void) const   { return this->_specular[kChannelRed]; }
+	inline float getSpecularGreen(void) const { return this->_specular[kChannelGreen]; }
+	inline float getSpecularBlue(void) const  { return this->_specular[kChannelBlue]; }
+	inline float getSpecularAlpha(void) const { return this->_specular[kChannelAlpha]; }
+	inline CGPoint getSpecularRGB(void) const
+	{
+		return CGPoint(this->_specular[kChannelRed],
+			       this->_specular[kChannelGreen],
+			       this->_specular[kChannelBlue]);
+	}
 
-            inline void setSpecularRed(float v)   { specular[0] = v; }
-            inline void setSpecularGreen(float v) { specular[1] = v; }
-            inline void setSpecularBlue(float v)  { specular[2] = v; }
-            inline void setSpecularAlpha(float v) { specular[3] = v; }
+	inline void setSpecularRed(float v)   { this->_specular[kChannelRed] = v; }
+	inline void setSpecularGreen(float v) { this->_specular[kChannelGreen] = v; }
+	inline void setSpecularBlue(float v)  { this->_specular[kChannelBlue] = v; }
+	inline void setSpecularAlpha(float v) { this->_specular[kChannelAlpha] = v; }
 
-            inline void setSpecularRGB(float r, float g, float b) { specular[0] = r;
-                                                                    specular[1] = g;
-                                                                    specular[2] = b; }
+	inline void setSpecularRGB(float r, float g, float b)
+	{
+		this->_specular[kChannelRed] = r;
+		this->_specular[kChannelGreen] = g;
+		this->_specular[kChannelBlue] = b;
+	}
 
-            inline void setSpecularRGB(CGPoint p) { specular[0] = p[0];
-                                                    specular[1] = p[1];
-                                                    specular[2] = p[2]; }
+	inline void setSpecularRGB(CGPoint p) {
+		this->setSpecularRGB(p[kChannelRed], p[kChannelGreen], p[kChannelBlue]);
+	}
 
-            inline void setSpecularRGBA(float r, float g, float b, float a) { specular[0] = r;
-                                                                              specular[1] = g;
-                                                                              specular[2] = b;
-                                                                              specular[3] = a; }
+	inline void setSpecularRGBA(float r, float g, float b, float a)
+	{
+		this->_specular[kChannelRed] = r;
+		this->_specular[kChannelGreen] = g;
+		this->_specular[kChannelBlue] = b;
+		this->_specular[kChannelAlpha] = a;
+	}
 
-            inline void setSpecularWhite(float v) { specular[0] = v;
-                                                    specular[1] = v;
-                                                    specular[2] = v; }
+	inline void setSpecularWhite(float v) { this->setSpecularRGB(v, v, v); }
 
-            //----------- POSITION -----------//
-            inline float getPositionX() { return position[0]; }
-            inline float getPositionY() { return position[1]; }
-            inline float getPositionZ() { return position[2]; }
-            inline float getPositionW() { return position[3]; }
-            inline CGPoint getPositionXYZ() { return CGPoint(position[0], position[1], position[2]); }
+	/** POSITION */
+	inline float getPositionX(void) const { return this->_position[kCoordX]; }
+	inline float getPositionY(void) const { return this->_position[kCoordY]; }
+	inline float getPositionZ(void) const { return this->_position[kCoordZ]; }
+	inline float getPositionW(void) const { return this->_position[kCoordW]; }
+	inline CGPoint getPositionXYZ(void) const
+	{
+		return CGPoint(this->_position[kCoordX], this->_position[kCoordY], this->_position[kCoordZ]);
+	}
 
-            inline void setPositionX(float v) { position[0] = v; }
-            inline void setPositionY(float v) { position[1] = v; }
-            inline void setPositionZ(float v) { position[2] = v; }
-            inline void setPositionW(float v) { position[3] = v; }
+	inline void setPositionX(float v) { this->_position[kCoordX] = v; }
+	inline void setPositionY(float v) { this->_position[kCoordY] = v; }
+	inline void setPositionZ(float v) { this->_position[kCoordZ] = v; }
+	inline void setPositionW(float v) { this->_position[kCoordW] = v; }
 
-            inline void setPositionXYZ(CGPoint p) { position[0] = p[0];
-                                                    position[1] = p[1];
-                                                    position[2] = p[2]; }
+	inline void setPositionXYZ(float x, float y, float z)
+	{
+		this->_position[kCoordX] = x;
+		this->_position[kCoordY] = y;
+		this->_position[kCoordZ] = z;
+	}
 
-            inline void setPositionXYZ(float x, float y, float z) { position[0] = x;
-                                                                    position[1] = y;
-                                                                    position[2] = z; }
+	inline void setPositionXYZ(CGPoint p) { this->setPositionXYZ(p[kCoordX], p[kCoordY], p[kCoordZ]); }
 
-            inline void setPositionXYZW(float x, float y, float z, float w) { position[0] = x;
-                                                                              position[1] = y;
-                                                                              position[2] = z;
-                                                                              position[3] = w; }
+	inline void setPositionXYZW(float x, float y, float z, float w)
+	{
+		this->_position[kCoordX] = x;
+		this->_position[kCoordY] = y;
+		this->_position[kCoordZ] = z;
+		this->_position[kCoordW] = w;
+	}
 
-            //----------- SPOT DIRECTION -----------//
-            inline float getDirectionX() { return direction[0]; }
-            inline float getDirectionY() { return direction[1]; }
-            inline float getDirectionZ() { return direction[2]; }
-            inline CGPoint getDirectionXYZ() { return CGPoint(direction[0], direction[1], direction[2]); }
+	/** SPOT DIRECTION */
+	inline float getDirectionX(void) const { return this->_direction[kCoordX]; }
+	inline float getDirectionY(void) const { return this->_direction[kCoordY]; }
+	inline float getDirectionZ(void) const { return this->_direction[kCoordZ]; }
+	inline CGPoint getDirectionXYZ(void) const
+	{
+		return CGPoint(this->_direction[kCoordX], this->_direction[kCoordY], this->_direction[kCoordZ]);
+	}
 
-            inline void setDirectionX(float v) { direction[0] = v; }
-            inline void setDirectionY(float v) { direction[1] = v; }
-            inline void setDirectionZ(float v) { direction[2] = v; }
-            inline void setDirectionXYZ(CGPoint p) { direction[0] = p[0];
-                                                     direction[1] = p[1];
-                                                     direction[2] = p[2]; }
-            inline void setDirectionXYZ(float x, float y, float z) { direction[0] = x;
-                                                                     direction[1] = y;
-                                                                     direction[2] = z; }
+	inline void setDirectionX(float v) { this->_direction[kCoordX] = v; }
+	inline void setDirectionY(float v) { this->_direction[kCoordY] = v; }
+	inline void setDirectionZ(float v) { this->_direction[kCoordZ] = v; }
+	inline void setDirectionXYZ(float x, float y, float z)
+	{
+		this->_direction[kCoordX] = x;
+		this->_direction[kCoordY] = y;
+		this->_direction[kCoordZ] = z;
+	}
+	inline void setDirectionXYZ(CGPoint p) { this->setDirectionXYZ(p[kCoordX], p[kCoordY], p[kCoordZ]); }
 
-            //----------- SPOT EXPONENT -----------//
-            inline float getExponent() { return exponent[0]; }
-            inline void setExponent(float v) { exponent[0] = v; }
+	/** SPOT EXPONENT */
+	inline float getExponent(void) const { return this->_exponent[0]; }
+	inline void setExponent(float v) { this->_exponent[0] = v; }
 
-            //----------- SPOT CUTOFF -----------//
-            inline float getCutOff() { return cutoff[0]; }
-            inline void setCutOff(float v) { cutoff[0] = v; }
+	/** SPOT CUTOFF */
+	inline float getCutOff(void) const { return this->_cutoff[0]; }
+	inline void setCutOff(float v) { this->_cutoff[0] = v; }
 
-            //----------- CONSTANT ATTENUATION -----------//
-            inline float getConstantAttenuation() { return att_const[0]; }
-            inline void setConstantAttenuation(float v) { att_const[0] = v; }
+	/** CONSTANT ATTENUATION */
+	inline float getConstantAttenuation(void) const { return this->_att_const[0]; }
+	inline void setConstantAttenuation(float v) { this->_att_const[0] = v; }
 
-            //----------- LINEAR ATTENUATION -----------//
-            inline float getLinearAttenuation() { return att_lin[0]; }
-            inline void setLinearAttenuation(float v) { att_lin[0] = v; }
+	/** LINEAR ATTENUATION */
+	inline float getLinearAttenuation(void) const { return this->_att_lin[0]; }
+	inline void setLinearAttenuation(float v) { this->_att_lin[0] = v; }
 
-            //----------- QUADRATIC ATTENUATION -----------//
-            inline float getQuadraticAttenuation() { return att_quad[0]; }
-            inline void setQuadraticAttenuation(float v) { att_quad[0] = v; }
+	/** QUADRATIC ATTENUATION */
+	inline float getQuadraticAttenuation(void) const { return this->_att_quad[0]; }
+	inline void setQuadraticAttenuation(float v) { this->_att_quad[0] = v; }
 
+	/** RESET */
+	void reset( void );
 
+private:
+	bool _on;
 
-            //----------- RESET -----------//
-            void reset();
-
-     private:
-
-            bool on;
-
-            float ambient[4];
-            float diffuse[4];
-            float specular[4];
-            float position[4];
-            float direction[3];
-            float exponent[0];
-            float cutoff[0];
-            float att_const[0];
-            float att_lin[0];
-            float att_quad[0];
+	float _ambient[kChannelsRGBA];
+	float _diffuse[kChannelsRGBA];
+	float _specular[kChannelsRGBA];
+	float _position[kCoordsXYZW];
+	float _direction[kCoordsXYZ];
+	float _exponent[0];
+	float _cutoff[0];
+	float _att_const[0];
+	float _att_lin[0];
+	float _att_quad[0];
 };
 
-#endif // GLLight_H
+#endif // CGVIEW_OPENGL_SCENE_LIGHT_GLLIGHT_H

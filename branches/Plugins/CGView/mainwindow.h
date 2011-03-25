@@ -17,11 +17,18 @@
 #ifndef CGVIEW_MAINWINDOW_H
 #define CGVIEW_MAINWINDOW_H
 
-#include <QMainWindow>
-#include "engine.h"
+/**
+ * La classe MainWindow si occupa di creare la finestra del nostro programma
+ * gestendo il menu e le azioni corrispondenti a ogni elemento del menu
+ */
+
+#include <QMainWindow> // class QMainWindow
+#include "pluginmanager.h" // PluginManager
+class Engine;
 
 QT_BEGIN_NAMESPACE
 class QAction;
+class QActionGroup;
 class QMenu;
 class QScrollArea;
 class QGridLayout;
@@ -32,188 +39,213 @@ class StatusBar;
 
 class MainWindow : public QMainWindow
 {
-    Q_OBJECT
+	Q_OBJECT
 
 public:
-    MainWindow();
+	MainWindow();
 
 private:
+	/** Type of area in the main window */
+	enum AreaType
+	{
+		kAreaIntro = 0,
+		kAreaViewer,
+		kAreaStatus,
+		kAreaPalette,
+		// Number of areas
+		kAreasMax
+	};
 
-protected:
-    //Type of area in the main window
-    enum AreaType
-    {
-        INTRO,
-        VIEWER,
-        STATUS,
-        PALETTE,
+	/** Type of menu in the main menu */
+	enum MenuType
+	{
+		/// Menu
+		kMenuFile = 0,
+		kMenuEdit,
+		kMenuView,
+		kMenuTool,
+		kMenuWindow,
+		kMenuHelp,
 
-        /// Number of areas --- THIS MUST BE THE LAST ELEMENT
-        AREA_NUM
-    };
-    //Number of area in the main window
-    static const int _AreaDim = AREA_NUM;
+		/// File submenu
+		kMenuFileNew,
 
-    //Type of menu in the main menu
-    enum MenuType
-    {
-        /// Menu
-        MENU_FILE,
-        MENU_EDIT,
-        MENU_VIEW,
-        MENU_TOOL,
-        MENU_WINDOW,
-        MENU_HELP,
+		/// Edit submenu
+		kMenuEditNormal,
+		kMenuEditQuality,
+		kMenuEditColor,
+		kMenuEditBox,
 
-        /// File submenu
-        MENU_FILE_NEW,
+		/// View submenu
+		kMenuViewBox,
+		kMenuViewMesh,
+		kMenuViewColor,
+		kMenuViewMisc,
 
-        /// Edit submenu
-        MENU_EDIT_NORMAL,
-        MENU_EDIT_QUALITY,
-        MENU_EDIT_COLOR,
-        MENU_EDIT_BOX,
+		/// Tool submenu
+		kMenuToolChaos,
+		kMenuToolVoxel,
 
-        /// View submenu
-        MENU_VIEW_BOX,
-        MENU_VIEW_MESH,
-        MENU_VIEW_COLOR,
-        MENU_VIEW_NORMAL,
-        MENU_VIEW_MISC,
+		/// Window submenu
+		kMenuWindowBar,
+		
+		/// Number of menus and submenus
+		kMenusMax
+	};
 
-        /// Tool submenu
-        MENU_TOOL_CHAOS,
-        MENU_TOOL_VOXEL,
+	/** Type of action in the main menu **/
+	enum ActionType
+	{
+		/// File actions
+		kActionFileNewCloud = 0,
+		kActionFileOpen,
+		kActionFileSaveas,
+		kActionFileSave,
+		kActionFileClose,
+		kActionFileReset,
+		kActionFileExit,
+		kActionFileAdd,
 
-        /// Window submenu
-        MENU_WINDOW_BAR,
+		/// Edit actions
+		kActionEditUpdateVertNormal,
+		kActionEditUpdateFaceNormal,
+		kActionEditUpdateAllNormal,
+		kActionEditInvertVertNormal,
+		kActionEditInvertFaceNormal,
+		kActionEditInvertAllNormal,
+		kActionEditResetQuality,
+		kActionEditRandomVertQuality,
+		kActionEditRandomFaceQuality,
+		kActionEditTransferQualityVerttoface,
+		kActionEditTransferQualityFacetovert,
+		kActionEditRandomVertColor,
+		kActionEditRandomFaceColor,
+		kActionEditTransferColorVerttoface,
+		kActionEditTransferColorFacetovert,
+		kActionEditUpdateBox,
 
-        /// Number of menus --- THIS MUST BE THE LAST ELEMENT
-        MENU_NUM
-    };
-    //Number of menu and submenu
-    static const int _MenuDim = MENU_NUM;
+		/// View actions
+		kActionViewBoxDisable,
+		kActionViewBoxWired,
+		kActionViewBoxTrans,
+		kActionViewBoxSolid,
+		kActionViewMeshDisable,
+		kActionViewMeshPoint,
+		kActionViewMeshFlat,
+		kActionViewMeshSmooth,
+		kActionViewMeshVoxel,
+		kActionViewColorDisable,
+		kActionViewColorVertex,
+		kActionViewColorFace,
+		kActionViewColorTexture,
+		kActionViewColorVertQuality,
+		kActionViewColorFaceQuality,
+		kActionViewColorMaterial,
+		kActionViewMiscWire,
 
-    //Type of action in the main menu
-    enum ActionType
-    {
-        /// File actions
-        ACTION_FILE_NEW_CLOUD,
-        ACTION_FILE_OPEN,
-        ACTION_FILE_SAVEAS,
-        ACTION_FILE_SAVE,
-        ACTION_FILE_CLOSE,
-        ACTION_FILE_RESET,
-        ACTION_FILE_EXIT,
-        ACTION_FILE_ADD,
+		/// Tool actions
+		kActionToolConvexhull,
+		kActionToolChaosArnoldcat,
+		kActionToolChaosIkeda,
+		kActionToolChaosDuffing,
+		kActionToolChaosHenon,
+		kActionToolChaosGingerbread,
+		kActionToolChaosTinkerbell,
+		kActionToolChaosZaslavskii,
+		kActionToolVoxelDisable,
+		kActionToolVoxelExtern,
+		kActionToolVoxelAll,
 
-        /// Edit actions
-        ACTION_EDIT_UPDATE_VERT_NORMAL,
-        ACTION_EDIT_UPDATE_FACE_NORMAL,
-        ACTION_EDIT_UPDATE_ALL_NORMAL,
-        ACTION_EDIT_INVERT_VERT_NORMAL,
-        ACTION_EDIT_INVERT_FACE_NORMAL,
-        ACTION_EDIT_INVERT_ALL_NORMAL,
-        ACTION_EDIT_RESET_QUALITY,
-        ACTION_EDIT_RANDOM_VERT_QUALITY,
-        ACTION_EDIT_RANDOM_FACE_QUALITY,
-        ACTION_EDIT_TRANSFER_QUALITY_VERTTOFACE,
-        ACTION_EDIT_TRANSFER_QUALITY_FACETOVERT,
-        ACTION_EDIT_RANDOM_VERT_COLOR,
-        ACTION_EDIT_RANDOM_FACE_COLOR,
-        ACTION_EDIT_TRANSFER_COLOR_VERTTOFACE,
-        ACTION_EDIT_TRANSFER_COLOR_FACETOVERT,
-        ACTION_EDIT_UPDATE_BOX,
+		/// Window actions
+		kActionWindowBarStatus,
+		kActionWindowBarPalette,
 
-        /// View actions
-        ACTION_VIEW_BOX_DISABLE,
-        ACTION_VIEW_BOX_WIRED,
-        ACTION_VIEW_BOX_TRANS,
-        ACTION_VIEW_BOX_SOLID,
-        ACTION_VIEW_MESH_DISABLE,
-        ACTION_VIEW_MESH_POINT,
-        ACTION_VIEW_MESH_FLAT,
-        ACTION_VIEW_MESH_SMOOTH,
-        ACTION_VIEW_MESH_VOXEL,
-        ACTION_VIEW_COLOR_DISABLE,
-        ACTION_VIEW_COLOR_VERTEX,
-        ACTION_VIEW_COLOR_FACE,
-        ACTION_VIEW_COLOR_TEXTURE,
-        ACTION_VIEW_COLOR_VERT_QUALITY,
-        ACTION_VIEW_COLOR_FACE_QUALITY,
-        ACTION_VIEW_COLOR_MATERIAL,
-        ACTION_VIEW_NORMAL_DISABLE,
-        ACTION_VIEW_NORMAL_VERT,
-        ACTION_VIEW_NORMAL_FACE,
-        ACTION_VIEW_MISC_WIRE,
-        ACTION_VIEW_MISC_GRID,
-        ACTION_VIEW_MISC_AXIS,
-        ACTION_VIEW_ANAGLYPH,
+		/// About
+		kActionHelpAbout,
 
-        /// Tool actions
-        ACTION_TOOL_CONVEXHULL,
-        ACTION_TOOL_VOXEL_DISABLE,
-        ACTION_TOOL_VOXEL_EXTERN,
-        ACTION_TOOL_VOXEL_ALL,
+		/// Number of actions
+		kActionsMax
+	};
 
-        /// Window actions
-        ACTION_WINDOW_BAR_STATUS,
+	/** Action Groups **/
+	enum ActionGroupType
+	{
+		kActiongroupViewBox,
+		kActiongroupViewMesh,
+		kActiongroupViewColor,
+		kActiongroupViewMisc,
 
-        /// About
-        ACTION_HELP_ABOUT,
+		kActiongroupToolChaos,
 
-        /// Number of actions --- THIS MUST BE THE LAST ELEMENT
-        ACTION_NUM
-    };
-    //Number of actions
-    static const int _ActionDim = ACTION_NUM;
+		kActiongroupWindowBar,
 
-    //Create the main menus
-    void createMenus();
-    //Create the actions for the menus
-    void createActions();
-    //Create connections between actions and objects
-    void createConnections();
+		/// Number of action groups
+		kActiongroupsMax
+	};
 
-    //Create the intro area
-    void createIntro();
-    //Create the viewer area
-    void createViewer();
-    //create the status bar
-    void createStatus();
+	/** Toolbars **/
+	enum ToolBarType
+	{
+		kToolbarFile,
+		kToolbarView,
+		kToolbarMesh,
+		kToolbarColor,
+		/// Number of toolbars
+		kToolbarsMax
+	};
 
-    //Main widget
-    QWidget *_mainWidget;
-    //Main menu
-    QMenu *_menu[_MenuDim];
-    //Actions of the menu
-    QAction *_action[_ActionDim];
+	/** Create the main menus **/
+	void createMenus(void);
+	/** Create the toolbars **/
+	void createToolBars(void);
+	/** Create the actions for the menus **/
+	void createActions(void);
+	/** Create connections between actions and objects **/
+	void createConnections(void);
 
-    //Layout of the main window
-    QGridLayout *_layout;
+	/** Create the intro area **/
+	void createIntro(void);
+	/** Create the viewer area **/
+	void createViewer(void);
+	/** create the status bar **/
+	void createStatus(void);
+	void addToMenu(QObject *plugin, const QString &name, QMenu *menu, const char *signal, QObject *target,
+			const char *member, QActionGroup *actionGroup, bool checkable);
 
-    //The areas present in the window
-    QScrollArea *_area[_AreaDim];
+	/// Main widget
+	QWidget *_mainWidget;
+	/// Main menu
+	QMenu *_menu[kMenusMax];
+	/// Actions of the menu
+	QAction *_action[kActionsMax];
+	/// Action groups
+	QActionGroup *_actiongroup[kActiongroupsMax];
+	/// Toolbars
+	QToolBar *_toolbar[kToolbarsMax];
 
-    /// areas
-    GLIntro *_glIntro;
-    GLWindow *_glWindow;
-    StatusBar *_statusBar;
+	/// Layout of the main window
+	QGridLayout *_layout;
 
-    /// Engine
-    Engine *_engine;
+	/// The areas present in the window
+	QScrollArea *_area[kAreasMax];
 
-signals:
+	/// Areas
+	GLIntro *_glIntro;
+	GLWindow *_glWindow;
+	StatusBar *_statusBar;
 
-public slots:
+	/// Engine
+	Engine *_engine;
 
 private slots:
-    //Enable/Disable the status bar
-    void ToggleStatus();
+	/** Enable/Disable the status bar */
+	void toggleStatus(void);
 
-    void endIntro();
+	void endIntro(void);
 
-    void Normals();
+	void setupPlugin(QObject *plugin, PluginManager::PluginType type);
+
+	void runTransformPlugin( void );
 };
 
 #endif // MAINWINDOW_H

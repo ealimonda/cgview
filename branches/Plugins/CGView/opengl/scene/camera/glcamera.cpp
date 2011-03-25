@@ -15,154 +15,157 @@
  * $Revision::                                                 $: Revision    *
  ******************************************************************************/
 #include "glcamera.h"
+#include <QtOpenGL>
 
-GLCamera::GLCamera()
+GLCamera::GLCamera(void)
 {
-	reset();
+	this->reset();
 }
 
 GLCamera::GLCamera(float width)
 {
-	reset();
-    fitWidth(width);
+	this->reset();
+	this->fitWidth(width);
 }
 
-void GLCamera::camProjection()
+void GLCamera::camProjection(void)
 {
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    gluPerspective(fov, aspect, zNear, zFar);
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	gluPerspective(this->_fov, this->_aspect, this->_zNear, this->_zFar);
 }
 
 void GLCamera::camPosition(EyePosition e)
 {
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-    switch(e)
-    {
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+	switch (e)
+	{
 	case kEyePositionCenter:
-        {
-            gluLookAt(eye[0], eye[1], eye[2], center[0], center[1], center[2], vup[0], vup[1], vup[2]);
-        }
-        break;
+	  {
+		gluLookAt(this->_eye[kCoordX], this->_eye[kCoordY], this->_eye[kCoordZ],
+				this->_center[kCoordX], this->_center[kCoordY], this->_center[kCoordZ],
+				this->_vup[kCoordX], this->_vup[kCoordY], this->_vup[kCoordZ]);
+          }
+		break;
 
 	case kEyePositionLeft:
-        {
-            gluLookAt(eye[0] + (-distance / 30.0f) * vr[0],
-                      eye[1] + (-distance / 30.0f) * vr[1],
-                      eye[2] + (-distance / 30.0f) * vr[2],
-                      center[0], center[1], center[2],
-                      vup[0], vup[1], vup[2]);
-        }
-        break;
+	  {
+		gluLookAt(this->_eye[kCoordX] + (-this->_distance / 30.0f) * this->_vr[kCoordX],
+				this->_eye[kCoordY] + (-this->_distance / 30.0f) * this->_vr[kCoordY],
+				this->_eye[kCoordZ] + (-this->_distance / 30.0f) * this->_vr[kCoordZ],
+				this->_center[kCoordX], this->_center[kCoordY], this->_center[kCoordZ],
+				this->_vup[kCoordX], this->_vup[kCoordY], this->_vup[kCoordZ]);
+	  }
+		break;
 
 	case kEyePositionRight:
-        {
-            gluLookAt(eye[0] + (distance / 30.0f) * vr[0],
-                      eye[1] + (distance / 30.0f) * vr[1],
-                      eye[2] + (distance / 30.0f) * vr[2],
-                      center[0], center[1], center[2],
-                      vup[0], vup[1], vup[2]);
-        }
-        break;
-    }
+	  {
+		gluLookAt(this->_eye[kCoordX] + (this->_distance / 30.0f) * this->_vr[kCoordX],
+				this->_eye[kCoordY] + (this->_distance / 30.0f) * this->_vr[kCoordY],
+				this->_eye[kCoordZ] + (this->_distance / 30.0f) * this->_vr[kCoordZ],
+				this->_center[kCoordX], this->_center[kCoordY], this->_center[kCoordZ],
+				this->_vup[kCoordX], this->_vup[kCoordY], this->_vup[kCoordZ]);
+	  }
+		break;
+	}
 }
 
 void GLCamera::changeDistance(float d)
 {
-    eye[0] = eye[0] + (d * dir[0]);
-    eye[1] = eye[1] + (d * dir[1]);
-    eye[2] = eye[2] + (d * dir[2]);
-    distance = vcg::Distance(eye, center);
+	this->_eye[kCoordX] = this->_eye[kCoordX] + (d * this->_dir[kCoordX]);
+	this->_eye[kCoordY] = this->_eye[kCoordY] + (d * this->_dir[kCoordY]);
+	this->_eye[kCoordZ] = this->_eye[kCoordZ] + (d * this->_dir[kCoordZ]);
+	this->_distance = vcg::Distance(this->_eye, this->_center);
 }
 
 void GLCamera::strafeCam(float d)
 {
-    eye[0] = eye[0] + (d * vr[0]);
-    eye[1] = eye[1] + (d * vr[1]);
-    eye[2] = eye[2] + (d * vr[2]);
-    distance = vcg::Distance(eye, center);
+	this->_eye[kCoordX] = this->_eye[kCoordX] + (d * this->_vr[kCoordX]);
+	this->_eye[kCoordY] = this->_eye[kCoordY] + (d * this->_vr[kCoordY]);
+	this->_eye[kCoordZ] = this->_eye[kCoordZ] + (d * this->_vr[kCoordZ]);
+	this->_distance = vcg::Distance(this->_eye, this->_center);
 }
 
 void GLCamera::liftCam(float d)
 {
-    eye[0] = eye[0] + (d * vup[0]);
-    eye[1] = eye[1] + (d * vup[1]);
-    eye[2] = eye[2] + (d * vup[2]);
-    distance = vcg::Distance(eye, center);
+	this->_eye[kCoordX] = this->_eye[kCoordX] + (d * this->_vup[kCoordX]);
+	this->_eye[kCoordY] = this->_eye[kCoordY] + (d * this->_vup[kCoordY]);
+	this->_eye[kCoordZ] = this->_eye[kCoordZ] + (d * this->_vup[kCoordZ]);
+	this->_distance = vcg::Distance(this->_eye, this->_center);
 }
 
 void GLCamera::rotateVUp(float angle)
 {
-    vcg::Matrix44d t;
-    vcg::Matrix44d r;
+	vcg::Matrix44d t;
+	vcg::Matrix44d r;
 
-    t.SetTranslate(-center);
-    r.SetRotateRad(angle, vup);
+	t.SetTranslate(-this->_center);
+	r.SetRotateRad(angle, this->_vup);
 
-    eye = t * eye;
+	this->_eye = t * this->_eye;
 
-    eye = r * eye;
-    dir = r * dir;
-    vr  = r * vr;
+	this->_eye = r * this->_eye;
+	this->_dir = r * this->_dir;
+	this->_vr  = r * this->_vr;
 
-    t.SetTranslate(center);
-    eye = t * eye;
+	t.SetTranslate(this->_center);
+	this->_eye = t * this->_eye;
 }
 
 void GLCamera::rotateVR(float angle)
 {
-    vcg::Matrix44d t;
-    vcg::Matrix44d r;
+	vcg::Matrix44d t;
+	vcg::Matrix44d r;
 
-    t.SetTranslate(-center);
-    r.SetRotateRad(angle, vr);
+	t.SetTranslate(-this->_center);
+	r.SetRotateRad(angle, this->_vr);
 
-    eye = t * eye;
+	this->_eye = t * this->_eye;
 
-    eye = r * eye;
-    dir = r * dir;
-    vup  = r * vup;
+	this->_eye = r * this->_eye;
+	this->_dir = r * this->_dir;
+	this->_vup  = r * this->_vup;
 
-    t.SetTranslate(center);
-    eye = t * eye;
+	t.SetTranslate(this->_center);
+	this->_eye = t * this->_eye;
 }
 
 void GLCamera::rotateDir(float angle)
 {
-    vcg::Matrix44d r;
-    r.SetRotateRad(angle, dir);
+	vcg::Matrix44d r;
+	r.SetRotateRad(angle, this->_dir);
 
-    eye = r * eye;
-    vup = r * vup;
-    vr  = r * vr;
+	this->_eye = r * this->_eye;
+	this->_vup = r * this->_vup;
+	this->_vr  = r * this->_vr;
 }
 
 void GLCamera::reset(void)
 {
-    center = CGPoint(0.0f, 0.0f, 0.0f);
-    eye = CGPoint(0.0f, 0.0f, -1.0f);
-    vup = CGPoint(0.0f, 1.0f, 0.0f);
-    vr = CGPoint(1.0f, 0.0f, 0.0f);
-    dir = CGPoint(0.0f, 0.0f, 1.0f);
-    distance = 1.0f;
+	this->_center = CGPoint(0.0f, 0.0f, 0.0f);
+	this->_eye = CGPoint(0.0f, 0.0f, -1.0f);
+	this->_vup = CGPoint(0.0f, 1.0f, 0.0f);
+	this->_vr = CGPoint(1.0f, 0.0f, 0.0f);
+	this->_dir = CGPoint(0.0f, 0.0f, 1.0f);
+	this->_distance = 1.0f;
 
-    fov = 60.0f;
-    aspect = 1.0f;
-    zNear = 0.5f;
-    zFar = 1.5f;
+	this->_fov = 60.0f;
+	this->_aspect = 1.0f;
+	this->_zNear = 0.5f;
+	this->_zFar = 1.5f;
 }
 
 void GLCamera::fitWidth(float d)
 {
-    float BC = d;
-    float BH = BC / 2.0f;
-    float alpha = vcg::math::ToRad((float)fov/2.0);
-    float AB = BH / vcg::math::Sin(alpha / 2.0f);
-    float AH = vcg::math::Sqrt( AB - BH );
+	float BC = d;
+	float BH = BC / 2.0f;
+	float alpha = vcg::math::ToRad((float)this->_fov/2.0);
+	float AB = BH / vcg::math::Sin(alpha / 2.0f);
+	float AH = vcg::math::Sqrt( AB - BH );
 
-    eye[0] = center[0] + (AH + BH) * dir[0];
-    eye[1] = center[1] + (AH + BH) * dir[1];
-    eye[2] = center[2] + (AH + BH) * dir[2];
-    distance = AH + BH;
+	this->_eye[kCoordX] = this->_center[kCoordX] + (AH + BH) * this->_dir[kCoordX];
+	this->_eye[kCoordY] = this->_center[kCoordY] + (AH + BH) * this->_dir[kCoordY];
+	this->_eye[kCoordZ] = this->_center[kCoordZ] + (AH + BH) * this->_dir[kCoordZ];
+	this->_distance = AH + BH;
 }

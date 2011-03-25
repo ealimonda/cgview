@@ -17,345 +17,288 @@
 #ifndef CGVIEW_OPENGL_GLWINDOW_H
 #define CGVIEW_OPENGL_GLWINDOW_H
 
-#include <QtOpenGL/QGLWidget>
-#include "mesh_definition.h"
-#include "opengl/scene/scene.h"
+#include <QtOpenGL> // QGLWidget
+#include "opengl/scene/scene.h" // GLCamera, GLLight, GLMesh
+#include "pluginmanager.h" // PluginManager
+
+class PluginTransformInterface;
+class PluginRenderInterface;
 
 class GLWindow : public QGLWidget
 {
-    Q_OBJECT
+	Q_OBJECT
 
 public:
-    //Constructor
-    GLWindow(QWidget *parent = 0);
-    //Deconstructor
-    inline ~GLWindow()
-    {
-        for(unsigned int i = 0; i < _mesh.size(); i++)
-        {
-            _mesh[i].~GLMesh();
-        }
-        _mesh.clear();
-
-        makeCurrent();
-    }
-
-private:
-
-protected:
-    /// OPENGL
-    //Initialize the OpenGL parameters
-    void initializeGL();
-    //Draw the entire scene
-    void paintGL();
-    //Set the OpenGL parameters after a windows resize action
-    void resizeGL(int width, int height);
-
-    /// SCENE
-    //Mesh inside the scene
-    std::vector<GLMesh> _mesh;
-    //Bounding box of the entire scene
-    vcg::Box3<double> _box;
-    //Draws the background gradient
-    void drawGradient();
-
-    //Scene camera
-    GLCamera _camera;
-    //Scene light (if needed)
-    //GLLight _light;
-
-    /// MOUSE
-    //Last position clicked
-    QPoint _lastPos;
-    //Sensivity of the mouse
-    float _mouseSens;
-
-    /// FLAGS
-    //Flag for knowing if a mesh is loaded or not
-    bool _load;
-    //Flag for activating the anaglyph mode
-    bool _anaglyph;
-
-    /// INTERACTION
-    //Keyboard event handler
-    void keyPressEvent(QKeyEvent *event);
-    //Mouse event handler
-    void mousePressEvent(QMouseEvent *event);
-    void mouseMoveEvent(QMouseEvent *event);
-    void wheelEvent(QWheelEvent *event);
-
-signals:
-    void hasReset();
+	/** Constructor */
+	GLWindow(QWidget *parent = 0);
+	/** Destructor */
+	inline ~GLWindow() {
+		for (unsigned int i = 0; i < this->_mesh.size(); ++i)
+		{
+			this->_mesh[i].~GLMesh();
+		}
+		this->_mesh.clear();
+		this->makeCurrent();
+	}
+	void runTransformPlugin(PluginTransformInterface *plugin);
 
 public slots:
-    /// BOX
-    //Disable the bounding box
-    inline void DisableBoundingBox()
-    {
-        for(unsigned int i = 0; i < _mesh.size(); i++)
-        {
-            if(_mesh[i].isSelected()) _mesh[i].DisableBoundingBox();
-        }
-        updateGL();
-    }
-    //Set the wired bounding box
-    inline void EnableWiredBoundingBox()
-    {
-        for(unsigned int i = 0; i < _mesh.size(); i++)
-        {
-            if(_mesh[i].isSelected()) _mesh[i].EnableWiredBoundingBox();
-        }
-        updateGL();
-    }
-    //Set the transparent bounding box
-    inline void EnableTransBoundingBox()
-    {
-        for(unsigned int i = 0; i < _mesh.size(); i++)
-        {
-            if(_mesh[i].isSelected()) _mesh[i].EnableTransBoundingBox();
-        }
-        updateGL();
-    }
-    //Set the solid bounding box
-    inline void EnableSolidBoundingBox()
-    {
-        for(unsigned int i = 0; i < _mesh.size(); i++)
-        {
-            if(_mesh[i].isSelected()) _mesh[i].EnableSolidBoundingBox();
-        }
-        updateGL();
-    }
+	/// BOX
+	/** Disable the bounding box */
+	inline void disableBoundingBox(void)
+	{
+		for (unsigned int i = 0; i < this->_mesh.size(); ++i)
+		{
+			if (this->_mesh[i].isSelected())
+				this->_mesh[i].disableBoundingBox();
+		}
+		this->updateGL();
+	}
+	/** Set the wired bounding box **/
+	inline void enableWiredBoundingBox(void)
+	{
+		for (unsigned int i = 0; i < this->_mesh.size(); ++i)
+		{
+			if (this->_mesh[i].isSelected())
+				this->_mesh[i].enableWiredBoundingBox();
+		}
+		this->updateGL();
+	}
+	/** Set the transparent bounding box */
+	inline void enableTransBoundingBox(void)
+	{
+		for (unsigned int i = 0; i < this->_mesh.size(); ++i)
+		{
+			if (this->_mesh[i].isSelected())
+				this->_mesh[i].enableTransBoundingBox();
+		}
+		this->updateGL();
+	}
+	/** Set the solid bounding box */
+	inline void enableSolidBoundingBox(void)
+	{
+		for (unsigned int i = 0; i < this->_mesh.size(); ++i)
+		{
+			if (this->_mesh[i].isSelected())
+				this->_mesh[i].enableSolidBoundingBox();
+		}
+		this->updateGL();
+	}
 
-    /// MESH
-    //Disable the mesh
-    inline void DisableMesh()
-    {
-        for(unsigned int i = 0; i < _mesh.size(); i++)
-        {
-            if(_mesh[i].isSelected()) _mesh[i].DisableMesh();
-        }
-        updateGL();
-    }
-    //Set the point visualization
-    inline void EnablePointMesh()
-    {
-        for(unsigned int i = 0; i < _mesh.size(); i++)
-        {
-            if(_mesh[i].isSelected()) _mesh[i].EnablePointMesh();
-        }
-        updateGL();
-    }
-    //Set the flat shading
-    inline void EnableFlatMesh()
-    {
-        for(unsigned int i = 0; i < _mesh.size(); i++)
-        {
-            if(_mesh[i].isSelected()) _mesh[i].EnableFlatMesh();
-        }
-        updateGL();
-    }
-    //Set the smooth shading
-    inline void EnableSmoothMesh()
-    {
-        for(unsigned int i = 0; i < _mesh.size(); i++)
-        {
-            if(_mesh[i].isSelected()) _mesh[i].EnableSmoothMesh();
-        }
-        updateGL();
-    }
-    //Set the voxel visualization
-    inline void EnableVoxel()
-    {
-        for(unsigned int i = 0; i < _mesh.size(); i++)
-        {
-            if(_mesh[i].isSelected()) _mesh[i].EnableVoxel();
-        }
-        updateGL();
-    }
+	/// MESH
+	/** Disable the mesh */
+	inline void disableMesh(void)
+	{
+		for (unsigned int i = 0; i < this->_mesh.size(); ++i)
+		{
+			if (this->_mesh[i].isSelected())
+				this->_mesh[i].disableMesh();
+		}
+		updateGL();
+	}
+	/** Set the point visualization */
+	inline void enablePointMesh(void)
+	{
+		for (unsigned int i = 0; i < this->_mesh.size(); ++i)
+		{
+			if (this->_mesh[i].isSelected())
+				this->_mesh[i].enablePointMesh();
+		}
+		updateGL();
+	}
+	/** Set the flat shading */
+	inline void enableFlatMesh(void)
+	{
+		for (unsigned int i = 0; i < this->_mesh.size(); ++i)
+		{
+			if (this->_mesh[i].isSelected())
+				this->_mesh[i].enableFlatMesh();
+		}
+		updateGL();
+	}
+	/** Set the smooth shading */
+	inline void enableSmoothMesh(void)
+	{
+		for (unsigned int i = 0; i < this->_mesh.size(); ++i)
+		{
+			if (this->_mesh[i].isSelected())
+				this->_mesh[i].enableSmoothMesh();
+		}
+		this->updateGL();
+	}
+	/** Set the voxel visualization */
+	inline void enableVoxel(void)
+	{
+		for (unsigned int i = 0; i < this->_mesh.size(); ++i)
+		{
+			if (this->_mesh[i].isSelected())
+				this->_mesh[i].enableVoxel();
+		}
+		this->updateGL();
+	}
 
-    /// COLOR
-    //Disable the colors
-    inline void DisableColor()
-    {
-        for(unsigned int i = 0; i < _mesh.size(); i++)
-        {
-            if(_mesh[i].isSelected()) _mesh[i].DisableColor();
-        }
-        updateGL();
-    }
-    //Enable the vertex color
-    inline void EnableVertexColor()
-    {
-        for(unsigned int i = 0; i < _mesh.size(); i++)
-        {
-            if(_mesh[i].isSelected()) _mesh[i].EnableVertexColor();
-        }
-        updateGL();
-    }
-    //Enable the face color
-    inline void EnableFaceColor()
-    {
-        for(unsigned int i = 0; i < _mesh.size(); i++)
-        {
-            if(_mesh[i].isSelected()) _mesh[i].EnableFaceColor();
-        }
-        updateGL();
-    }
-    //Enable the texture
-    inline void EnableTexture()
-    {
-        for(unsigned int i = 0; i < _mesh.size(); i++)
-        {
-            if(_mesh[i].isSelected()) _mesh[i].EnableTexture();
-        }
-        updateGL();
-    }
-    //Enable the vertex quality color
-    inline void EnableQualityVertex()
-    {
-        for(unsigned int i = 0; i < _mesh.size(); i++)
-        {
-            if(_mesh[i].isSelected()) _mesh[i].EnableQualityVertex();
-        }
-        updateGL();
-    }
-    //Enable the face quality color
-    inline void EnableQualityFace()
-    {
-        for(unsigned int i = 0; i < _mesh.size(); i++)
-        {
-            if(_mesh[i].isSelected()) _mesh[i].EnableQualityFace();
-        }
-        updateGL();
-    }
-    //Enable the material
-    inline void EnableMaterial()
-    {
-        for(unsigned int i = 0; i < _mesh.size(); i++)
-        {
-            if(_mesh[i].isSelected()) _mesh[i].EnableMaterial();
-        }
-        updateGL();
-    }
+	/// COLOR
+	/** Disable the colors */
+	inline void disableColor(void)
+	{
+		for (unsigned int i = 0; i < this->_mesh.size(); ++i)
+		{
+			if (this->_mesh[i].isSelected())
+				this->_mesh[i].disableColor();
+		}
+		this->updateGL();
+	}
+	/** Enable the vertex color */
+	inline void enableVertexColor(void)
+	{
+		for (unsigned int i = 0; i < this->_mesh.size(); ++i)
+		{
+			if (this->_mesh[i].isSelected())
+				this->_mesh[i].enableVertexColor();
+		}
+		this->updateGL();
+	}
+	/** Enable the face color */
+	inline void enableFaceColor(void)
+	{
+		for (unsigned int i = 0; i < this->_mesh.size(); ++i)
+		{
+			if (this->_mesh[i].isSelected())
+				this->_mesh[i].enableFaceColor();
+		}
+		this->updateGL();
+	}
+	/** Enable the texture */
+	inline void enableTexture(void)
+	{
+		for (unsigned int i = 0; i < this->_mesh.size(); ++i)
+		{
+			if (this->_mesh[i].isSelected())
+				this->_mesh[i].enableTexture();
+		}
+		this->updateGL();
+	}
+	/** Enable the vertex quality color */
+	inline void enableQualityVertex(void)
+	{
+		for (unsigned int i = 0; i < this->_mesh.size(); ++i)
+		{
+			if (this->_mesh[i].isSelected())
+				this->_mesh[i].enableQualityVertex();
+		}
+		this->updateGL();
+	}
+	/** Enable the face quality color */
+	inline void enableQualityFace(void)
+	{
+		for (unsigned int i = 0; i < this->_mesh.size(); ++i)
+		{
+			if (this->_mesh[i].isSelected())
+				this->_mesh[i].enableQualityFace();
+		}
+		this->updateGL();
+	}
+	/** Enable the material */
+	inline void enableMaterial(void)
+	{
+		for (unsigned int i = 0; i < this->_mesh.size(); ++i)
+		{
+			if (this->_mesh[i].isSelected())
+				this->_mesh[i].enableMaterial();
+		}
+		updateGL();
+	}
 
-    /// NORMAL
-    //Disable the normal visualization
-    inline void DisableNormal()
-    {
-        for(unsigned int i = 0; i < _mesh.size(); i++)
-        {
-            if(_mesh[i].isSelected()) _mesh[i].DisableNormal();
-        }
-        updateGL();
-    }
-    //Enable or Disable the vertex normal
-    inline void ToggleNormalVertex()
-    {
-        for(unsigned int i = 0; i < _mesh.size(); i++)
-        {
-            if(_mesh[i].isSelected()) _mesh[i].ToggleNormalVertex();
-        }
-        updateGL();
-    }
-    //Enable or Disable the face normal
-    inline void ToggleNormalFace()
-    {
-        for(unsigned int i = 0; i < _mesh.size(); i++)
-        {
-            if(_mesh[i].isSelected()) _mesh[i].ToggleNormalFace();
-        }
-        updateGL();
-    }
+	/// WIREFRAME
+	/** Enable or Disable the wireframe visualization */
+	inline void toggleWireframe(void)
+	{
+		for (unsigned int i = 0; i < this->_mesh.size(); ++i)
+		{
+			if (this->_mesh[i].isSelected())
+				this->_mesh[i].toggleWireframe();
+		}
+		this->updateGL();
+	}
 
-    /// WIREFRAME
-    //Enable or Disable the wireframe visualization
-    inline void ToggleWireframe()
-    {
-        for(unsigned int i = 0; i < _mesh.size(); i++)
-        {
-            if(_mesh[i].isSelected()) _mesh[i].ToggleWireframe();
-        }
-        updateGL();
-    }
+	/// GENERAL
+	/** Reset the GLWindow */
+	void reset(void);
+	/** Return the bounding box of the scene */
+	inline vcg::Box3d Box(void) const { return this->_box; }
+	/** Remove the i-th mesh */
+	inline void removeMesh(const unsigned int i)
+	{
+		assert(/*(i >= 0) &&*/ (i < this->_mesh.size()));
 
-    /// GRID
-    //Enable or Disable the grid visualization
-    inline void ToggleGrid()
-    {
-        for(unsigned int i = 0; i < _mesh.size(); i++)
-        {
-            if(_mesh[i].isSelected()) _mesh[i].ToggleGrid();
-        }
-        updateGL();
-    }
+		this->_mesh.erase(this->_mesh.begin() + i);
 
-    /// AXIS
-    //Enable or Disable the axis visualization
-    inline void ToggleAxis()
-    {
-        for(unsigned int i = 0; i < _mesh.size(); i++)
-        {
-            if(_mesh[i].isSelected()) _mesh[i].ToggleAxis();
-        }
-        updateGL();
-    }
+		this->_box.SetNull();
+		for (unsigned int j = 0; j < this->_mesh.size(); ++j)
+		{
+			this->_box.Add(this->_mesh[j].Box());
+		}
+	}
 
-    /// OTHERS
-    //Set the number of cell per side of the grid
-    inline void setGrid(const unsigned int side)
-    {
-        for(unsigned int i = 0; i < _mesh.size(); i++)
-        {
-            if(_mesh[i].isSelected()) _mesh[i].setGrid(side);
-        }
-    }
+	/** Add a mesh to the scene */
+	void addMesh(CGMesh* m);
+	/** Update the GLWindow **/
+	inline void updateWindow(void)
+	{
+		for (unsigned int i = 0; i < this->_mesh.size(); ++i)
+		{
+			this->_mesh[i].remakeMesh();
+		}
+		this->updateGL();
+	}
+	/** Return the camera */
+	inline GLCamera *camera(void)
+	{
+		return &this->_camera;
+	}
 
-    /// GENERAL
-    //Reset the GLWindow
-    void Reset();
-    //Return the bounding box of the scene
-    inline vcg::Box3d Box()
-    {
-        return _box;
-    }
-    //Remove the i-th mesh
-    inline void removeMesh(const unsigned int i)
-    {
-        assert((i >= 0) && (i < _mesh.size()));
+private:
+	/// OPENGL
+	/** Initialize the OpenGL parameters */
+	void initializeGL(void);
+	/** Draw the entire scene */
+	void paintGL(void);
+	/** Set the OpenGL parameters after a windows resize action */
+	void resizeGL(int width, int height);
 
-        _mesh.erase(_mesh.begin() + i);
+	/// SCENE
+	/** Draws the background gradient */
+	void drawGradient(void);
+	/// Mesh inside the scene
+	std::vector<GLMesh> _mesh;
+	/// Bounding box of the entire scene
+	vcg::Box3<double> _box;
 
-        _box.SetNull();
-        for(unsigned int j = 0; j < _mesh.size(); j++)
-        {
-            _box.Add(_mesh[j].Box());
-        }
-    }
+	/// Scene camera
+	GLCamera _camera;
+	/// Scene light (if needed)
+	//GLLight _light;
 
-    //Add a mesh to the scene
-    void addMesh(CGMesh* m);
-    //Update the GLWindow
-    inline void UpdateWindow()
-    {
-        for(unsigned int i = 0; i < _mesh.size(); i++)
-        {
-            _mesh[i].remakeMesh();
-        }
-        updateGL();
-    }
+	/// MOUSE
+	/// Last position clicked
+	QPoint _lastPos;
+	/// Sensivity of the mouse
+	float _mouseSens;
 
-    /// RENDERING
-    //Enable or disable the anaglyph
-    inline void useAnaglyph()
-    {
-        if(_load) _anaglyph = !_anaglyph;
-        updateGL();
-    }
+	/// FLAGS
+	/// Flag for knowing if a mesh is loaded or not
+	bool _loaded;
 
-private slots:
+	/// INTERACTION
+	/** Keyboard event handler */
+	void keyPressEvent(QKeyEvent *event);
+	/** Mouse event handler */
+	void mousePressEvent(QMouseEvent *event);
+	void mouseMoveEvent(QMouseEvent *event);
+	void wheelEvent(QWheelEvent *event);
 
-protected slots:
-
+signals:
+	void hasReset(void);
 };
 
-#endif //GLWINDOW_H
+#endif // CGVIEW_OPENGL_GLWINDOW_H

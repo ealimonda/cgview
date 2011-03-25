@@ -23,7 +23,7 @@ CONFIG += \
 QT +=		opengl
 
 INCLUDEPATH +=	. \
-		../../lib/vcglib
+		../../../lib/vcglib
 
 HEADERS = \
 		opengl/glwindow.h \
@@ -38,7 +38,9 @@ HEADERS = \
 		opengl/scene/scene.h \
 		opengl/mesh/glmesh.h \
 		convex_hull/my_convhull.h \
-		statusbar.h
+		statusbar.h \
+		interfaces.h \
+		pluginmanager.h
 
 SOURCES = \
 		opengl/glwindow.cpp \
@@ -52,7 +54,8 @@ SOURCES = \
 		opengl/mesh/glmesh.cpp \
 		statusbar.cpp \
 		convex_hull/my_convhull.cpp \
-		../../lib/vcglib/wrap/ply/plylib.cpp
+		pluginmanager.cpp \
+		../../../lib/vcglib/wrap/ply/plylib.cpp
 
 win32:RC_FILE =	icon.rc
 
@@ -72,3 +75,4 @@ QMAKE_CXXFLAGS += \
 		-Wconversion
 
 DEFINES +=	NDEBUG
+DESTDIR =	../output

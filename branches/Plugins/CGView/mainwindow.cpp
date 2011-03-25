@@ -16,484 +16,615 @@
  ******************************************************************************/
 #include "mainwindow.h"
 
-#include <QtGui>
-#include <QtOpenGL/QtOpenGL>
-#include "opengl/intro/glintro.h"
-#include "opengl/glwindow.h"
-#include "statusbar.h"
+#include <QtGlobal> // Q_OS_*
+#include <QtGui> // QScrollArea
 
+#include "engine.h" // class Engine
+#include "opengl/intro/glintro.h" // class GLIntro
+#include "opengl/glwindow.h" // class GLWindow
+#include "statusbar.h" // class StatusBar
+#include "interfaces.h" // class PluginTransformInterface
+#include "pluginmanager.h" // class PluginManager
+
+/** Costruttore
+ * Crea la viewport, l'engine, i menu, e attiva il keyboard listener della viewport
+ */
 MainWindow::MainWindow()
 {
-    _engine = new Engine(NULL);
+	this->_engine = new Engine(NULL);
 
-    //Setting the title of the main windows
-    this->setWindowTitle(QString("CGView - Convex Hull version"));
+#ifdef Q_OS_MAC
+	// Use the Unifed Toolbar style on Mac OS X
+	this->setUnifiedTitleAndToolBarOnMac(true);
+#endif // Q_OS_MAC
+	this->setToolButtonStyle(Qt::ToolButtonFollowStyle);
 
-    //Setting the minimum height and width and the initial height and width
-    //this->setMinimumSize(500, 500);
-    this->setWindowState(Qt::WindowMaximized);
+	// Setting the title of the main windows
+	this->setWindowTitle(QString("CGView"));
 
-    this->setContentsMargins(0, 0, 0, 0);
+	// Setting the minimum height and width and the initial height and width
+	this->setMinimumSize(300, 300);
+	this->setWindowState(Qt::WindowMaximized);
 
-    //Creating the central widget
-    _mainWidget = new QWidget;
-    this->setCentralWidget(_mainWidget);
+	this->setContentsMargins(0, 0, 0, 0);
 
-    createIntro();
-    createStatus();
-    createViewer();
+	// Creating the central widget
+	this->_mainWidget = new QWidget;
+	this->setCentralWidget(this->_mainWidget);
 
-    _area[INTRO]->setVisible(true);
-    _area[STATUS]->setVisible(false);
-    _area[VIEWER]->setVisible(false);
+	this->createIntro();
+	this->createStatus();
+	this->createViewer();
 
-    //Creating the layout
-    _layout = new QGridLayout;
-    _layout->setSpacing(0);
+	this->_area[kAreaIntro]->setVisible(true);
+	this->_area[kAreaStatus]->setVisible(false);
+	this->_area[kAreaViewer]->setVisible(false);
 
-    _layout->addWidget(_area[INTRO], 0, 0);
-    _layout->addWidget(_area[VIEWER], 1, 0);
-    _layout->addWidget(_area[STATUS], 2, 0);
+	// Creating the layout
+	this->_layout = new QGridLayout();
+	this->_layout->setSpacing(0);
 
-    _mainWidget->setLayout(_layout);
+	this->_layout->addWidget(this->_area[kAreaIntro], 0, 0);
+	this->_layout->addWidget(this->_area[kAreaViewer], 1, 0);
+	this->_layout->addWidget(this->_area[kAreaStatus], 2, 0);
 
-    //Creazione dei menu e delle azioni
-    createActions();
-    createMenus();
+	this->_mainWidget->setLayout(this->_layout);
 
-    //Connessioni
-    createConnections();
+	// Creazione dei menu e delle azioni
+	this->createActions();
+	this->createMenus();
+	this->createToolBars();
+
+	// Connessioni
+	this->createConnections();
+
+	PluginManager::sharedInstance()->loadPlugins();
 }
 
-//Create the main menus
-void MainWindow::createMenus()
+/** Create the main menus **/
+void MainWindow::createMenus(void)
 {
-    /// FILE ----------------------------------------------
-    _menu[MENU_FILE] = menuBar()->addMenu(tr("&File"));
+	/// FILE ----------------------------------------------
+	this->_menu[kMenuFile] = menuBar()->addMenu(tr("&File"));
 
-    //FILE SUBMENU
-    _menu[MENU_FILE_NEW] = new QMenu("&New", this);
+	// FILE SUBMENU
+	this->_menu[kMenuFileNew] = new QMenu("&New", this);
 
-    //Adding submenus and action
-    _menu[MENU_FILE]->addMenu(_menu[MENU_FILE_NEW]);
+	// Adding submenus and action
+	this->_menu[kMenuFile]->addMenu(this->_menu[kMenuFileNew]);
 
-    _menu[MENU_FILE_NEW]->addAction(_action[ACTION_FILE_NEW_CLOUD]);
-    _menu[MENU_FILE]->addSeparator();
-    _menu[MENU_FILE]->addAction(_action[ACTION_FILE_OPEN]);
-    _menu[MENU_FILE]->addAction(_action[ACTION_FILE_ADD]);
-    _menu[MENU_FILE]->addAction(_action[ACTION_FILE_SAVEAS]);
-    _menu[MENU_FILE]->addAction(_action[ACTION_FILE_SAVE]);
-    _menu[MENU_FILE]->addAction(_action[ACTION_FILE_CLOSE]);
-    _menu[MENU_FILE]->addAction(_action[ACTION_FILE_RESET]);
-    _menu[MENU_FILE]->addSeparator();
-    _menu[MENU_FILE]->addAction(_action[ACTION_FILE_EXIT]);
+	this->_menu[kMenuFileNew]->addAction(this->_action[kActionFileNewCloud]);
+	this->_menu[kMenuFile]->addSeparator();
+	this->_menu[kMenuFile]->addAction(this->_action[kActionFileOpen]);
+	this->_menu[kMenuFile]->addAction(this->_action[kActionFileAdd]);
+	this->_menu[kMenuFile]->addAction(this->_action[kActionFileSaveas]);
+	this->_menu[kMenuFile]->addAction(this->_action[kActionFileSave]);
+	this->_menu[kMenuFile]->addSeparator();
+	this->_menu[kMenuFile]->addAction(this->_action[kActionFileClose]);
+	this->_menu[kMenuFile]->addAction(this->_action[kActionFileReset]);
+	this->_menu[kMenuFile]->addSeparator();
+	this->_menu[kMenuFile]->addAction(this->_action[kActionFileExit]);
 
+#if 0
+	/// EDIT ----------------------------------------------
+	this->_menu[kMenuEdit] = menuBar()->addMenu(tr("&Edit"));
 
+	// EDIT SUBMENU
+	this->_menu[kMenuEditNormal]  = new QMenu("&Normals", this);
+	this->_menu[kMenuEditQuality] = new QMenu("&Quality", this);
+	this->_menu[kMenuEditColor]   = new QMenu("&Colors", this);
+	this->_menu[kMenuEditBox]     = new QMenu("&Bounding Box", this);
 
-    /// EDIT ----------------------------------------------
-    /*_menu[MENU_EDIT] = menuBar()->addMenu(tr("&Edit"));
+	// Adding submenus and action
+	this->_menu[kMenuEdit]->addMenu(this->_menu[kMenuEditNormal]);
+	this->_menu[kMenuEdit]->addMenu(this->_menu[kMenuEditQuality]);
+	this->_menu[kMenuEdit]->addMenu(this->_menu[kMenuEditColor]);
+	this->_menu[kMenuEdit]->addMenu(this->_menu[kMenuEditBox]);
 
-    //EDIT SUBMENU
-    _menu[MENU_EDIT_NORMAL]  = new QMenu("&Normals", this);
-    _menu[MENU_EDIT_QUALITY] = new QMenu("&Quality", this);
-    _menu[MENU_EDIT_COLOR]   = new QMenu("&Colors", this);
-    _menu[MENU_EDIT_BOX]     = new QMenu("&Bounding Box", this);
+	this->_menu[kMenuEditNormal]->addAction(this->_action[kActionEditUpdateVertNormal]);
+	this->_menu[kMenuEditNormal]->addAction(this->_action[kActionEditUpdateFaceNormal]);
+	this->_menu[kMenuEditNormal]->addAction(this->_action[kActionEditUpdateAllNormal]);
+	this->_menu[kMenuEditNormal]->addAction(this->_action[kActionEditInvertVertNormal]);
+	this->_menu[kMenuEditNormal]->addAction(this->_action[kActionEditInvertFaceNormal]);
+	this->_menu[kMenuEditNormal]->addAction(this->_action[kActionEditInvertAllNormal]);
+	this->_menu[kMenuEditQuality]->addAction(this->_action[kActionEditResetQuality]);
+	this->_menu[kMenuEditQuality]->addAction(this->_action[kActionEditRandomVertQuality]);
+	this->_menu[kMenuEditQuality]->addAction(this->_action[kActionEditRandomFaceQuality]);
+	this->_menu[kMenuEditQuality]->addAction(this->_action[kActionEditTransferQualityVerttoface]);
+	this->_menu[kMenuEditQuality]->addAction(this->_action[kActionEditTransferQualityFacetovert]);
+	this->_menu[kMenuEditColor]->addAction(this->_action[kActionEditRandomVertColor]);
+	this->_menu[kMenuEditColor]->addAction(this->_action[kActionEditRandomFaceColor]);
+	this->_menu[kMenuEditColor]->addAction(this->_action[kActionEditTransferColorVerttoface]);
+	this->_menu[kMenuEditColor]->addAction(this->_action[kActionEditTransferColorFacetovert]);
+	this->_menu[kMenuEditBox]->addAction(this->_action[kActionEditUpdateBox]);
+#endif // 0
 
-    //Adding submenus and action
-    _menu[MENU_EDIT]->addMenu(_menu[MENU_EDIT_NORMAL]);
-    _menu[MENU_EDIT]->addMenu(_menu[MENU_EDIT_QUALITY]);
-    _menu[MENU_EDIT]->addMenu(_menu[MENU_EDIT_COLOR]);
-    _menu[MENU_EDIT]->addMenu(_menu[MENU_EDIT_BOX]);
+	/// VIEW ----------------------------------------------
+	this->_menu[kMenuView] = menuBar()->addMenu(tr("&View"));
 
-    _menu[MENU_EDIT_NORMAL]->addAction(_action[ACTION_EDIT_UPDATE_VERT_NORMAL]);
-    _menu[MENU_EDIT_NORMAL]->addAction(_action[ACTION_EDIT_UPDATE_FACE_NORMAL]);
-    _menu[MENU_EDIT_NORMAL]->addAction(_action[ACTION_EDIT_UPDATE_ALL_NORMAL]);
-    _menu[MENU_EDIT_NORMAL]->addAction(_action[ACTION_EDIT_INVERT_VERT_NORMAL]);
-    _menu[MENU_EDIT_NORMAL]->addAction(_action[ACTION_EDIT_INVERT_FACE_NORMAL]);
-    _menu[MENU_EDIT_NORMAL]->addAction(_action[ACTION_EDIT_INVERT_ALL_NORMAL]);
-    _menu[MENU_EDIT_QUALITY]->addAction(_action[ACTION_EDIT_RESET_QUALITY]);
-    _menu[MENU_EDIT_QUALITY]->addAction(_action[ACTION_EDIT_RANDOM_VERT_QUALITY]);
-    _menu[MENU_EDIT_QUALITY]->addAction(_action[ACTION_EDIT_RANDOM_FACE_QUALITY]);
-    _menu[MENU_EDIT_QUALITY]->addAction(_action[ACTION_EDIT_TRANSFER_QUALITY_VERTTOFACE]);
-    _menu[MENU_EDIT_QUALITY]->addAction(_action[ACTION_EDIT_TRANSFER_QUALITY_FACETOVERT]);
-    _menu[MENU_EDIT_COLOR]->addAction(_action[ACTION_EDIT_RANDOM_VERT_COLOR]);
-    _menu[MENU_EDIT_COLOR]->addAction(_action[ACTION_EDIT_RANDOM_FACE_COLOR]);
-    _menu[MENU_EDIT_COLOR]->addAction(_action[ACTION_EDIT_TRANSFER_COLOR_VERTTOFACE]);
-    _menu[MENU_EDIT_COLOR]->addAction(_action[ACTION_EDIT_TRANSFER_COLOR_FACETOVERT]);
-    _menu[MENU_EDIT_BOX]->addAction(_action[ACTION_EDIT_UPDATE_BOX]);*/
+	// VIEW SUBMENU
+	this->_menu[kMenuViewBox]    = new QMenu("&Bounding Box", this);
+	this->_menu[kMenuViewMesh]   = new QMenu("&Mesh", this);
+	this->_menu[kMenuViewColor]  = new QMenu("&Colors", this);
+	this->_menu[kMenuViewMisc]   = new QMenu("&Miscellaneous", this);
 
+	// Adding submenus and action
+	this->_menu[kMenuView]->addMenu(this->_menu[kMenuViewBox]);
+	this->_menu[kMenuView]->addMenu(this->_menu[kMenuViewMesh]);
+	this->_menu[kMenuView]->addMenu(this->_menu[kMenuViewColor]);
+	this->_menu[kMenuView]->addMenu(this->_menu[kMenuViewMisc]);
 
+	this->_menu[kMenuViewBox]->addAction(this->_action[kActionViewBoxDisable]);
+	this->_menu[kMenuViewBox]->addSeparator();
+	this->_menu[kMenuViewBox]->addAction(this->_action[kActionViewBoxWired]);
+	this->_menu[kMenuViewBox]->addAction(this->_action[kActionViewBoxTrans]);
+	this->_menu[kMenuViewBox]->addAction(this->_action[kActionViewBoxSolid]);
+	this->_menu[kMenuViewMesh]->addAction(this->_action[kActionViewMeshDisable]);
+	this->_menu[kMenuViewMesh]->addSeparator();
+	this->_menu[kMenuViewMesh]->addAction(this->_action[kActionViewMeshPoint]);
+	this->_menu[kMenuViewMesh]->addAction(this->_action[kActionViewMeshFlat]);
+	this->_menu[kMenuViewMesh]->addAction(this->_action[kActionViewMeshSmooth]);
+	this->_menu[kMenuViewMesh]->addAction(this->_action[kActionViewMeshVoxel]);
+	this->_menu[kMenuViewColor]->addAction(this->_action[kActionViewColorDisable]);
+	this->_menu[kMenuViewColor]->addSeparator();
+	this->_menu[kMenuViewColor]->addAction(this->_action[kActionViewColorVertex]);
+	this->_menu[kMenuViewColor]->addAction(this->_action[kActionViewColorFace]);
+	this->_menu[kMenuViewColor]->addAction(this->_action[kActionViewColorTexture]);
+	this->_menu[kMenuViewColor]->addSeparator();
+	this->_menu[kMenuViewColor]->addAction(this->_action[kActionViewColorVertQuality]);
+	this->_menu[kMenuViewColor]->addAction(this->_action[kActionViewColorFaceQuality]);
+	this->_menu[kMenuViewColor]->addSeparator();
+	this->_menu[kMenuViewColor]->addAction(this->_action[kActionViewColorMaterial]);
+	this->_menu[kMenuViewMisc]->addAction(this->_action[kActionViewMiscWire]);
+	this->_menu[kMenuView]->addSeparator();
 
-    /// VIEW ----------------------------------------------
-    _menu[MENU_VIEW] = menuBar()->addMenu(tr("&View"));
+	/// TOOL ----------------------------------------------
+	this->_menu[kMenuTool] = menuBar()->addMenu(tr("&Tool"));
 
-    //VIEW SUBMENU
-    _menu[MENU_VIEW_BOX]    = new QMenu("&Bounding Box", this);
-    _menu[MENU_VIEW_MESH]   = new QMenu("&Mesh", this);
-    _menu[MENU_VIEW_COLOR]  = new QMenu("&Colors", this);
-    _menu[MENU_VIEW_NORMAL] = new QMenu("&Normals", this);
-    _menu[MENU_VIEW_MISC]   = new QMenu("&Miscellaneous", this);
+	// TOOL SUBMENU
+	//this->_menu[kMenuToolChaos] = new QMenu("&Chaotic Maps", this);
+	//this->_menu[kMenuToolVoxel] = new QMenu("&Voxelize", this);
 
-    //Adding submenus and action
-    _menu[MENU_VIEW]->addMenu(_menu[MENU_VIEW_BOX]);
-    _menu[MENU_VIEW]->addMenu(_menu[MENU_VIEW_MESH]);
-    _menu[MENU_VIEW]->addMenu(_menu[MENU_VIEW_COLOR]);
-    _menu[MENU_VIEW]->addMenu(_menu[MENU_VIEW_NORMAL]);
-    _menu[MENU_VIEW]->addMenu(_menu[MENU_VIEW_MISC]);
+	// Adding submenus and action
+	this->_menu[kMenuTool]->addAction(this->_action[kActionToolConvexhull]);
 
-    _menu[MENU_VIEW_BOX]->addAction(_action[ACTION_VIEW_BOX_DISABLE]);
-    _menu[MENU_VIEW_BOX]->addSeparator();
-    _menu[MENU_VIEW_BOX]->addAction(_action[ACTION_VIEW_BOX_WIRED]);
-    _menu[MENU_VIEW_BOX]->addAction(_action[ACTION_VIEW_BOX_TRANS]);
-    _menu[MENU_VIEW_BOX]->addAction(_action[ACTION_VIEW_BOX_SOLID]);
-    _menu[MENU_VIEW_MESH]->addAction(_action[ACTION_VIEW_MESH_DISABLE]);
-    _menu[MENU_VIEW_MESH]->addSeparator();
-    _menu[MENU_VIEW_MESH]->addAction(_action[ACTION_VIEW_MESH_POINT]);
-    _menu[MENU_VIEW_MESH]->addAction(_action[ACTION_VIEW_MESH_FLAT]);
-    _menu[MENU_VIEW_MESH]->addAction(_action[ACTION_VIEW_MESH_SMOOTH]);
-    _menu[MENU_VIEW_MESH]->addAction(_action[ACTION_VIEW_MESH_VOXEL]);
-    _menu[MENU_VIEW_COLOR]->addAction(_action[ACTION_VIEW_COLOR_DISABLE]);
-    _menu[MENU_VIEW_COLOR]->addSeparator();
-    _menu[MENU_VIEW_COLOR]->addAction(_action[ACTION_VIEW_COLOR_VERTEX]);
-    _menu[MENU_VIEW_COLOR]->addAction(_action[ACTION_VIEW_COLOR_FACE]);
-    _menu[MENU_VIEW_COLOR]->addAction(_action[ACTION_VIEW_COLOR_TEXTURE]);
-    _menu[MENU_VIEW_COLOR]->addSeparator();
-    _menu[MENU_VIEW_COLOR]->addAction(_action[ACTION_VIEW_COLOR_VERT_QUALITY]);
-    _menu[MENU_VIEW_COLOR]->addAction(_action[ACTION_VIEW_COLOR_FACE_QUALITY]);
-    _menu[MENU_VIEW_COLOR]->addSeparator();
-    _menu[MENU_VIEW_COLOR]->addAction(_action[ACTION_VIEW_COLOR_MATERIAL]);
-    _menu[MENU_VIEW_NORMAL]->addAction(_action[ACTION_VIEW_NORMAL_DISABLE]);
-    _menu[MENU_VIEW_NORMAL]->addSeparator();
-    _menu[MENU_VIEW_NORMAL]->addAction(_action[ACTION_VIEW_NORMAL_VERT]);
-    _menu[MENU_VIEW_NORMAL]->addAction(_action[ACTION_VIEW_NORMAL_FACE]);
-    _menu[MENU_VIEW_MISC]->addAction(_action[ACTION_VIEW_MISC_WIRE]);
-    _menu[MENU_VIEW_MISC]->addAction(_action[ACTION_VIEW_MISC_GRID]);
-    _menu[MENU_VIEW_MISC]->addAction(_action[ACTION_VIEW_MISC_AXIS]);
-    _menu[MENU_VIEW]->addSeparator();
-    _menu[MENU_VIEW]->addAction(_action[ACTION_VIEW_ANAGLYPH]);
+#if 0
+	this->_menu[kMenuTool]->addMenu(this->_menu[kMenuToolChaos]);
+	this->_menu[kMenuTool]->addMenu(this->_menu[kMenuToolVoxel]);
 
+	this->_menu[kMenuToolVoxel]->addAction(this->_action[kActionToolVoxelDisable]);
+	this->_menu[kMenuToolVoxel]->addSeparator();
+	this->_menu[kMenuToolVoxel]->addAction(this->_action[kActionToolVoxelExtern]);
+	this->_menu[kMenuToolVoxel]->addAction(this->_action[kActionToolVoxelAll]);
+#endif // 0
 
+	/// WINDOW --------------------------------------------
+	this->_menu[kMenuWindow] = menuBar()->addMenu(tr("&Window"));
 
-    /// TOOL ----------------------------------------------
-    _menu[MENU_TOOL] = menuBar()->addMenu(tr("&Tool"));
+	// OPTION SUBMENU
+	this->_menu[kMenuWindowBar] = new QMenu("&Bars", this);
 
-    //TOOL SUBMENU
-    _menu[MENU_TOOL_CHAOS] = new QMenu("&Chaotic Maps", this);
-    //_menu[MENU_TOOL_VOXEL] = new QMenu("&Voxelize", this);
+	// Adding submenus and action
+	this->_menu[kMenuWindow]->addMenu(this->_menu[kMenuWindowBar]);
 
-    //Adding submenus and action
-    _menu[MENU_TOOL]->addAction(_action[ACTION_TOOL_CONVEXHULL]);
+	this->_menu[kMenuWindowBar]->addAction(this->_action[kActionWindowBarStatus]);
 
-    /*_menu[MENU_TOOL]->addMenu(_menu[MENU_TOOL_VOXEL]);
+	/// HELP ----------------------------------------------
+	this->_menu[kMenuHelp] = menuBar()->addMenu(tr("&?"));
 
-    _menu[MENU_TOOL_VOXEL]->addAction(_action[ACTION_TOOL_VOXEL_DISABLE]);
-    _menu[MENU_TOOL_VOXEL]->addSeparator();
-    _menu[MENU_TOOL_VOXEL]->addAction(_action[ACTION_TOOL_VOXEL_EXTERN]);
-    _menu[MENU_TOOL_VOXEL]->addAction(_action[ACTION_TOOL_VOXEL_ALL]);*/
+	// ABOUT SUBMENU
 
-
-
-    /// WINDOW --------------------------------------------
-    _menu[MENU_WINDOW] = menuBar()->addMenu(tr("&Window"));
-
-    //OPTION SUBMENU
-    _menu[MENU_WINDOW_BAR] = new QMenu("&Bars", this);
-
-    //Adding submenus and action
-    _menu[MENU_WINDOW]->addMenu(_menu[MENU_WINDOW_BAR]);
-
-    _menu[MENU_WINDOW_BAR]->addAction(_action[ACTION_WINDOW_BAR_STATUS]);
-
-
-
-    /// HELP ----------------------------------------------
-    _menu[MENU_HELP] = menuBar()->addMenu(tr("&About"));
-
-    //ABOUT SUBMENU
-
-    //Adding submenus and action
-    _menu[MENU_HELP]->addAction(_action[ACTION_HELP_ABOUT]);
+	// Adding submenus and action
+	this->_menu[kMenuHelp]->addAction(this->_action[kActionHelpAbout]);
 }
 
-//Create the actions for the menus
-void MainWindow::createActions()
+/** Create the toolbars **/
+void MainWindow::createToolBars(void)
 {
-    /// FILE ----------------------------------------------
-    _action[ACTION_FILE_OPEN]   = new QAction(tr("Open..."), this);
-    _action[ACTION_FILE_ADD]   = new QAction(tr("Add..."), this);
-    _action[ACTION_FILE_SAVE]   = new QAction(tr("Save"), this);
-    _action[ACTION_FILE_SAVEAS] = new QAction(tr("Save as..."), this);
-    _action[ACTION_FILE_CLOSE]  = new QAction(tr("Close"), this);
-    _action[ACTION_FILE_RESET]  = new QAction(tr("Reset"), this);
-    _action[ACTION_FILE_EXIT]   = new QAction(tr("Exit"), this);
+	/// FILE ----------------------------------------------
+	this->_toolbar[kToolbarFile] = this->addToolBar(tr("File"));
+	this->_toolbar[kToolbarFile]->addAction(this->_action[kActionFileOpen]);
+	this->_toolbar[kToolbarFile]->addAction(this->_action[kActionFileAdd]);
+	this->_toolbar[kToolbarFile]->addAction(this->_action[kActionFileSave]);
+	this->_toolbar[kToolbarFile]->addAction(this->_action[kActionFileClose]);
+	this->_toolbar[kToolbarFile]->addAction(this->_action[kActionFileReset]);
+#ifdef Q_WS_MAC
+	this->_toolbar[kToolbarFile]->addSeparator();
+#endif
 
-    //FILE SUBMENU
-    _action[ACTION_FILE_NEW_CLOUD] = new QAction(tr("Points Cloud"), this);
-
-
-    /// EDIT ----------------------------------------------
-
-    //EDIT SUBMENU
-    /*_action[ACTION_EDIT_UPDATE_VERT_NORMAL]          = new QAction(tr("Update Vertex Normals"), this);
-    _action[ACTION_EDIT_UPDATE_FACE_NORMAL]          = new QAction(tr("Update Face Normals"), this);
-    _action[ACTION_EDIT_UPDATE_ALL_NORMAL]           = new QAction(tr("Update All Normals"), this);
-    _action[ACTION_EDIT_INVERT_VERT_NORMAL]          = new QAction(tr("Invert Vertex Normals"), this);
-    _action[ACTION_EDIT_INVERT_FACE_NORMAL]          = new QAction(tr("Invert Face Normals"), this);
-    _action[ACTION_EDIT_INVERT_ALL_NORMAL]           = new QAction(tr("Invert All Normals"), this);
-    _action[ACTION_EDIT_RESET_QUALITY]               = new QAction(tr("Reset Quality"), this);
-    _action[ACTION_EDIT_RANDOM_VERT_QUALITY]         = new QAction(tr("Random Vertex Quality"), this);
-    _action[ACTION_EDIT_RANDOM_FACE_QUALITY]         = new QAction(tr("Random Face Quality"), this);
-    _action[ACTION_EDIT_TRANSFER_QUALITY_VERTTOFACE] = new QAction(tr("Vertex Quality To Face"), this);
-    _action[ACTION_EDIT_TRANSFER_QUALITY_FACETOVERT] = new QAction(tr("Face Quality To Vertex"), this);
-    _action[ACTION_EDIT_RANDOM_VERT_COLOR]           = new QAction(tr("Random Vertex Color"), this);
-    _action[ACTION_EDIT_RANDOM_FACE_COLOR]           = new QAction(tr("Random Face Color"), this);
-    _action[ACTION_EDIT_TRANSFER_COLOR_VERTTOFACE]   = new QAction(tr("Vertex Color To Face"), this);
-    _action[ACTION_EDIT_TRANSFER_COLOR_FACETOVERT]   = new QAction(tr("Face Color To Vertex"), this);
-    _action[ACTION_EDIT_UPDATE_BOX]                  = new QAction(tr("Update Box"), this);*/
-
-
-
-    /// VIEW ----------------------------------------------
-    _action[ACTION_VIEW_ANAGLYPH] = new QAction(tr("Toggle 3D Anaglyph"), this);
-    _action[ACTION_VIEW_ANAGLYPH]->setCheckable(true);
-    _action[ACTION_VIEW_ANAGLYPH]->setChecked(false);
-
-    //VIEW SUBMENU
-    _action[ACTION_VIEW_BOX_DISABLE]        = new QAction(tr("Disable Bounding Box"), this);
-    _action[ACTION_VIEW_BOX_WIRED]          = new QAction(tr("Wireframe Bounding Box"), this);
-    _action[ACTION_VIEW_BOX_TRANS]          = new QAction(tr("Transparent Bounding Box"), this);
-    _action[ACTION_VIEW_BOX_SOLID]          = new QAction(tr("Solid Bounding Box"), this);
-    _action[ACTION_VIEW_MESH_DISABLE]       = new QAction(tr("Disable Mesh"), this);
-    _action[ACTION_VIEW_MESH_POINT]         = new QAction(tr("Points Cloud"), this);
-    _action[ACTION_VIEW_MESH_FLAT]          = new QAction(tr("Flat Shading"), this);
-    _action[ACTION_VIEW_MESH_SMOOTH]        = new QAction(tr("Smooth Shading"), this);
-    _action[ACTION_VIEW_MESH_VOXEL]         = new QAction(tr("Voxels"), this);
-    _action[ACTION_VIEW_COLOR_DISABLE]      = new QAction(tr("Disable Colors"), this);
-    _action[ACTION_VIEW_COLOR_VERTEX]       = new QAction(tr("Vertex Colors"), this);
-    _action[ACTION_VIEW_COLOR_FACE]         = new QAction(tr("Face Colors"), this);
-    _action[ACTION_VIEW_COLOR_TEXTURE]      = new QAction(tr("Texture"), this);
-    _action[ACTION_VIEW_COLOR_VERT_QUALITY] = new QAction(tr("Vertex Quality Color"), this);
-    _action[ACTION_VIEW_COLOR_FACE_QUALITY] = new QAction(tr("Face Quality Color"), this);
-    _action[ACTION_VIEW_COLOR_MATERIAL]     = new QAction(tr("Material"), this);
-    _action[ACTION_VIEW_NORMAL_DISABLE]     = new QAction(tr("Disable Normals"), this);
-    _action[ACTION_VIEW_NORMAL_VERT]        = new QAction(tr("Vertex Normals"), this);
-    _action[ACTION_VIEW_NORMAL_FACE]        = new QAction(tr("Face Normals"), this);
-    _action[ACTION_VIEW_MISC_WIRE]          = new QAction(tr("Toggle Wireframe"), this);
-    _action[ACTION_VIEW_MISC_GRID]          = new QAction(tr("Toggle Grid"), this);
-    _action[ACTION_VIEW_MISC_AXIS]          = new QAction(tr("Toggle Axis"), this);
-    _action[ACTION_VIEW_NORMAL_VERT]->setCheckable(true);
-    _action[ACTION_VIEW_NORMAL_FACE]->setCheckable(true);
-    _action[ACTION_VIEW_MISC_WIRE]->setCheckable(true);
-    _action[ACTION_VIEW_MISC_GRID]->setCheckable(true);
-    _action[ACTION_VIEW_MISC_AXIS]->setCheckable(true);
-    _action[ACTION_VIEW_NORMAL_VERT]->setChecked(false);
-    _action[ACTION_VIEW_NORMAL_FACE]->setChecked(false);
-    _action[ACTION_VIEW_MISC_WIRE]->setChecked(false);
-    _action[ACTION_VIEW_MISC_GRID]->setChecked(false);
-    _action[ACTION_VIEW_MISC_AXIS]->setChecked(false);
-
-
-
-    /// TOOL ----------------------------------------------
-    _action[ACTION_TOOL_CONVEXHULL] = new QAction(tr("Convex Hull"), this);
-
-    //TOOL SUBMENU
-    /*_action[ACTION_TOOL_VOXEL_DISABLE]     = new QAction(tr("Delete Voxels"), this);
-    _action[ACTION_TOOL_VOXEL_EXTERN]      = new QAction(tr("Voxelize Surface"), this);
-    _action[ACTION_TOOL_VOXEL_ALL]         = new QAction(tr("Voxelize All"), this);*/
-
-
-
-    /// WINDOW --------------------------------------------
-
-    //WINDOW SUBMENU
-    _action[ACTION_WINDOW_BAR_STATUS]  = new QAction(tr("Status Bar"), this);
-    _action[ACTION_WINDOW_BAR_STATUS]->setCheckable(true);
-    _action[ACTION_WINDOW_BAR_STATUS]->setChecked(true);
-
-
-
-    /// HELP ----------------------------------------------
-    _action[ACTION_HELP_ABOUT] = new QAction(tr("About CGView..."), this);
-
-    //HELP SUBMENU
+	/// VIEW ----------------------------------------------
+	this->_toolbar[kToolbarView] = this->addToolBar(tr("View"));
+	this->_toolbar[kToolbarView]->addAction(this->_action[kActionViewBoxDisable]);
+	this->_toolbar[kToolbarView]->addAction(this->_action[kActionViewBoxWired]);
+	this->_toolbar[kToolbarView]->addAction(this->_action[kActionViewBoxTrans]);
+	this->_toolbar[kToolbarView]->addAction(this->_action[kActionViewBoxSolid]);
+	this->_toolbar[kToolbarView]->addSeparator();
+	this->_toolbar[kToolbarView]->addAction(this->_action[kActionViewMeshDisable]);
+	this->_toolbar[kToolbarView]->addAction(this->_action[kActionViewMeshPoint]);
+	this->_toolbar[kToolbarView]->addAction(this->_action[kActionViewMeshFlat]);
+	this->_toolbar[kToolbarView]->addAction(this->_action[kActionViewMeshSmooth]);
+	this->_toolbar[kToolbarView]->addAction(this->_action[kActionViewMeshVoxel]);
+	this->_toolbar[kToolbarView]->addSeparator();
+	this->_toolbar[kToolbarView]->addAction(this->_action[kActionViewColorDisable]);
+	this->_toolbar[kToolbarView]->addAction(this->_action[kActionViewColorVertex]);
+	this->_toolbar[kToolbarView]->addAction(this->_action[kActionViewColorFace]);
+	this->_toolbar[kToolbarView]->addAction(this->_action[kActionViewColorTexture]);
+	this->_toolbar[kToolbarView]->addAction(this->_action[kActionViewColorVertQuality]);
+	this->_toolbar[kToolbarView]->addAction(this->_action[kActionViewColorFaceQuality]);
+	this->_toolbar[kToolbarView]->addAction(this->_action[kActionViewColorMaterial]);
+	this->_toolbar[kToolbarView]->addSeparator();
+	this->_toolbar[kToolbarView]->addAction(this->_action[kActionViewMiscWire]);
 }
 
-//Create connections between actions and objects
-void MainWindow::createConnections()
+/** Create the actions for the menus and toolbars **/
+void MainWindow::createActions(void)
 {
-    /// GENERAL -------------------------------------------
-    connect(_engine, SIGNAL(sendDcel(CGMesh*)), _glWindow, SLOT(addMesh(CGMesh*)));
-    connect(_engine, SIGNAL(sendDcel(CGMesh*)), _statusBar, SLOT(reset()));
-    connect(_engine, SIGNAL(sendInfo(const unsigned int, const unsigned int, const unsigned int)), _statusBar, SLOT(setInfo(const unsigned int, const unsigned int, const unsigned int)));
-    connect(_engine, SIGNAL(sendDcel(CGMesh*)), this, SLOT(endIntro()));
-    connect(_engine, SIGNAL(updateWindow()),    _glWindow, SLOT(UpdateWindow()));
+	/// FILE ----------------------------------------------
+	this->_action[kActionFileOpen]   = new QAction(tr("&Open"), this);
+	this->_action[kActionFileOpen]->setShortcut(QKeySequence::Open);
+	this->_action[kActionFileAdd]    = new QAction(tr("&Add..."), this);
+	this->_action[kActionFileSave]   = new QAction(tr("&Save"), this);
+	this->_action[kActionFileSave]->setShortcut(QKeySequence::Save);
+	this->_action[kActionFileSaveas] = new QAction(tr("Sa&ve as..."), this);
+	this->_action[kActionFileSaveas]->setShortcut(QKeySequence::SaveAs);
+	this->_action[kActionFileClose]  = new QAction(tr("&Close"), this);
+	this->_action[kActionFileClose]->setShortcut(QKeySequence::Close);
+	this->_action[kActionFileReset]  = new QAction(tr("&Reset"), this);
+	this->_action[kActionFileReset]->setShortcut(tr("Ctrl+Shift+R"));
+	this->_action[kActionFileExit]   = new QAction(tr("E&xit"), this);
+	this->_action[kActionFileExit]->setShortcut(QKeySequence::Quit);
 
+	// FILE SUBMENU
+	this->_action[kActionFileNewCloud] = new QAction(tr("Points Cloud"), this);
 
+	/// EDIT ----------------------------------------------
 
-    /// FILE ----------------------------------------------
-    connect(_action[ACTION_FILE_OPEN],   SIGNAL(triggered()), _engine, SLOT(openFile()));
-    //connect(_action[ACTION_FILE_ADD],   SIGNAL(triggered()), _engine, SLOT(openFile()));
-    connect(_action[ACTION_FILE_SAVEAS], SIGNAL(triggered()), _engine, SLOT(saveFile()));
-    //connect(_action[ACTION_FILE_SAVE],   SIGNAL(triggered()), , SLOT());
-    //connect(_action[ACTION_FILE_CLOSE],  SIGNAL(triggered()), , SLOT());
-    //connect(_action[ACTION_FILE_CLOSE],  SIGNAL(triggered()), this, SLOT(endIntro()));
-    connect(_action[ACTION_FILE_RESET],  SIGNAL(triggered()), _engine,   SLOT(reset()));
-    connect(_action[ACTION_FILE_RESET],  SIGNAL(triggered()), _glWindow, SLOT(Reset()));
-    connect(_action[ACTION_FILE_EXIT],   SIGNAL(triggered()), this,   SLOT(close()));
+	// EDIT SUBMENU
+#if 0
+	this->_action[kActionEditUpdateVertNormal]          = new QAction(tr("Update Vertex Normals"), this);
+	this->_action[kActionEditUpdateFaceNormal]          = new QAction(tr("Update Face Normals"), this);
+	this->_action[kActionEditUpdateAllNormal]           = new QAction(tr("Update All Normals"), this);
+	this->_action[kActionEditInvertVertNormal]          = new QAction(tr("Invert Vertex Normals"), this);
+	this->_action[kActionEditInvertFaceNormal]          = new QAction(tr("Invert Face Normals"), this);
+	this->_action[kActionEditInvertAllNormal]           = new QAction(tr("Invert All Normals"), this);
+	this->_action[kActionEditResetQuality]              = new QAction(tr("Reset Quality"), this);
+	this->_action[kActionEditRandomVertQuality]         = new QAction(tr("Random Vertex Quality"), this);
+	this->_action[kActionEditRandomFaceQuality]         = new QAction(tr("Random Face Quality"), this);
+	this->_action[kActionEditTransferQualityVerttoface] = new QAction(tr("Vertex Quality To Face"), this);
+	this->_action[kActionEditTransferQualityFacetovert] = new QAction(tr("Face Quality To Vertex"), this);
+	this->_action[kActionEditRandomVertColor]           = new QAction(tr("Random Vertex Color"), this);
+	this->_action[kActionEditRandomFaceColor]           = new QAction(tr("Random Face Color"), this);
+	this->_action[kActionEditTransferColorVerttoface]   = new QAction(tr("Vertex Color To Face"), this);
+	this->_action[kActionEditTransferColorFacetovert]   = new QAction(tr("Face Color To Vertex"), this);
+	this->_action[kActionEditUpdateBox]                 = new QAction(tr("Update Box"), this);
+#endif // 0
 
-    //FILE SUBMENU
-    connect( _action[ACTION_FILE_NEW_CLOUD], SIGNAL(triggered()), _engine, SLOT(newObject()));
+	/// VIEW ----------------------------------------------
 
+	// VIEW SUBMENU
+	this->_actiongroup[kActiongroupViewBox] = new QActionGroup(this);
+	this->_action[kActionViewBoxDisable]    = new QAction(tr("Disable Bounding Box"), this);
+	this->_action[kActionViewBoxDisable]->setIconText(tr("No B.Box"));
+	this->_action[kActionViewBoxDisable]->setCheckable(true);
+	this->_actiongroup[kActiongroupViewBox]->addAction(this->_action[kActionViewBoxDisable]);
+	this->_action[kActionViewBoxWired]      = new QAction(tr("Wireframe Bounding Box"), this);
+	this->_action[kActionViewBoxWired]->setIconText(tr("WF B.Box"));
+	this->_action[kActionViewBoxWired]->setCheckable(true);
+	this->_actiongroup[kActiongroupViewBox]->addAction(this->_action[kActionViewBoxWired]);
+	this->_action[kActionViewBoxTrans]      = new QAction(tr("Transparent Bounding Box"), this);
+	this->_action[kActionViewBoxTrans]->setIconText(tr("Transp B.Box"));
+	this->_action[kActionViewBoxTrans]->setCheckable(true);
+	this->_actiongroup[kActiongroupViewBox]->addAction(this->_action[kActionViewBoxTrans]);
+	this->_action[kActionViewBoxSolid]      = new QAction(tr("Solid Bounding Box"), this);
+	this->_action[kActionViewBoxSolid]->setIconText(tr("Solid B.Box"));
+	this->_action[kActionViewBoxSolid]->setCheckable(true);
+	this->_actiongroup[kActiongroupViewBox]->addAction(this->_action[kActionViewBoxSolid]);
+	this->_actiongroup[kActiongroupViewBox]->setExclusive(true);
+	this->_action[kActionViewBoxDisable]->setChecked(true);
 
+	this->_actiongroup[kActiongroupViewMesh] = new QActionGroup(this);
+	this->_action[kActionViewMeshDisable]    = new QAction(tr("Disable Mesh"), this);
+	this->_action[kActionViewMeshDisable]->setIconText(tr("No Mesh"));
+	this->_action[kActionViewMeshDisable]->setCheckable(true);
+	this->_actiongroup[kActiongroupViewMesh]->addAction(this->_action[kActionViewMeshDisable]);
+	this->_action[kActionViewMeshPoint]      = new QAction(tr("Points Cloud"), this);
+	this->_action[kActionViewMeshPoint]->setIconText(tr("P.Cloud"));
+	this->_action[kActionViewMeshPoint]->setCheckable(true);
+	this->_actiongroup[kActiongroupViewMesh]->addAction(this->_action[kActionViewMeshPoint]);
+	this->_action[kActionViewMeshFlat]       = new QAction(tr("Flat Shading"), this);
+	this->_action[kActionViewMeshFlat]->setIconText(tr("Flat Sh."));
+	this->_action[kActionViewMeshFlat]->setCheckable(true);
+	this->_actiongroup[kActiongroupViewMesh]->addAction(this->_action[kActionViewMeshFlat]);
+	this->_action[kActionViewMeshSmooth]     = new QAction(tr("Smooth Shading"), this);
+	this->_action[kActionViewMeshSmooth]->setIconText(tr("Smooth Sh."));
+	this->_action[kActionViewMeshSmooth]->setCheckable(true);
+	this->_actiongroup[kActiongroupViewMesh]->addAction(this->_action[kActionViewMeshSmooth]);
+	this->_action[kActionViewMeshVoxel]      = new QAction(tr("Voxels"), this);
+	this->_action[kActionViewMeshVoxel]->setIconText(tr("Vox"));
+	this->_action[kActionViewMeshVoxel]->setCheckable(true);
+	this->_actiongroup[kActiongroupViewMesh]->addAction(this->_action[kActionViewMeshVoxel]);
+	this->_actiongroup[kActiongroupViewMesh]->setExclusive(true);
+	this->_action[kActionViewMeshDisable]->setChecked(true);
 
-    /// EDIT ----------------------------------------------
+	this->_actiongroup[kActiongroupViewColor]  = new QActionGroup(this);
+	this->_action[kActionViewColorDisable]     = new QAction(tr("Disable Colors"), this);
+	this->_action[kActionViewColorDisable]->setIconText(tr("No Color"));
+	this->_action[kActionViewColorDisable]->setCheckable(true);
+	this->_actiongroup[kActiongroupViewColor]->addAction(this->_action[kActionViewColorDisable]);
+	this->_action[kActionViewColorVertex]      = new QAction(tr("Vertex Colors"), this);
+	this->_action[kActionViewColorVertex]->setIconText(tr("Vert. Col."));
+	this->_action[kActionViewColorVertex]->setCheckable(true);
+	this->_actiongroup[kActiongroupViewColor]->addAction(this->_action[kActionViewColorVertex]);
+	this->_action[kActionViewColorFace]        = new QAction(tr("Face Colors"), this);
+	this->_action[kActionViewColorFace]->setIconText(tr("Face Col."));
+	this->_action[kActionViewColorFace]->setCheckable(true);
+	this->_actiongroup[kActiongroupViewColor]->addAction(this->_action[kActionViewColorFace]);
+	this->_action[kActionViewColorTexture]     = new QAction(tr("Texture"), this);
+	this->_action[kActionViewColorTexture]->setIconText(tr("Txtr"));
+	this->_action[kActionViewColorTexture]->setCheckable(true);
+	this->_actiongroup[kActiongroupViewColor]->addAction(this->_action[kActionViewColorTexture]);
+	this->_action[kActionViewColorVertQuality] = new QAction(tr("Vertex Quality Color"), this);
+	this->_action[kActionViewColorVertQuality]->setIconText(tr("Vert. Qlt. Col."));
+	this->_action[kActionViewColorVertQuality]->setCheckable(true);
+	this->_actiongroup[kActiongroupViewColor]->addAction(this->_action[kActionViewColorVertQuality]);
+	this->_action[kActionViewColorFaceQuality] = new QAction(tr("Face Quality Color"), this);
+	this->_action[kActionViewColorFaceQuality]->setIconText(tr("Face Qlt. Col."));
+	this->_action[kActionViewColorFaceQuality]->setCheckable(true);
+	this->_actiongroup[kActiongroupViewColor]->addAction(this->_action[kActionViewColorFaceQuality]);
+	this->_action[kActionViewColorMaterial]    = new QAction(tr("Material"), this);
+	this->_action[kActionViewColorMaterial]->setIconText(tr("Mat."));
+	this->_action[kActionViewColorMaterial]->setCheckable(true);
+	this->_actiongroup[kActiongroupViewColor]->addAction(this->_action[kActionViewColorMaterial]);
+	this->_actiongroup[kActiongroupViewColor]->setExclusive(true);
+	this->_action[kActionViewColorDisable]->setChecked(true);
 
-    //EDIT SUBMENU
-    //connect(_action[ACTION_EDIT_UPDATE_VERT_NORMAL], SIGNAL(triggered()), , SLOT());
-    //connect(_action[ACTION_EDIT_UPDATE_FACE_NORMAL], SIGNAL(triggered()), , SLOT());
-    //connect(_action[ACTION_EDIT_UPDATE_ALL_NORMAL], SIGNAL(triggered()), , SLOT());
-    //connect(_action[ACTION_EDIT_INVERT_VERT_NORMAL], SIGNAL(triggered()), , SLOT());
-    //connect(_action[ACTION_EDIT_INVERT_FACE_NORMAL], SIGNAL(triggered()), , SLOT());
-    //connect(_action[ACTION_EDIT_INVERT_ALL_NORMAL],         SIGNAL(triggered()), _glWindow, SLOT(invertNormals()));
-    //connect(_action[ACTION_EDIT_RESET_QUALITY], SIGNAL(triggered()), , SLOT());
-    //connect(_action[ACTION_EDIT_RANDOM_VERT_QUALITY], SIGNAL(triggered()), , SLOT());
-    //connect(_action[ACTION_EDIT_RANDOM_FACE_QUALITY], SIGNAL(triggered()), , SLOT());
-    //connect(_action[ACTION_EDIT_TRANSFER_QUALITY_VERTTOFACE], SIGNAL(triggered()), , SLOT());
-    /*connect(_action[ACTION_EDIT_TRANSFER_QUALITY_FACETOVERT], SIGNAL(triggered()), _engine, SLOT(facetovert_q()));*/
+	this->_actiongroup[kActiongroupViewMisc] = new QActionGroup(this);
+	this->_action[kActionViewMiscWire]       = new QAction(tr("Toggle Wireframe"), this);
+	this->_action[kActionViewMiscWire]->setIconText(tr("WF"));
+	this->_action[kActionViewMiscWire]->setCheckable(true);
+	this->_actiongroup[kActiongroupViewMisc]->addAction(this->_action[kActionViewMiscWire]);
+	this->_actiongroup[kActiongroupViewMisc]->setExclusive(false);
 
-    //connect(_action[ACTION_EDIT_RANDOM_VERT_COLOR],         SIGNAL(triggered()), _glWindow, SLOT(randColor()));
-    //connect(_action[ACTION_EDIT_RANDOM_FACE_COLOR], SIGNAL(triggered()), , SLOT());
-    //connect(_action[ACTION_EDIT_TRANSFER_COLOR_VERTTOFACE], SIGNAL(triggered()), _glWindow, SLOT(colorVF()));
-    //connect(_action[ACTION_EDIT_TRANSFER_COLOR_FACETOVERT], SIGNAL(triggered()), , SLOT());
-    //connect(_action[ACTION_EDIT_UPDATE_BOX], SIGNAL(triggered()), , SLOT());
+	/// TOOL ----------------------------------------------
+	this->_action[kActionToolConvexhull] = new QAction(tr("Convex Hull"), this);
 
-
-
-    /// VIEW ----------------------------------------------
-    connect(_action[ACTION_VIEW_ANAGLYPH], SIGNAL(triggered()), _glWindow, SLOT(useAnaglyph()));
-
-    //VIEW SUBMENU
-    connect(_action[ACTION_VIEW_BOX_DISABLE],        SIGNAL(triggered()), _glWindow, SLOT(DisableBoundingBox()));
-    connect(_action[ACTION_VIEW_BOX_WIRED],          SIGNAL(triggered()), _glWindow, SLOT(EnableWiredBoundingBox()));
-    connect(_action[ACTION_VIEW_BOX_TRANS],          SIGNAL(triggered()), _glWindow, SLOT(EnableTransBoundingBox()));
-    connect(_action[ACTION_VIEW_BOX_SOLID],          SIGNAL(triggered()), _glWindow, SLOT(EnableSolidBoundingBox()));
-    connect(_action[ACTION_VIEW_MESH_DISABLE],       SIGNAL(triggered()), _glWindow, SLOT(DisableMesh()));
-    connect(_action[ACTION_VIEW_MESH_POINT],         SIGNAL(triggered()), _glWindow, SLOT(EnablePointMesh()));
-    connect(_action[ACTION_VIEW_MESH_FLAT],          SIGNAL(triggered()), _glWindow, SLOT(EnableFlatMesh()));
-    connect(_action[ACTION_VIEW_MESH_SMOOTH],        SIGNAL(triggered()), _glWindow, SLOT(EnableSmoothMesh()));
-    //connect(_action[ACTION_VIEW_MESH_VOXEL],         SIGNAL(triggered()), , SLOT());
-    connect(_action[ACTION_VIEW_COLOR_DISABLE],      SIGNAL(triggered()), _glWindow, SLOT(DisableColor()));
-    connect(_action[ACTION_VIEW_COLOR_VERTEX],       SIGNAL(triggered()), _glWindow, SLOT(EnableVertexColor()));
-    connect(_action[ACTION_VIEW_COLOR_FACE],         SIGNAL(triggered()), _glWindow, SLOT(EnableFaceColor()));
-    connect(_action[ACTION_VIEW_COLOR_TEXTURE],      SIGNAL(triggered()), _glWindow, SLOT(EnableTexture()));
-    connect(_action[ACTION_VIEW_COLOR_VERT_QUALITY], SIGNAL(triggered()), _glWindow, SLOT(EnableQualityVertex()));
-    connect(_action[ACTION_VIEW_COLOR_FACE_QUALITY], SIGNAL(triggered()), _glWindow, SLOT(EnableQualityFace()));
-    connect(_action[ACTION_VIEW_COLOR_MATERIAL],     SIGNAL(triggered()), _glWindow, SLOT(EnableMaterial()));
-    connect(_action[ACTION_VIEW_NORMAL_DISABLE],     SIGNAL(triggered()), _glWindow, SLOT(DisableNormal()));
-    connect(_action[ACTION_VIEW_NORMAL_DISABLE],     SIGNAL(triggered()), this, SLOT(Normals()));
-    connect(_action[ACTION_VIEW_NORMAL_VERT],        SIGNAL(triggered()), _glWindow, SLOT(ToggleNormalVertex()));
-    connect(_action[ACTION_VIEW_NORMAL_FACE],        SIGNAL(triggered()), _glWindow, SLOT(ToggleNormalFace()));
-    connect(_action[ACTION_VIEW_MISC_WIRE],          SIGNAL(triggered()), _glWindow, SLOT(ToggleWireframe()));
-    connect(_action[ACTION_VIEW_MISC_GRID],          SIGNAL(triggered()), _glWindow, SLOT(ToggleGrid()));
-    connect(_action[ACTION_VIEW_MISC_AXIS],          SIGNAL(triggered()), _glWindow, SLOT(ToggleAxis()));
-
-
-
-
-    /// TOOL ----------------------------------------------
-    connect(_action[ACTION_TOOL_CONVEXHULL], SIGNAL(triggered()), _engine, SLOT(calculateCH()));
-
-    //TOOL SUBMENU
-
-
+#if 0
+	this->_action[kActionToolVoxelDisable] = new QAction(tr("Delete Voxels"), this);
+	this->_action[kActionToolVoxelExtern]  = new QAction(tr("Voxelize Surface"), this);
+	this->_action[kActionToolVoxelAll]     = new QAction(tr("Voxelize All"), this);
+#endif // 0
 
     /// WINDOW --------------------------------------------
 
-    //WINDOW SUBMENU
-    connect(_action[ACTION_WINDOW_BAR_STATUS],  SIGNAL(triggered()), this, SLOT(ToggleStatus()));
+	/// WINDOW --------------------------------------------
 
+	// WINDOW SUBMENU
+	this->_actiongroup[kActiongroupWindowBar] = new QActionGroup(this);
+	this->_action[kActionWindowBarStatus]     = new QAction(tr("Status Bar"), this);
+	this->_action[kActionWindowBarStatus]->setCheckable(true);
+	this->_action[kActionWindowBarStatus]->setChecked(true);
+	this->_actiongroup[kActiongroupWindowBar]->addAction(this->_action[kActionWindowBarStatus]);
+	this->_actiongroup[kActiongroupWindowBar]->setExclusive(false);
 
+	/// HELP ----------------------------------------------
+	this->_action[kActionHelpAbout] = new QAction(tr("&About CGView..."), this);
 
-    /// HELP ----------------------------------------------
-    //connect(_action[ACTION_ABOUT_HELP], SIGNAL(triggered()), , SLOT());
-
-    //ABOUT SUBMENU
+	// HELP SUBMENU
 }
 
-void MainWindow::createIntro()
+/** Create connections between actions and objects */
+void MainWindow::createConnections(void)
 {
-    //Creating the intro
-    _glIntro = new GLIntro();
-    _glIntro->setMinimumSize(500, 500);
+	/// GENERAL -------------------------------------------
+	connect(this->_engine, SIGNAL(sendDcel(CGMesh*)), this->_glWindow, SLOT(addMesh(CGMesh*)));
+	connect(this->_engine, SIGNAL(sendDcel(CGMesh*)), this->_statusBar, SLOT(reset()));
+	connect(this->_engine, SIGNAL(sendInfo(const unsigned int, const unsigned int, const unsigned int)),
+			this->_statusBar, SLOT(setInfo(const unsigned int, const unsigned int, const unsigned int)));
+	connect(this->_engine, SIGNAL(sendDcel(CGMesh*)), this, SLOT(endIntro()));
+	connect(this->_engine, SIGNAL(updateWindow()),	this->_glWindow, SLOT(updateWindow()));
 
-    //Creating the intro area
-    _area[INTRO] = new QScrollArea;
-    _area[INTRO]->setWidget(_glIntro);
-    _area[INTRO]->setWidgetResizable(true);
-    _area[INTRO]->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    _area[INTRO]->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    _area[INTRO]->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
-    _area[INTRO]->setMinimumSize(500, 500);
+	connect(PluginManager::sharedInstance(), SIGNAL(loadedPlugin(QObject*, PluginManager::PluginType)),
+			this, SLOT(setupPlugin(QObject*, PluginManager::PluginType)));
+	connect(PluginManager::sharedInstance(), SIGNAL(loadedPlugin(QObject*, PluginManager::PluginType)),
+			PluginManager::sharedInstance(), SLOT(setupPlugin(QObject*, PluginManager::PluginType)));
+
+	/// FILE ----------------------------------------------
+	connect(this->_action[kActionFileOpen],    SIGNAL(triggered()), this->_engine,   SLOT(openFile()));
+	//connect(this->_action[kActionFileAdd],   SIGNAL(triggered()), this->_engine,   SLOT(openFile()));
+	connect(this->_action[kActionFileSaveas],  SIGNAL(triggered()), this->_engine,   SLOT(saveFile()));
+	//connect(this->_action[kActionFileSave],  SIGNAL(triggered()), ,                SLOT());
+	//connect(this->_action[kActionFileClose], SIGNAL(triggered()), ,                SLOT());
+	//connect(this->_action[kActionFileClose], SIGNAL(triggered()), this,            SLOT(prova()));
+	connect(this->_action[kActionFileReset],   SIGNAL(triggered()), this->_engine,   SLOT(reset()));
+	connect(this->_action[kActionFileReset],   SIGNAL(triggered()), this->_glWindow, SLOT(reset()));
+	connect(this->_action[kActionFileExit],    SIGNAL(triggered()), this,            SLOT(close()));
+
+	// FILE SUBMENU
+	connect(this->_action[kActionFileNewCloud], SIGNAL(triggered()), this->_engine, SLOT(newObject()));
+
+	/// EDIT ----------------------------------------------
+
+	// EDIT SUBMENU
+	//connect(this->_action[kActionEditUpdateVertNormal],          SIGNAL(triggered()), , SLOT());
+	//connect(this->_action[kActionEditUpdateFaceNormal],          SIGNAL(triggered()), , SLOT());
+	//connect(this->_action[kActionEditUpdateAllNormal],           SIGNAL(triggered()), , SLOT());
+	//connect(this->_action[kActionEditInvertVertNormal],          SIGNAL(triggered()), , SLOT());
+	//connect(this->_action[kActionEditInvertFaceNormal],          SIGNAL(triggered()), , SLOT());
+	//connect(this->_action[kActionEditInvertAllNormal],           SIGNAL(triggered()),
+	//		this->_glWindow, SLOT(invertNormals()));
+	//connect(this->_action[kActionEditResetQuality],              SIGNAL(triggered()), , SLOT());
+	//connect(this->_action[kActionEditRandomVertQuality],         SIGNAL(triggered()), , SLOT());
+	//connect(this->_action[kActionEditRandomFaceQuality],         SIGNAL(triggered()), , SLOT());
+	//connect(this->_action[kActionEditTransferQualityVerttoface], SIGNAL(triggered()), , SLOT());
+	/*connect(this->_action[kActionEditTransferQualityFacetovert],   SIGNAL(triggered()),
+			this->_engine, SLOT(faceToVertQ()));*/
+
+	//connect(this->_action[kActionEditRandomVertColor],         SIGNAL(triggered()),
+	//		this->_glWindow, SLOT(randColor()));
+	//connect(this->_action[kActionEditRandomFaceColor],         SIGNAL(triggered()), , SLOT());
+	//connect(this->_action[kActionEditTransferColorVerttoface], SIGNAL(triggered()),
+	//		this->_glWindow, SLOT(colorVF()));
+	//connect(this->_action[kActionEditTransferColorFacetovert], SIGNAL(triggered()), , SLOT());
+	//connect(this->_action[kActionEditUpdateBox],               SIGNAL(triggered()), , SLOT());
+
+	/// VIEW ----------------------------------------------
+
+	// VIEW SUBMENU
+	connect(this->_action[kActionViewBoxDisable],       SIGNAL(triggered()), this->_glWindow, SLOT(disableBoundingBox()));
+	connect(this->_action[kActionViewBoxWired],         SIGNAL(triggered()), this->_glWindow, SLOT(enableWiredBoundingBox()));
+	connect(this->_action[kActionViewBoxTrans],         SIGNAL(triggered()), this->_glWindow, SLOT(enableTransBoundingBox()));
+	connect(this->_action[kActionViewBoxSolid],         SIGNAL(triggered()), this->_glWindow, SLOT(enableSolidBoundingBox()));
+	connect(this->_action[kActionViewMeshDisable],      SIGNAL(triggered()), this->_glWindow, SLOT(disableMesh()));
+	connect(this->_action[kActionViewMeshPoint],        SIGNAL(triggered()), this->_glWindow, SLOT(enablePointMesh()));
+	connect(this->_action[kActionViewMeshFlat],         SIGNAL(triggered()), this->_glWindow, SLOT(enableFlatMesh()));
+	connect(this->_action[kActionViewMeshSmooth],       SIGNAL(triggered()), this->_glWindow, SLOT(enableSmoothMesh()));
+	//connect(this->_action[kActionViewMeshVoxel],      SIGNAL(triggered()), ,                SLOT());
+	connect(this->_action[kActionViewColorDisable],     SIGNAL(triggered()), this->_glWindow, SLOT(disableColor()));
+	connect(this->_action[kActionViewColorVertex],      SIGNAL(triggered()), this->_glWindow, SLOT(enableVertexColor()));
+	connect(this->_action[kActionViewColorFace],        SIGNAL(triggered()), this->_glWindow, SLOT(enableFaceColor()));
+	connect(this->_action[kActionViewColorTexture],     SIGNAL(triggered()), this->_glWindow, SLOT(enableTexture()));
+	connect(this->_action[kActionViewColorVertQuality], SIGNAL(triggered()), this->_glWindow, SLOT(enableQualityVertex()));
+	connect(this->_action[kActionViewColorFaceQuality], SIGNAL(triggered()), this->_glWindow, SLOT(enableQualityFace()));
+	connect(this->_action[kActionViewColorMaterial],    SIGNAL(triggered()), this->_glWindow, SLOT(enableMaterial()));
+	connect(this->_action[kActionViewMiscWire],         SIGNAL(triggered()), this->_glWindow, SLOT(toggleWireframe()));
+
+	/// TOOL ----------------------------------------------
+	connect(this->_action[kActionToolConvexhull], SIGNAL(triggered()), this->_engine, SLOT(calculateCH()));
+
+	// TOOL SUBMENU
+
+	/// WINDOW --------------------------------------------
+
+	// WINDOW SUBMENU
+	connect(this->_action[kActionWindowBarStatus],  SIGNAL(triggered()), this, SLOT(toggleStatus()));
+
+	/// HELP ----------------------------------------------
+	//connect(_action[kActionHelpAbout], SIGNAL(triggered()), , SLOT());
 }
 
-void MainWindow::createViewer()
+void MainWindow::createIntro(void)
 {
-    //Creating the viewer
-    _glWindow = new GLWindow();
-    _glWindow->setMinimumSize(500, 500);
-    _glWindow->grabKeyboard();
+	// Creating the intro
+	this->_glIntro = new GLIntro();
+	this->_glIntro->setMinimumSize(500, 500);
 
-    //Creating the viewer area
-    _area[VIEWER] = new QScrollArea;
-    _area[VIEWER]->setWidget(_glWindow);
-    _area[VIEWER]->setWidgetResizable(true);
-    _area[VIEWER]->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    _area[VIEWER]->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    _area[VIEWER]->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
-    _area[VIEWER]->setMinimumSize(500, 500);
+	// Creating the intro area
+	this->_area[kAreaIntro] = new QScrollArea;
+	this->_area[kAreaIntro]->setWidget(this->_glIntro);
+	this->_area[kAreaIntro]->setWidgetResizable(true);
+	this->_area[kAreaIntro]->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	this->_area[kAreaIntro]->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	this->_area[kAreaIntro]->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
+	this->_area[kAreaIntro]->setMinimumSize(500, 500);
 }
 
-void MainWindow::createStatus()
+void MainWindow::createViewer(void)
 {
-    //Creating the viewer
-    _statusBar = new StatusBar();
+	// Creating the viewer
+	this->_glWindow = new GLWindow();
+	this->_glWindow->setMinimumSize(500, 500);
+	this->_glWindow->grabKeyboard();
 
-    //Creating the status bar
-    _area[STATUS] = new QScrollArea;
-    _area[STATUS]->setWidget(_statusBar);
-    _area[STATUS]->setWidgetResizable(true);
-    _area[STATUS]->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    _area[STATUS]->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    _area[STATUS]->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
-    _area[STATUS]->setMinimumHeight(20);
-    _area[STATUS]->setMaximumHeight(20);
+	// Creating the viewer area
+	this->_area[kAreaViewer] = new QScrollArea;
+	this->_area[kAreaViewer]->setWidget(this->_glWindow);
+	this->_area[kAreaViewer]->setWidgetResizable(true);
+	this->_area[kAreaViewer]->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	this->_area[kAreaViewer]->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	this->_area[kAreaViewer]->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
+	this->_area[kAreaViewer]->setMinimumSize(500, 500);
 }
 
-//Enable/Disable the status bar
-void MainWindow::ToggleStatus()
+void MainWindow::createStatus(void)
 {
-    if(_action[ACTION_WINDOW_BAR_STATUS]->isChecked())
-    {
-        _area[STATUS]->setVisible(true);
-    }
-    else
-    {
-        _area[STATUS]->setVisible(false);
-    }
+	// Creating the viewer
+	this->_statusBar = new StatusBar();
+
+	// Creating the status bar
+	this->_area[kAreaStatus] = new QScrollArea;
+	this->_area[kAreaStatus]->setWidget(this->_statusBar);
+	this->_area[kAreaStatus]->setWidgetResizable(true);
+	this->_area[kAreaStatus]->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	this->_area[kAreaStatus]->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	this->_area[kAreaStatus]->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
+	this->_area[kAreaStatus]->setMinimumHeight(20);
+	this->_area[kAreaStatus]->setMaximumHeight(20);
 }
 
-
-void MainWindow::endIntro()
+/** Enable/Disable the status bar **/
+void MainWindow::toggleStatus(void)
 {
-    _area[INTRO]->setVisible(false);
-    _glIntro->stopCube();
-    _area[VIEWER]->setVisible(true);
-    _area[STATUS]->setVisible(true);
+	this->_area[kAreaStatus]->setVisible(this->_action[kActionWindowBarStatus]->isChecked());
 }
 
-void MainWindow::Normals()
+void MainWindow::endIntro(void)
 {
-    _action[ACTION_VIEW_NORMAL_VERT]->setChecked(false);
-    _action[ACTION_VIEW_NORMAL_FACE]->setChecked(false);
+	this->_area[kAreaIntro]->setVisible(false);
+	this->_glIntro->stopCube();
+	this->_area[kAreaViewer]->setVisible(true);
+	this->_area[kAreaStatus]->setVisible(true);
+}
+
+void MainWindow::setupPlugin(QObject *plugin, PluginManager::PluginType type)
+{
+	switch (type)
+	{
+	case PluginManager::kTypeInvalid:
+	case PluginManager::kTypeCollection:
+		return;
+	case PluginManager::kTypeTransform:
+	  {
+		PluginTransformInterface *thisPlugin = qobject_cast<PluginTransformInterface *>(plugin);
+		if (thisPlugin)
+			addToMenu(plugin, thisPlugin->menuName(), this->_menu[MainWindow::kMenuTool/*Chaos*/],
+					SIGNAL(triggered()), this, SLOT(runTransformPlugin()),
+					NULL/*this->_actiongroup[MainWindow::kActiongroupToolChaos]*/, true);
+	  }
+		break;
+	case PluginManager::kTypeRender:
+	  {
+		PluginRenderInterface *thisPlugin = qobject_cast<PluginRenderInterface *>(plugin);
+		if (thisPlugin)
+			addToMenu(plugin, thisPlugin->menuName(), this->_menu[MainWindow::kMenuView],
+					SIGNAL(triggered(bool)), plugin, SLOT(enable(bool)),
+					NULL, true);
+		connect(thisPlugin, SIGNAL(toggled()), PluginManager::sharedInstance(), SIGNAL(renderPluginToggled()));
+	}
+		break;
+	case PluginManager::kTypeVisualization:
+	  {
+		PluginVisualizationInterface *thisPlugin = qobject_cast<PluginVisualizationInterface *>(plugin);
+		if (thisPlugin)
+			addToMenu(plugin, thisPlugin->menuName(), this->_menu[MainWindow::kMenuViewMisc],
+					SIGNAL(triggered(bool)), plugin, SLOT(enable(bool)),
+					NULL, true);
+		connect(thisPlugin, SIGNAL(toggled()), PluginManager::sharedInstance(), SIGNAL(visualizationPluginToggled()));
+	  }
+		break;
+	}
+}
+
+void MainWindow::addToMenu(QObject *plugin, const QString &name, QMenu *menu, const char *signal, QObject *target,
+		const char *member, QActionGroup *actionGroup, bool checkable)
+{
+	QAction *action = new QAction(name, plugin);
+	connect(action, signal ? signal : SIGNAL(triggered()), target, member);
+	menu->addAction(action);
+
+	if (checkable || actionGroup)
+	{
+		action->setCheckable(true);
+	}
+	if (actionGroup)
+	{
+		actionGroup->addAction(action);
+	}
+}
+
+void MainWindow::runTransformPlugin(void)
+{
+	QAction *action = qobject_cast<QAction *>(sender());
+	PluginTransformInterface *plugin = qobject_cast<PluginTransformInterface *>(action->parent());
+
+	this->_glWindow->runTransformPlugin(plugin);
 }

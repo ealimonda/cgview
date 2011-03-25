@@ -34,154 +34,168 @@
 #include <QtOpenGL>
 #include "mesh_definition.h"
 
-
 class GLCamera
 {
 public:
-	enum EyePosition {
+	enum EyePosition
+	{
 		kEyePositionCenter,
 		kEyePositionLeft,
 		kEyePositionRight,
 	};
 
-            GLCamera();
-            GLCamera(float width);
+	GLCamera();
+	explicit GLCamera(float width);
 
-            //Esegue il codice OpenGL per la proiezione
-            void camProjection();
-            //Esegue il codice OpenGL per la camera
-            void camPosition(EyePosition e);
-            
+	/// Esegue il codice OpenGL per la proiezione
+	void camProjection(void);
+	/// Esegue il codice OpenGL per la camera
+	void camPosition(EyePosition e);
 
-            //----------- CENTER -----------//
-            inline float getCenterX() { return center[0]; }
-            inline float getCenterY() { return center[1]; }
-            inline float getCenterZ() { return center[2]; }
-            inline CGPoint getCenter() { return center; }
+	/** CENTER */
+	inline float getCenterX(void) const { return this->_center[kCoordX]; }
+	inline float getCenterY(void) const { return this->_center[kCoordY]; }
+	inline float getCenterZ(void) const { return this->_center[kCoordZ]; }
+	inline CGPoint getCenter(void) const { return this->_center; }
 
-            inline void setCenterX(float x) { center[0] = x; computeDistance(); }
-            inline void setCenterY(float y) { center[1] = y; computeDistance(); }
-            inline void setCenterZ(float z) { center[2] = z; computeDistance(); }
-            inline void setCenter(CGPoint p) { center = p; computeDistance();  }
-            inline void setCenterXYZ(float x, float y, float z) { center[0] = x;
-                                                                  center[1] = y;
-                                                                  center[2] = z;
-                                                                  computeDistance();
-                                                                  computeDirection(); }
+	inline void setCenterX(float x) { this->_center[kCoordX] = x; this->computeDistance(); }
+	inline void setCenterY(float y) { this->_center[kCoordY] = y; this->computeDistance(); }
+	inline void setCenterZ(float z) { this->_center[kCoordZ] = z; this->computeDistance(); }
+	inline void setCenter(CGPoint p) { this->_center = p; this->computeDistance();  }
+	inline void setCenterXYZ(float x, float y, float z)
+	{
+		this->_center[kCoordX] = x;
+		this->_center[kCoordY] = y;
+		this->_center[kCoordZ] = z;
+		this->computeDistance();
+		this->computeDirection();
+	}
 
-            //----------- OBSERVER -----------//
-            inline float getObserverX() { return eye[0]; }
-            inline float getObserverY() { return eye[1]; }
-            inline float getObserverZ() { return eye[2]; }
-            inline CGPoint getObserver() { return eye; }
+	/** OBSERVER */
+	inline float getObserverX(void) const { return this->_eye[kCoordX]; }
+	inline float getObserverY(void) const { return this->_eye[kCoordY]; }
+	inline float getObserverZ(void) const { return this->_eye[kCoordZ]; }
+	inline CGPoint getObserver(void) const { return this->_eye; }
 
-            inline void setObserverX(float x) { eye[0] = x; computeDistance(); }
-            inline void setObserverY(float y) { eye[1] = y; computeDistance(); }
-            inline void setObserverZ(float z) { eye[2] = z; computeDistance(); }
-            inline void setObserver(CGPoint p) { eye = p; computeDistance();  }
-            inline void setObserverXYZ(float x, float y, float z) { eye[0] = x;
-                                                                    eye[1] = y;
-                                                                    eye[2] = z;
-                                                                    computeDistance();
-                                                                    computeDirection(); }
+	inline void setObserverX(float x) { this->_eye[kCoordX] = x; this->computeDistance(); }
+	inline void setObserverY(float y) { this->_eye[kCoordY] = y; this->computeDistance(); }
+	inline void setObserverZ(float z) { this->_eye[kCoordZ] = z; this->computeDistance(); }
+	inline void setObserver(CGPoint p) { this->_eye = p; this->computeDistance(); }
+	inline void setObserverXYZ(float x, float y, float z)
+	{
+		this->_eye[kCoordX] = x;
+		this->_eye[kCoordY] = y;
+		this->_eye[kCoordZ] = z;
+		this->computeDistance();
+		this->computeDirection();
+	}
 
-            //----------- DIRECTION -----------//
-            inline float getDirectionX() { return eye[0]; }
-            inline float getDirectionY() { return eye[1]; }
-            inline float getDirectionZ() { return eye[2]; }
-            inline CGPoint getDirection() { return eye; }
+	/** DIRECTION */
+	inline float getDirectionX(void) const { return this->_eye[kCoordX]; }
+	inline float getDirectionY(void) const { return this->_eye[kCoordY]; }
+	inline float getDirectionZ(void) const { return this->_eye[kCoordZ]; }
+	inline CGPoint getDirection(void) const { return this->_eye; }
 
-            inline void setDirectionX(float x) { dir[0] = x; }
-            inline void setDirectionY(float y) { dir[1] = y; }
-            inline void setDirectionZ(float z) { dir[2] = z; }
-            inline void setDirection(CGPoint p) { dir = p; }
-            inline void setDirectionXYZ(float x, float y, float z) { dir[0] = x;
-                                                                     dir[1] = y;
-                                                                     dir[2] = z; }
+	inline void setDirectionX(float x) { this->_dir[kCoordX] = x; }
+	inline void setDirectionY(float y) { this->_dir[kCoordY] = y; }
+	inline void setDirectionZ(float z) { this->_dir[kCoordZ] = z; }
+	inline void setDirection(CGPoint p) { this->_dir = p; }
+	inline void setDirectionXYZ(float x, float y, float z)
+	{
+		this->_dir[kCoordX] = x;
+		this->_dir[kCoordY] = y;
+		this->_dir[kCoordZ] = z;
+	}
 
-            inline void computeDirection() { dir = eye - center; dir.Normalize(); }
+	inline void computeDirection(void) { this->_dir = this->_eye - this->_center; this->_dir.Normalize(); }
 
-            //----------- VUP -----------//
-            inline float getVUpX() { return vup[0]; }
-            inline float getVUpY() { return vup[1]; }
-            inline float getVUpZ() { return vup[2]; }
-            inline CGPoint getVUp() { return vup; }
+	/** VUP */
+	inline float getVUpX(void) const { return this->_vup[kCoordX]; }
+	inline float getVUpY(void) const { return this->_vup[kCoordY]; }
+	inline float getVUpZ(void) const { return this->_vup[kCoordZ]; }
+	inline CGPoint getVUp(void) const { return this->_vup; }
 
-            inline void setVUpX(float x) { vup[0] = x; }
-            inline void setVUpY(float y) { vup[1] = y; }
-            inline void setVUpZ(float z) { vup[2] = z; }
-            inline void setVUp(CGPoint p) { vup = p; }
-            inline void setVUpXYZ(float x, float y, float z) { vup[0] = x;
-                                                               vup[1] = y;
-                                                               vup[2] = z; }
+	inline void setVUpX(float x) { this->_vup[kCoordX] = x; }
+	inline void setVUpY(float y) { this->_vup[kCoordY] = y; }
+	inline void setVUpZ(float z) { this->_vup[kCoordZ] = z; }
+	inline void setVUp(CGPoint p) { this->_vup = p; }
+	inline void setVUpXYZ(float x, float y, float z)
+	{
+		this->_vup[kCoordX] = x;
+		this->_vup[kCoordY] = y;
+		this->_vup[kCoordZ] = z;
+	}
 
-            //----------- VR -----------//
-            inline float getVRX() { return vr[0]; }
-            inline float getVRY() { return vr[1]; }
-            inline float getVRZ() { return vr[2]; }
-            inline CGPoint getVR() { return vr; }
+	/** VR */
+	inline float getVRX(void) const { return this->_vr[kCoordX]; }
+	inline float getVRY(void) const { return this->_vr[kCoordY]; }
+	inline float getVRZ(void) const { return this->_vr[kCoordZ]; }
+	inline CGPoint getVR(void) const { return this->_vr; }
 
-            inline void setVRX(float x) { vr[0] = x; }
-            inline void setVRY(float y) { vr[1] = y; }
-            inline void setVRZ(float z) { vr[2] = z; }
-            inline void setVR(CGPoint p) { vr = p; }
-            inline void setVRXYZ(float x, float y, float z) { vr[0] = x;
-                                                              vr[1] = y;
-                                                              vr[2] = z; }
+	inline void setVRX(float x) { this->_vr[kCoordX] = x; }
+	inline void setVRY(float y) { this->_vr[kCoordY] = y; }
+	inline void setVRZ(float z) { this->_vr[kCoordZ] = z; }
+	inline void setVR(CGPoint p) { this->_vr = p; }
+	inline void setVRXYZ(float x, float y, float z)
+	{
+		this->_vr[kCoordX] = x;
+		this->_vr[kCoordY] = y;
+		this->_vr[kCoordZ] = z;
+	}
 
-            //----------- FOV -----------//
-            inline float getFOV() { return fov; }
-            inline void setFOV(float alpha) { fov = alpha; }
+	/** FOV */
+	inline float getFOV(void) const { return this->_fov; }
+	inline void setFOV(float alpha) { this->_fov = alpha; }
 
-            //----------- ASPECT -----------//
-            inline float getAspect() { return aspect; }
-            inline void setAspect(float ratio) { aspect = ratio; }
+	/** ASPECT */
+	inline float getAspect(void) const { return this->_aspect; }
+	inline void setAspect(float ratio) { this->_aspect = ratio; }
 
-            //----------- Z NEAR -----------//
-            inline float getClipNear() { return zNear; }
-            inline void setClipNear(float v) { if(v >= 0.0f) zNear = v; }
+	/** Z NEAR */
+	inline float getClipNear(void) const { return this->_zNear; }
+	inline void setClipNear(float v) { if (v >= 0.0f) this->_zNear = v; }
 
-            //----------- Z FAR -----------//
-            inline float getClipFar() { return zFar; }
-            inline void setClipFar(float v) { if(v >= 0.0f) zFar = v; }
+	/** Z FAR **/
+	inline float getClipFar(void) const { return this->_zFar; }
+	inline void setClipFar(float v) { if (v >= 0.0f) this->_zFar = v; }
 
-            //----------- DISTANCE -----------//
-            inline float getDistance() { return distance; }
-            inline void computeDistance() { distance = vcg::Distance(eye, center);
-                                            dir = eye - center;
-                                            dir.Normalize(); }
+	/** DISTANCE **/
+	inline float getDistance(void) const { return this->_distance; }
+	inline void computeDistance(void)
+	{
+		this->_distance = vcg::Distance(this->_eye, this->_center);
+		this->_dir = this->_eye - this->_center;
+		this->_dir.Normalize();
+	}
 
+	/** ## TRASFORMATIONS ## */
 
-            //########### TRASFORMATIONS ###########//
+	/** TRANSLATIONS */
+	void changeDistance(float d);
+	void strafeCam(float d);
+	void liftCam(float d);
+	void fitWidth(float d);
 
-            //----------- TRANSLATIONS -----------//
-            void changeDistance(float d);
-            void strafeCam(float d);
-            void liftCam(float d);
-            void fitWidth(float d);
-
-            //----------- ROTATIONS -----------//
-            void rotateVUp(float angle);
-            void rotateVR(float angle);
-            void rotateDir(float angle);
+	/** ROTATIONS */
+	void rotateVUp(float angle);
+	void rotateVR(float angle);
+	void rotateDir(float angle);
 
 	/** RESET */
 	void reset(void);
 
-     private:
+private:
+	CGPoint _center;
+	CGPoint _eye;
+	CGPoint _vup;
+	CGPoint _vr;
+	CGPoint _dir;
+	float _distance;
 
-            CGPoint center;
-            CGPoint eye;
-            CGPoint vup;
-            CGPoint vr;
-            CGPoint dir;
-            float distance;
-
-            float fov;
-            float aspect;
-            float zNear;
-            float zFar;
-
+	float _fov;
+	float _aspect;
+	float _zNear;
+	float _zFar;
 };
 
-#endif // GLCAMERA_H
+#endif // CGVIEW_OPENGL_SCENE_CAMERA_GLCAMERA_H

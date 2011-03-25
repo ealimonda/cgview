@@ -17,458 +17,319 @@
 #ifndef CGVIEW_OPENGL_MESH_GLMESH_H
 #define CGVIEW_OPENGL_MESH_GLMESH_H
 
-#include <QtOpenGL/QtOpenGL>
-#include "mesh_definition.h"
-#include "opengl/mesh/mode/visualmode.h"
-#include "opengl/mesh/material/glmaterial.h"
+#include "opengl/mesh/mode/visualmode.h" // VisualMode
+#include "opengl/mesh/material/glmaterial.h" // GLMaterial
+#include "pluginmanager.h" // PluginManager
+
+class CGMesh;
+class PluginVisualizationInterface;
 
 class GLMesh
 {
-    //Q_OBJECT
+	//Q_OBJECT
 
 public:
-    //Constructor
-    inline GLMesh() { Reset(); }
-    inline GLMesh(CGMesh* m) { Reset(); setMesh(m); }
-    //Deconstructor
-    inline ~GLMesh()
-    {
-        for(unsigned int i = 0; i < m_PROP; i++)
-        {
-            glDeleteLists(_meshGL[i], 1);
-        }
-    }
+	/** Constructor */
+	inline GLMesh() { this->reset(); }
+	explicit inline GLMesh(CGMesh* m) { this->reset(); this->setMesh(m); }
+	/** Destructor */
+	inline ~GLMesh()
+	{
+		for (unsigned int i = 0; i < kPropertiesMax; ++i)
+		{
+			glDeleteLists(this->_meshGL[i], 1);
+		}
+	}
 
-    //Draws the mesh and its properties
-    inline void drawMesh()
-    {
-        glPushMatrix();
-        if(_vis.isAxisEnabled())      glCallList(_meshGL[AXIS]);
-        if(_vis.isMeshEnabled())      glCallList(_meshGL[MESH]);
-        if(_vis.isNormalEnabled())    glCallList(_meshGL[NORMAL]);
-        if(_vis.isWireframeEnabled()) glCallList(_meshGL[WIRE]);
-        if(_vis.isGridEnabled())      glCallList(_meshGL[GRID]);
-        if(_vis.isBoxEnabled())       glCallList(_meshGL[BOX]);
-        glPopMatrix();
-    }
-    //Remake the mesh for visualization purposes
-    inline void remakeMesh()
-    {
-        if(_vis.isAxisEnabled())      remakeProp(AXIS);
-        if(_vis.isMeshEnabled())      remakeProp(MESH);
-        if(_vis.isNormalEnabled())    remakeProp(NORMAL);
-        if(_vis.isWireframeEnabled()) remakeProp(WIRE);
-        if(_vis.isGridEnabled())      remakeProp(GRID);
-        if(_vis.isBoxEnabled())       remakeProp(BOX);
-    }
-    //Reset the mesh visual setting
-    inline void Reset()
-    {
-        _vis.Reset();
-	_mat.reset();
-	_mat.setMaterial(GLMaterial::kMaterialChrome);
+	/** Draws the mesh and its properties */
+	inline void drawMesh(void)
+	{
+		glPushMatrix();
+		if( this->_vis.isMeshEnabled() )      glCallList(this->_meshGL[kPropertyMesh]);
+		if( this->_vis.isWireframeEnabled() ) glCallList(this->_meshGL[kPropertyWireframe]);
+		if( this->_vis.isBoxEnabled() )       glCallList(this->_meshGL[kPropertyBox]);
+		glCallList(this->_meshGL[kPropertyPlugins]);
+		glPopMatrix();
+	}
+	/** Remake the mesh for visualization purposes */
+	inline void remakeMesh(void)
+	{
+		if( this->_vis.isMeshEnabled() )      this->remakeProp(kPropertyMesh);
+		if( this->_vis.isWireframeEnabled() ) this->remakeProp(kPropertyWireframe);
+		if( this->_vis.isBoxEnabled() )       this->remakeProp(kPropertyBox);
+		this->remakeProp(kPropertyPlugins);
+	}
+	/** Reset the mesh visual setting */
+	inline void reset(void)
+	{
+		this->_vis.reset();
+		this->_mat.reset();
+		this->_mat.setMaterial(GLMaterial::kMaterialChrome);
 
-        _meshGL[BOX] = 0;
-        _meshGL[MESH] = 0;
-        _meshGL[NORMAL] = 0;
-        _meshGL[WIRE] = 0;
-        _meshGL[GRID] = 0;
-        _meshGL[AXIS] = 0;
+		this->_meshGL[kPropertyBox] = 0;
+		this->_meshGL[kPropertyMesh] = 0;
+		this->_meshGL[kPropertyWireframe] = 0;
+		this->_meshGL[kPropertyPlugins] = 0;
 
-        _grid = CELL;
+		this->_loaded = false;
+		this->_selected = true;
+	}
+	/** Set a mesh */
+	inline void setMesh(CGMesh* m)
+	{
+		this->_m = m;
 
-        _load = false;
-        _select = true;
-    }
+		this->_loaded = true;
 
-    //Set a mesh
-    inline void setMesh(CGMesh* m)
-    {
-        _m = m;
+		// Make everything needed for the mesh
+		if (this->_vis.isBoxEnabled())
+			this->_meshGL[kPropertyBox] = this->makeProp(kPropertyBox);
+		if (this->_vis.isMeshEnabled())
+			this->_meshGL[kPropertyMesh] = this->makeProp(kPropertyMesh);
+		if (this->_vis.isWireframeEnabled())
+			this->_meshGL[kPropertyWireframe] = this->makeProp(kPropertyWireframe);
+		this->makeProp(kPropertyPlugins);
+	}
+	/** Return the bounding box of the mesh */
+	inline vcg::Box3d Box(void) const
+	{
+		return this->_m->bbox;
+	}
+	/** Return true if the mesh is selected */
+	inline bool isSelected(void) const
+	{
+		return this->_selected;
+	}
 
-        _load = true;
+	/// BOX
+	/** Disable the bounding box */
+	inline void disableBoundingBox(void)
+	{
+		if (!this->_loaded)
+			return;
+		this->_vis.disableBox();
+		if (this->_meshGL[kPropertyBox] != 0)
+			glDeleteLists(this->_meshGL[kPropertyBox], 1);
+		this->_meshGL[kPropertyBox] = 0;
+	}
+	/** Set the wired bounding box */
+	inline void enableWiredBoundingBox(void)
+	{
+		if (!this->_loaded)
+			return;
+		this->_vis.enableBoxWired();
+		this->remakeProp(kPropertyBox);
+	}
+	/** Set the transparent bounding box */
+	inline void enableTransBoundingBox(void)
+	{
+		if (!this->_loaded)
+			return;
+		this->_vis.enableBoxTrans();
+		this->remakeProp(kPropertyBox);
+	}
+	/** Set the solid bounding box */
+	inline void enableSolidBoundingBox(void)
+	{
+		if (!this->_loaded)
+			return;
+		this->_vis.enableBoxSolid();
+		this->remakeProp(kPropertyBox);
+	}
 
-        //Make everything needed for the mesh
-        if(_vis.isBoxEnabled())       _meshGL[BOX] = makeProp(BOX);
-        if(_vis.isMeshEnabled())      _meshGL[MESH] = makeProp(MESH);
-        if(_vis.isNormalEnabled())    _meshGL[NORMAL] = makeProp(NORMAL);
-        if(_vis.isWireframeEnabled()) _meshGL[WIRE] = makeProp(WIRE);
-        if(_vis.isGridEnabled())      _meshGL[GRID] = makeProp(GRID);
-        if(_vis.isAxisEnabled())      _meshGL[AXIS] = makeProp(AXIS);
-    }
-    //Return the bounding box of the mesh
-    inline vcg::Box3d Box()
-    {
-        return _m->bbox;
-    }
+	/// MESH
+	/** Disable the mesh */
+	inline void disableMesh(void)
+	{
+		if (!this->_loaded)
+			return;
+		this->_vis.disableMesh();
+		if (this->_meshGL[kPropertyMesh] != 0)
+			glDeleteLists(this->_meshGL[kPropertyMesh], 1);
+		this->_meshGL[kPropertyMesh] = 0;
+		if (this->_vis.isWireframeEnabled())
+			this->remakeProp(kPropertyWireframe);
+	}
+	/** Set the point visualization */
+	inline void enablePointMesh(void)
+	{
+		if (!this->_loaded)
+			return;
+		this->_vis.enableMeshPoint();
+		this->remakeProp(kPropertyMesh);
+		if (this->_vis.isWireframeEnabled())
+			this->remakeProp(kPropertyWireframe);
+	}
+	/** Set the flat shading */
+	inline void enableFlatMesh(void)
+	{
+		if (!this->_loaded)
+			return;
+		if (this->_m->fn > 0)
+		{
+			this->_vis.enableMeshFlat();
+		}
+		else
+		{
+			this->_vis.enableMeshPoint();
+		}
+		this->remakeProp(kPropertyMesh);
+		if( this->_vis.isWireframeEnabled() )
+			this->remakeProp(kPropertyWireframe);
+	}
+	/** Set the smooth shading */
+	inline void enableSmoothMesh(void)
+	{
+		if (!this->_loaded)
+			return;
+		if (this->_m->fn > 0)
+		{
+			this->_vis.enableMeshSmooth();
+		}
+		else
+		{
+			this->_vis.enableMeshPoint();
+		}
+		this->remakeProp(kPropertyMesh);
+		if (this->_vis.isWireframeEnabled())
+			this->remakeProp(kPropertyWireframe);
+	}
+	/** Set the voxel visualization */
+	inline void enableVoxel(void)
+	{
+		if (!this->_loaded)
+			return;
+		this->_vis.enableMeshVoxel();
+		this->remakeProp(kPropertyMesh);
+		if (this->_vis.isWireframeEnabled())
+			this->remakeProp(kPropertyWireframe);
+	}
 
-    //Set the cell per side of the grid
-    inline void setGrid(const unsigned int side)
-    {
-        _grid = side;
-        if(_vis.isGridEnabled()) remakeProp(GRID);
-    }
-    //Return true if the mesh is selected
-    inline bool isSelected()
-    {
-        return _select;
-    }
+	/// COLOR
+	/** Disable the colors */
+	inline void disableColor(void)
+	{
+		if (!this->_loaded)
+			return;
+		this->_vis.disableColor();
+		if (this->_vis.isMeshEnabled())      this->remakeProp(kPropertyMesh);
+		if (this->_vis.isWireframeEnabled()) this->remakeProp(kPropertyWireframe);
+	}
+	/** Enable the vertex color */
+	inline void enableVertexColor(void)
+	{
+		if (!this->_loaded)
+			return;
+		this->_vis.enableColorVertex();
+		if (this->_vis.isMeshEnabled())      this->remakeProp(kPropertyMesh);
+		if (this->_vis.isWireframeEnabled()) this->remakeProp(kPropertyWireframe);
+	}
+	/** Enable the face color */
+	inline void enableFaceColor(void)
+	{
+		if (!this->_loaded)
+			return;
+		this->_vis.enableColorFace();
+		if (this->_vis.isMeshEnabled())      this->remakeProp(kPropertyMesh);
+		if (this->_vis.isWireframeEnabled()) this->remakeProp(kPropertyWireframe);
+	}
+	/** Enable the texture */
+	inline void enableTexture(void)
+	{
+		if (!this->_loaded)
+			return;
+		this->_vis.enableColorTexture();
+		if (this->_vis.isMeshEnabled())      this->remakeProp(kPropertyMesh);
+		if (this->_vis.isWireframeEnabled()) this->remakeProp(kPropertyWireframe);
+	}
+	/** Enable the vertex quality color */
+	inline void enableQualityVertex(void)
+	{
+		if (!this->_loaded)
+			return;
+		this->_vis.enableColorQualityVertex();
+		if (this->_vis.isMeshEnabled())      this->remakeProp(kPropertyMesh);
+		if (this->_vis.isWireframeEnabled()) this->remakeProp(kPropertyWireframe);
+	}
+	/** Enable the face quality color */
+	inline void enableQualityFace(void)
+	{
+		if (!this->_loaded)
+			return;
+		this->_vis.enableColorQualityFace();
+		if (this->_vis.isMeshEnabled())      this->remakeProp(kPropertyMesh);
+		if (this->_vis.isWireframeEnabled()) this->remakeProp(kPropertyWireframe);
+	}
+	/** Enable the material */
+	inline void enableMaterial(void) {
+		if (!this->_loaded)
+			return;
+		this->_vis.enableColorMaterial();
+		this->_mat.reset();
+		this->_mat.setMaterial(rand()%GLMaterial::kMaterialsMax); // FIXME: Remove the rand()?
+		//this->_mat.setMaterial(GLMaterial::kMaterialChrome);
+		if (this->_vis.isMeshEnabled())      this->remakeProp(kPropertyMesh);
+		if (this->_vis.isWireframeEnabled()) this->remakeProp(kPropertyWireframe);
+	}
 
-    /// BOX
-    //Disable the bounding box
-    inline void DisableBoundingBox()
-    {
-        if(_load)
-        {
-            _vis.Disable_Box();
-            if(_meshGL[BOX] != 0) glDeleteLists(_meshGL[BOX], 1);
-            _meshGL[BOX] = 0;
-        }
-    }
-    //Set the wired bounding box
-    inline void EnableWiredBoundingBox()
-    {
-        if(_load)
-        {
-            _vis.Enable_Box_Wired();
-            remakeProp(BOX);
-        }
-    }
-    //Set the transparent bounding box
-    inline void EnableTransBoundingBox()
-    {
-        if(_load)
-        {
-            _vis.Enable_Box_Trans();
-            remakeProp(BOX);
-        }
-    }
-    //Set the solid bounding box
-    inline void EnableSolidBoundingBox()
-    {
-        if(_load)
-        {
-            _vis.Enable_Box_Solid();
-            remakeProp(BOX);
-        }
-    }
+	/// WIREFRAME
+	/** Enable or Disable the wireframe visualization */
+	inline void toggleWireframe(void)
+	{
+		if (!this->_loaded)
+			return;
+		if (this->_vis.isWireframeEnabled())
+		{
+			this->_vis.disableWireframe();
+			if (this->_meshGL[kPropertyWireframe] != 0)
+				glDeleteLists(this->_meshGL[kPropertyWireframe], 1);
+			this->_meshGL[kPropertyWireframe] = 0;
+		}
+		else
+		{
+			this->_vis.enableWireframe();
+			this->remakeProp(kPropertyWireframe);
+		}
+	}
 
-    /// MESH
-    //Disable the mesh
-    inline void DisableMesh()
-    {
-        if(_load)
-        {
-            _vis.Disable_Mesh();
-            if(_meshGL[MESH] != 0) glDeleteLists(_meshGL[MESH], 1);
-            _meshGL[MESH] = 0;
-            if(_vis.isWireframeEnabled()) remakeProp(WIRE);
-        }
-    }
-    //Set the point visualization
-    inline void EnablePointMesh()
-    {
-        if(_load)
-        {
-            _vis.Enable_Mesh_Point();
-            remakeProp(MESH);
-            if(_vis.isWireframeEnabled()) remakeProp(WIRE);
-        }
-    }
-    //Set the flat shading
-    inline void EnableFlatMesh()
-    {
-        if(_load)
-        {
-            if(_m->fn > 0)
-            {
-                _vis.Enable_Mesh_Flat();
-            }
-            else
-            {
-                _vis.Enable_Mesh_Point();
-            }
-            remakeProp(MESH);
-            if(_vis.isWireframeEnabled()) remakeProp(WIRE);
-        }
-    }
-    //Set the smooth shading
-    inline void EnableSmoothMesh()
-    {
-        if(_load)
-        {
-            if(_m->fn > 0)
-            {
-                _vis.Enable_Mesh_Smooth();
-            }
-            else
-            {
-                _vis.Enable_Mesh_Point();
-            }
-            remakeProp(MESH);
-            if(_vis.isWireframeEnabled()) remakeProp(WIRE);
-        }
-    }
-    //Set the voxel visualization
-    inline void EnableVoxel()
-    {
-        if(_load)
-        {
-            _vis.Enable_Mesh_Voxel();
-            remakeProp(MESH);
-            if(_vis.isWireframeEnabled()) remakeProp(WIRE);
-        }
-    }
-
-    /// COLOR
-    //Disable the colors
-    inline void DisableColor()
-    {
-        if(_load)
-        {
-            _vis.Disable_Color();
-            if(_vis.isMeshEnabled()) remakeProp(MESH);
-            if(_vis.isWireframeEnabled()) remakeProp(WIRE);
-        }
-    }
-    //Enable the vertex color
-    inline void EnableVertexColor()
-    {
-        if(_load)
-        {
-            _vis.Enable_Color_Vertex();
-            if(_vis.isMeshEnabled()) remakeProp(MESH);
-            if(_vis.isWireframeEnabled()) remakeProp(WIRE);
-        }
-    }
-    //Enable the face color
-    inline void EnableFaceColor()
-    {
-        if(_load)
-        {
-            _vis.Enable_Color_Face();
-            if(_vis.isMeshEnabled()) remakeProp(MESH);
-            if(_vis.isWireframeEnabled()) remakeProp(WIRE);
-        }
-    }
-    //Enable the texture
-    inline void EnableTexture()
-    {
-        if(_load)
-        {
-            _vis.Enable_Color_Texture();
-            if(_vis.isMeshEnabled()) remakeProp(MESH);
-            if(_vis.isWireframeEnabled()) remakeProp(WIRE);
-        }
-    }
-    //Enable the vertex quality color
-    inline void EnableQualityVertex()
-    {
-        if(_load)
-        {
-            _vis.Enable_Color_Quality_Vertex();
-            if(_vis.isMeshEnabled()) remakeProp(MESH);
-            if(_vis.isWireframeEnabled()) remakeProp(WIRE);
-        }
-    }
-    //Enable the face quality color
-    inline void EnableQualityFace()
-    {
-        if(_load)
-        {
-            _vis.Enable_Color_Quality_Face();
-            if(_vis.isMeshEnabled()) remakeProp(MESH);
-            if(_vis.isWireframeEnabled()) remakeProp(WIRE);
-        }
-    }
-    //Enable the material
-    inline void EnableMaterial()
-    {
-        if(_load)
-        {
-            _vis.Enable_Color_Material();
-	    _mat.reset();
-            _mat.setMaterial(rand()%20);
-            //_mat.setMaterial(GLMaterial::CHROME);
-            if(_vis.isMeshEnabled()) remakeProp(MESH);
-            if(_vis.isWireframeEnabled()) remakeProp(WIRE);
-        }
-    }
-
-    /// NORMAL
-    //Disable the normal visualization
-    inline void DisableNormal()
-    {
-        if(_load)
-        {
-            _vis.Disable_Normal();
-            if(_meshGL[NORMAL] != 0) glDeleteLists(_meshGL[NORMAL], 1);
-            _meshGL[NORMAL] = 0;
-        }
-    }
-    //Enable or Disable the vertex normal
-    inline void ToggleNormalVertex()
-    {
-        if(_load)
-        {
-            if(_vis.isNormalVertex())
-            {
-                _vis.Disable_Normal_Vertex();
-                if(_vis.isNormalFace())
-                {
-                    remakeProp(NORMAL);
-                }
-                else
-                {
-                    if(_meshGL[NORMAL] != 0) glDeleteLists(_meshGL[NORMAL], 1);
-                    _meshGL[NORMAL] = 0;
-                }
-            }
-            else
-            {
-                _vis.Enable_Normal_Vertex();
-                remakeProp(NORMAL);
-            }
-        }
-    }
-    //Enable or Disable the face normal
-    inline void ToggleNormalFace()
-    {
-        if(_load)
-        {
-            if(_vis.isNormalFace())
-            {
-                _vis.Disable_Normal_Face();
-                if(_vis.isNormalVertex())
-                {
-                    remakeProp(NORMAL);
-                }
-                else
-                {
-                    if(_meshGL[NORMAL] != 0) glDeleteLists(_meshGL[NORMAL], 1);
-                    _meshGL[NORMAL] = 0;
-                }
-            }
-            else
-            {
-                _vis.Enable_Normal_Face();
-                remakeProp(NORMAL);
-            }
-        }
-    }
-
-    /// WIREFRAME
-    //Enable or Disable the wireframe visualization
-    inline void ToggleWireframe()
-    {
-        if(_load)
-        {
-            if(_vis.isWireframeEnabled())
-            {
-                _vis.Disable_Wireframe();
-                if(_meshGL[WIRE] != 0) glDeleteLists(_meshGL[WIRE], 1);
-                _meshGL[WIRE] = 0;
-            }
-            else
-            {
-                _vis.Enable_Wireframe();
-                remakeProp(WIRE);
-            }
-        }
-    }
-
-    /// GRID
-    //Enable or Disable the grid visualization
-    inline void ToggleGrid()
-    {
-        if(_load)
-        {
-            if(_vis.isGridEnabled())
-            {
-                _vis.Disable_Grid();
-                if(_meshGL[GRID] != 0) glDeleteLists(_meshGL[GRID], 1);
-                _meshGL[GRID] = 0;
-            }
-            else
-            {
-                _vis.Enable_Grid();
-                remakeProp(GRID);
-            }
-        }
-    }
-
-    /// AXIS
-    //Enable or Disable the axis visualization
-    inline void ToggleAxis()
-    {
-        if(_load)
-        {
-            if(_vis.isAxisEnabled())
-            {
-                _vis.Disable_Axis();
-                if(_meshGL[AXIS] != 0) glDeleteLists(_meshGL[AXIS], 1);
-                _meshGL[AXIS] = 0;
-            }
-            else
-            {
-                _vis.Enable_Axis();
-                remakeProp(AXIS);
-            }
-        }
-    }
-
+	inline CGMesh *mesh(void) const {
+		return this->_m;
+	}
 
 private:
+	/** Identify the property of the mesh **/
+	enum MeshProperty {
+		kPropertyBox,
+		kPropertyMesh,
+		kPropertyColor,
+		kPropertyWireframe,
+		kPropertyPlugins,
+		kPropertiesMax
+	};
 
-protected:
-    //Identify the property of the mesh
-    enum MeshProp
-    {
-        BOX,
-        MESH,
-        COLOR,
-        NORMAL,
-        WIRE,
-        GRID,
-        AXIS
-    };
-    //Number of properties
-    static const unsigned int m_PROP = 7;
+	/** Construct the selected property of the mesh */
+	GLuint makeProp(MeshProperty p);
+	/** Remake the selected property of the mesh */
+	inline void remakeProp(MeshProperty p)
+	{
+		glDeleteLists(this->_meshGL[p], 1);
+		this->_meshGL[p] = 0;
+		this->_meshGL[p] = this->makeProp(p);
+	}
 
-    //Construct the selected property of the mesh
-    GLuint makeProp(MeshProp p);
-    //Remake the selected property of the mesh
-    inline void remakeProp(MeshProp p = MESH)
-    {
-        glDeleteLists(_meshGL[p], 1);
-        _meshGL[p] = 0;
-        _meshGL[p] = makeProp(p);
-    }
+	/// OpenGL identifier for the mesh and its properties
+	GLuint _meshGL[kPropertiesMax];
+	/// Real mesh
+	CGMesh* _m;
+	/// Visualization flags
+	VisualMode _vis;
+	/// Mesh Material
+	GLMaterial _mat;
+	/// Voxelized mesh
+	// Voxelization* _vox;
 
-    //OpenGL identifier for the mesh and its properties
-    GLuint _meshGL[m_PROP];
-    //Real mesh
-    CGMesh* _m;
-    //Visualization flags
-    VisualMode _vis;
-    //Mesh Material
-    GLMaterial _mat;
-    //Voxelized mesh
-    //Voxelization* _vox;
-
-    static const unsigned int CELL = 10;
-    unsigned int _grid;
-    //unsigned int _grid[3];
-
-    bool _load;
-    bool _select;
-
-//signals:
-
-//public slots:
-
-//private slots:
-
+	bool _loaded;
+	bool _selected;
 };
 
-#endif // GLMESH_H
+#endif // CGVIEW_OPENGL_MESH_GLMESH_H

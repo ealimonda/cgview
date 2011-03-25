@@ -1,28 +1,30 @@
-/**********************************************************************
-*                                                                     *
-*    CCCCCCCCCC  GGGGGGGGGG  VV        VV                             *
-*    CC          GG           VV      VV   II   EEEEE    W       W    *
-*    CC          GG            VV    VV        E     E   W       W    *
-*    CC          GG    GGGG     VV  VV     II  EEEEEE    W   W   W    *
-*    CC          GG      GG      VVVV      II  E         W   W   W    *
-*    CCCCCCCCCC  GGGGGGGGGG       VV       II   EEEEEE    WWW WWW     *
-*                                                                     *
-**********************************************************************/
-
-
-/*
-  Il main si occupa semplicemente di creare l'applicazione e farla partire
-*/
-
-
+/******************************************************************************
+ *        CCCCCCC     GGGGGGG   VV     VV   II   EEEEEEEEE   WW       WW      *
+ *      CC          GG           VV   VV    II   EE          WW       WW      *
+ *      CC          GG     GG     VV VV     II   EEEEEE       WW  W  WW       *
+ *      CC          GG     GG      VVV      II   EE            WW W WW        *
+ *        CCCCCCC     GGGGGGG       V       II   EEEEEEEEE      W   W         *
+ ******************************************************************************
+ * University of Cagliari, Italy - Computer Graphics Group                    *
+ * Filename: main.cpp                                                         *
+ * Description: Application's main().                                         *
+ ******************************************************************************
+ * $Id::                                                       $: SVN Info    *
+ * $Date::                                                     $: Last date   *
+ * $Author::                                                   $: Last author *
+ * $Revision::                                                 $: Revision    *
+ ******************************************************************************/
 #include <QApplication>
 
-#include "mainwindow.h"
+#include "mainwindow.h" // MainWindow
 
+/**
+ * Il main si occupa semplicemente di creare l'applicazione e farla partire
+ */
 int main(int argc, char *argv[])
 {
-    QApplication app(argc, argv);
-    MainWindow mainWin;
-    mainWin.show();
-    return app.exec();
+	QApplication app(argc, argv);
+	MainWindow mainWin;
+	mainWin.show();
+	return app.exec();
 }

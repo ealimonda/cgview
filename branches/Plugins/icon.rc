@@ -1,0 +1,17 @@
+/******************************************************************************
+ *        CCCCCCC     GGGGGGG   VV     VV   II   EEEEEEEEE   WW       WW      *
+ *      CC          GG           VV   VV    II   EE          WW       WW      *
+ *      CC          GG     GG     VV VV     II   EEEEEE       WW  W  WW       *
+ *      CC          GG     GG      VVV      II   EE            WW W WW        *
+ *        CCCCCCC     GGGGGGG       V       II   EEEEEEEEE      W   W         *
+ ******************************************************************************
+ * Università degli Studi di Cagliari - Gruppo di Informatica Grafica         *
+ * Filename: icon.rc                                                          *
+ * Description: Windows resources include                                     *
+ ******************************************************************************
+ * $Id:: icon.rc 216 2011-03-13 11:46:28Z syao                 $: SVN Info    *
+ * $Date:: 2011-03-13 12:46:28 +0100 (Sun, 13 Mar 2011)        $: Last date   *
+ * $Author:: syao                                              $: Last author *
+ * $Revision:: 216                                             $: Revision    *
+ ******************************************************************************/
+IDI_ICON1 ICON DISCARDABLE "logo.ico"

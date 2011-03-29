@@ -184,10 +184,12 @@ void MainWindow::createMenus(void)
 	// TOOL SUBMENU
 	//this->_menu[kMenuToolChaos] = new QMenu("&Chaotic Maps", this);
 	//this->_menu[kMenuToolVoxel] = new QMenu("&Voxelize", this);
+	this->_menu[kMenuToolInput] = new QMenu("&Input methods", this);
 
 	// Adding submenus and action
 	this->_menu[kMenuTool]->addAction(this->_action[kActionToolConvexhull]);
 
+	this->_menu[kMenuTool]->addMenu(this->_menu[kMenuToolInput]);
 #if 0
 	this->_menu[kMenuTool]->addMenu(this->_menu[kMenuToolChaos]);
 	this->_menu[kMenuTool]->addMenu(this->_menu[kMenuToolVoxel]);
@@ -394,8 +396,6 @@ void MainWindow::createActions(void)
 	this->_action[kActionToolVoxelAll]     = new QAction(tr("Voxelize All"), this);
 #endif // 0
 
-    /// WINDOW --------------------------------------------
-
 	/// WINDOW --------------------------------------------
 
 	// WINDOW SUBMENU
@@ -523,7 +523,10 @@ void MainWindow::createViewer(void)
 	// Creating the viewer
 	this->_glWindow = new GLWindow();
 	this->_glWindow->setMinimumSize(500, 500);
-	this->_glWindow->grabKeyboard();
+//	this->_glWindow->grabKeyboard();
+//	this->_glWindow->installEventFilter(this);
+//	this->_glIntro->installEventFilter(this);
+//	this->_statusBar->installEventFilter(this);
 
 	// Creating the viewer area
 	this->_area[kAreaViewer] = new QScrollArea;
@@ -579,6 +582,7 @@ void MainWindow::setupPlugin(QObject *plugin, PluginManager::PluginType type)
 			addToMenu(plugin, thisPlugin->menuName(), this->_menu[MainWindow::kMenuTool/*Chaos*/],
 					SIGNAL(triggered()), this, SLOT(runTransformPlugin()),
 					NULL/*this->_actiongroup[MainWindow::kActiongroupToolChaos]*/, true);
+		thisPlugin->loaded();
 	  }
 		break;
 	case PluginManager::kTypeRender:
@@ -589,6 +593,7 @@ void MainWindow::setupPlugin(QObject *plugin, PluginManager::PluginType type)
 					SIGNAL(triggered(bool)), plugin, SLOT(enable(bool)),
 					NULL, true);
 		connect(thisPlugin, SIGNAL(toggled()), PluginManager::sharedInstance(), SIGNAL(renderPluginToggled()));
+		thisPlugin->loaded();
 	}
 		break;
 	case PluginManager::kTypeVisualization:
@@ -599,6 +604,18 @@ void MainWindow::setupPlugin(QObject *plugin, PluginManager::PluginType type)
 					SIGNAL(triggered(bool)), plugin, SLOT(enable(bool)),
 					NULL, true);
 		connect(thisPlugin, SIGNAL(toggled()), PluginManager::sharedInstance(), SIGNAL(visualizationPluginToggled()));
+		thisPlugin->loaded();
+	  }
+		break;
+	case PluginManager::kTypeUIInput:
+	  {
+		PluginUIInputInterface *thisPlugin = qobject_cast<PluginUIInputInterface *>(plugin);
+		if (thisPlugin)
+			addToMenu(plugin, thisPlugin->menuName(), this->_menu[MainWindow::kMenuToolInput],
+					SIGNAL(triggered(bool)), plugin, SLOT(enable(bool)),
+					NULL, true);
+		connect(thisPlugin, SIGNAL(toggled()), this, SLOT(uiInputPluginToggled()));
+		thisPlugin->loaded();
 	  }
 		break;
 	}
@@ -627,4 +644,28 @@ void MainWindow::runTransformPlugin(void)
 	PluginTransformInterface *plugin = qobject_cast<PluginTransformInterface *>(action->parent());
 
 	this->_glWindow->runTransformPlugin(plugin);
+}
+
+void MainWindow::uiInputPluginToggled(void)
+{
+	PluginUIInputInterface *senderPlugin = (PluginUIInputInterface *)sender();
+	if (!senderPlugin)
+		return;
+	if (senderPlugin->isEnabled())
+		connect(senderPlugin, SIGNAL(receivedEvent(InputEvents::EventType,float)),
+				this->_glWindow, SLOT(uiInputEvent(InputEvents::EventType,float)));
+	else
+		disconnect(senderPlugin, SIGNAL(receivedEvent(InputEvents::EventType,float)),
+				this->_glWindow, SLOT(uiInputEvent(InputEvents::EventType,float)));
+}
+
+/**
+ * Keyboard listener
+ */
+void MainWindow::keyPressEvent(QKeyEvent *event)
+{
+	if (InputEvents::DispatchEvent((QEvent *)event))
+		event->accept();
+	else
+		event->ignore();
 }

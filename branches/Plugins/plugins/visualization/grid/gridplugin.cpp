@@ -91,6 +91,9 @@ void GridPlugin::enable(bool state)
 	emit(toggled());
 }
 
+void GridPlugin::loaded(void) {
+}
+
 QT_BEGIN_NAMESPACE
 Q_EXPORT_PLUGIN2(visualization_grid, GridPlugin)
 QT_END_NAMESPACE

@@ -5,33 +5,35 @@
  *      CC          GG     GG      VVV      II   EE            WW W WW        *
  *        CCCCCCC     GGGGGGG       V       II   EEEEEEEEE      W   W         *
  ******************************************************************************
- * University of Cagliari, Italy - Computer Graphics Group                    *
- * Filename: randomoffsetplugin.h                                             *
- * Description: Random Offset sample plugin                                   *
+ * Università degli Studi di Cagliari - Gruppo di Informatica Grafica         *
+ * Filename: inputevents.cpp                                                  *
+ * Description: UI Input Events                                               *
  ******************************************************************************
  * $Id::                                                       $: SVN Info    *
  * $Date::                                                     $: Last date   *
  * $Author::                                                   $: Last author *
  * $Revision::                                                 $: Revision    *
  ******************************************************************************/
-#ifndef CGVIEW_PLUGINS_TRANSFORM_RANDOMOFFSET_RANDOMOFFSETPLUGIN_H
-#define CGVIEW_PLUGINS_TRANSFORM_RANDOMOFFSET_RANDOMOFFSETPLUGIN_H
+#include "inputevents.h"
 
-#include <QObject> // class QObject
-#include <interfaces.h> // class PluginTransformInterface
+#include "interfaces.h" // PluginUIInputInterface
+#include "pluginmanager.h" // class PluginManager
 
-class CGMesh;
-
-class RandomOffsetPlugin : public virtual PluginTransformInterface
+InputEvents::InputEvents()
 {
-	Q_OBJECT
-	Q_INTERFACES(PluginTransformInterface)
+}
 
-public:
-	// PluginTransformInterface
-	RandomOffsetPlugin();
-	void runTransform(CGMesh *mesh) const;
-	void loaded(void);
-};
+bool InputEvents::DispatchEvent(QEvent *event)
+{
+	bool handled = false;
+	std::vector<PluginUIInputInterface *> uiInputPlugins = PluginManager::sharedInstance()->uiInputPlugins();
+	for (unsigned int i = 0; i < uiInputPlugins.size(); ++i)
+	{
+		if (!uiInputPlugins[i]->isEnabled())
+			continue;
 
-#endif // CGVIEW_PLUGINS_TRANSFORM_RANDOMOFFSET_RANDOMOFFSETPLUGIN_H 
+		if (uiInputPlugins[i]->handleEvent(event))
+			handled = true;
+	}
+	return handled;
+}

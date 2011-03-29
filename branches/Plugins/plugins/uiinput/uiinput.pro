@@ -5,9 +5,9 @@
 #*      CC          GG     GG      VVV      II   EE            WW W WW        *
 #*        CCCCCCC     GGGGGGG       V       II   EEEEEEEEE      W   W         *
 #******************************************************************************
-#* University of Cagliari, Italy - Computer Graphics Group                    *
-#* Filename: plugins.pro                                                      *
-#* Description: Plugins main project                                          *
+#* Università degli Studi di Cagliari - Gruppo di Informatica Grafica         *
+#* Filename: uiinput.pro                                                      *
+#* Description: User Interface Input                                          *
 #******************************************************************************
 #* $Id::                                                       $: SVN Info    *
 #* $Date::                                                     $: Last date   *
@@ -15,8 +15,7 @@
 #* $Revision::                                                 $: Revision    *
 #******************************************************************************
 TEMPLATE =	subdirs
-SUBDIRS = \
-		transform \
-		render \
-		visualization \
-		uiinput
+SUBDIRS =	keyboard
+##SUBDIRS +=	mouse
+# Add your plugins here
+#SUBDIRS +=	sample

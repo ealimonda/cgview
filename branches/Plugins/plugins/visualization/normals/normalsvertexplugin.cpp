@@ -62,3 +62,7 @@ void NormalsVertexPlugin::enable(bool state)
 	this->setEnabled(state);
 	emit(toggled());
 }
+
+void NormalsVertexPlugin::loaded(void) {
+}
+

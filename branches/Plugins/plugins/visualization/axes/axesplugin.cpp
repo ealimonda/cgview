@@ -100,6 +100,9 @@ void AxesPlugin::enable(bool state)
 	emit(toggled());
 }
 
+void AxesPlugin::loaded(void) {
+}
+
 QT_BEGIN_NAMESPACE
 Q_EXPORT_PLUGIN2(visualization_axes, AxesPlugin)
 QT_END_NAMESPACE

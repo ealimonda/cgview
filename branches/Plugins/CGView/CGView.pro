@@ -40,7 +40,8 @@ HEADERS = \
 		convex_hull/my_convhull.h \
 		statusbar.h \
 		interfaces.h \
-		pluginmanager.h
+		pluginmanager.h \
+		inputevents.h
 
 SOURCES = \
 		opengl/glwindow.cpp \
@@ -55,6 +56,7 @@ SOURCES = \
 		statusbar.cpp \
 		convex_hull/my_convhull.cpp \
 		pluginmanager.cpp \
+		inputevents.cpp \
 		../../../lib/vcglib/wrap/ply/plylib.cpp
 
 win32:RC_FILE =	icon.rc

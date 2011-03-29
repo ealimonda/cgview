@@ -83,8 +83,9 @@ private:
 		kMenuViewMisc,
 
 		/// Tool submenu
-		kMenuToolChaos,
-		kMenuToolVoxel,
+//		kMenuToolChaos,
+//		kMenuToolVoxel,
+		kMenuToolInput,
 
 		/// Window submenu
 		kMenuWindowBar,
@@ -145,20 +146,20 @@ private:
 
 		/// Tool actions
 		kActionToolConvexhull,
-		kActionToolChaosArnoldcat,
-		kActionToolChaosIkeda,
-		kActionToolChaosDuffing,
-		kActionToolChaosHenon,
-		kActionToolChaosGingerbread,
-		kActionToolChaosTinkerbell,
-		kActionToolChaosZaslavskii,
-		kActionToolVoxelDisable,
-		kActionToolVoxelExtern,
-		kActionToolVoxelAll,
+//		kActionToolChaosArnoldcat,
+//		kActionToolChaosIkeda,
+//		kActionToolChaosDuffing,
+//		kActionToolChaosHenon,
+//		kActionToolChaosGingerbread,
+//		kActionToolChaosTinkerbell,
+//		kActionToolChaosZaslavskii,
+//		kActionToolVoxelDisable,
+//		kActionToolVoxelExtern,
+//		kActionToolVoxelAll,
 
 		/// Window actions
 		kActionWindowBarStatus,
-		kActionWindowBarPalette,
+//		kActionWindowBarPalette,
 
 		/// About
 		kActionHelpAbout,
@@ -175,7 +176,7 @@ private:
 		kActiongroupViewColor,
 		kActiongroupViewMisc,
 
-		kActiongroupToolChaos,
+//		kActiongroupToolChaos,
 
 		kActiongroupWindowBar,
 
@@ -212,6 +213,9 @@ private:
 	void addToMenu(QObject *plugin, const QString &name, QMenu *menu, const char *signal, QObject *target,
 			const char *member, QActionGroup *actionGroup, bool checkable);
 
+	/** Keyboard listener */
+	void keyPressEvent(QKeyEvent *event);
+
 	/// Main widget
 	QWidget *_mainWidget;
 	/// Main menu
@@ -245,7 +249,9 @@ private slots:
 
 	void setupPlugin(QObject *plugin, PluginManager::PluginType type);
 
-	void runTransformPlugin( void );
+	void runTransformPlugin(void);
+
+	void uiInputPluginToggled(void);
 };
 
-#endif // MAINWINDOW_H
+#endif // CGVIEW_MAINWINDOW_H

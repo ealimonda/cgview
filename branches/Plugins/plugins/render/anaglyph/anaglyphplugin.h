@@ -32,6 +32,7 @@ public:
 	// PluginTransformInterface
 	AnaglyphPlugin();
 	void doRender(std::vector<GLMesh> &mesh, GLWindow *window) const;
+	void loaded(void);
 
 public slots:
 	void enable(bool state);

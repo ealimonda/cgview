@@ -34,6 +34,7 @@ public:
 		kTypeTransform,
 		kTypeRender,
 		kTypeVisualization,
+		kTypeUIInput,
 	} PluginType;
 
 	static PluginManager *sharedInstance()
@@ -71,6 +72,10 @@ public:
 	{
 		return this->_visualizationPlugins;
 	}
+	inline const std::vector<PluginUIInputInterface *> &uiInputPlugins(void)
+	{
+		return this->_uiInputPlugins;
+	}
 
 public slots:
 	void setupPlugin(QObject *plugin, PluginManager::PluginType type);
@@ -86,6 +91,7 @@ private:
 	std::vector<PluginTransformInterface *> _transformPlugins;
 	std::vector<PluginRenderInterface *> _renderPlugins;
 	std::vector<PluginVisualizationInterface *> _visualizationPlugins;
+	std::vector<PluginUIInputInterface *> _uiInputPlugins;
 
 	// Hide copy constructor and assign operator
 	PluginManager(const PluginManager &);
@@ -97,6 +103,7 @@ signals:
 	void loadedPlugin(QObject *plugin, PluginManager::PluginType type);
 	void visualizationPluginToggled(void);
 	void renderPluginToggled(void);
+	void uiInputEvent(InputEvents::EventType, int value);
 };
 
 #endif // CGVIEW_PLUGINMANAGER_H

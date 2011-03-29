@@ -80,6 +80,8 @@ void AnaglyphPlugin::enable(bool state)
 	emit(toggled());
 }
 
+void AnaglyphPlugin::loaded(void) {
+}
 
 QT_BEGIN_NAMESPACE
 Q_EXPORT_PLUGIN2(render_anaglyph, AnaglyphPlugin)

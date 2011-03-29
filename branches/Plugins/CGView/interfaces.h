@@ -19,9 +19,11 @@
 
 #include <QtPlugin>
 #include <vector>
+#include "inputevents.h" // InputEvents::EventType
 
 QT_BEGIN_NAMESPACE
 class QString;
+class QEvent;
 QT_END_NAMESPACE
 class CGMesh;
 class GLMesh;
@@ -34,6 +36,7 @@ public:
 	{
 		return this->_menuName;
 	}
+	virtual void loaded(void) = 0;
 
 protected:
 	QString _menuName;
@@ -111,7 +114,33 @@ public slots:
 	virtual void enable(bool state) = 0;
 
 signals:
-	void toggled( void );
+	void toggled(void);
+
+private:
+	bool _state;
+};
+
+/** User Interface Input add-on.  allows interaction between user and program */
+class PluginUIInputInterface : public CGViewPluginInterface
+{
+public:
+	inline bool isEnabled(void) const
+	{
+		return this->_state;
+	}
+
+	inline void setEnabled(bool state)
+	{
+		this->_state = state;
+	}
+	virtual bool handleEvent(QEvent *event) = 0;
+
+public slots:
+	virtual void enable(bool state) = 0;
+
+signals:
+	void toggled(void);
+	void receivedEvent(InputEvents::EventType, float value);
 
 private:
 	bool _state;
@@ -123,6 +152,7 @@ Q_DECLARE_INTERFACE(CGViewPluginCollectionInterface, "it.unica.informatica.cgvie
 Q_DECLARE_INTERFACE(PluginRenderInterface, "it.unica.informatica.cgview.PluginRenderInterface/0.2")
 Q_DECLARE_INTERFACE(PluginTransformInterface, "it.unica.informatica.cgview.PluginTransformInterface/0.2")
 Q_DECLARE_INTERFACE(PluginVisualizationInterface, "it.unica.informatica.cgview.PluginVisualizationInterface/0.2")
+Q_DECLARE_INTERFACE(PluginUIInputInterface, "it.unica.informatica.cgview.PluginUIInputInterface/0.2")
 QT_END_NAMESPACE
 
 #endif // CGVIEW_INTERFACES_H

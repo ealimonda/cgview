@@ -37,6 +37,7 @@ public:
 	// PluginTransformInterface
 	SamplePlugin();
 	void runTransform(CGMesh *mesh) const;
+	void loaded(void);
 };
 
 #endif // CGVIEW_PLUGINS_TRANSFORM_SAMPLE_SAMPLEPLUGIN_H 

@@ -152,57 +152,6 @@ void GLWindow::resizeGL(int width, int height)
 }
 
 /**
- * Keyboard listener
- */
-void GLWindow::keyPressEvent(QKeyEvent *event)
-{
-	if (!this->_loaded)
-		return;
-
-	switch (event->key())
-	{
-	case Qt::Key_Up:
-	  {
-		this->_camera.liftCam(0.2f * this->_box.Diag());
-	  }
-		break;
-	case Qt::Key_Down:
-	  {
-		this->_camera.liftCam(-0.2f * this->_box.Diag());
-	  }
-		break;
-	case Qt::Key_Left:
-	  {
-		this->_camera.strafeCam(0.2f * this->_box.Diag());
-	  }
-		break;
-	case Qt::Key_Right:
-	  {
-		this->_camera.strafeCam(-0.2f * this->_box.Diag());
-	  }
-		break;
-	case Qt::Key_Z:
-	  {
-		this->_camera.changeDistance(0.2f * this->_box.Diag());
-	  }
-		break;
-	case Qt::Key_X:
-	  {
-		this->_camera.changeDistance(-0.2f * this->_box.Diag());
-	  }
-		break;
-	case Qt::Key_C:
-	  {
-		this->_camera.fitWidth(this->_box.Diag());
-	  }
-		break;
-	default:
-		break;
-	}
-	this->updateGL();
-}
-
-/**
  * Mouse listener
  */
 void GLWindow::mousePressEvent(QMouseEvent *event)
@@ -220,7 +169,11 @@ void GLWindow::mousePressEvent(QMouseEvent *event)
 
 void GLWindow::mouseMoveEvent(QMouseEvent *event)
 {
-	if (!this->_loaded)
+	if (!InputEvents::DispatchEvent((QEvent *)event))
+		event->accept();
+	else
+		event->ignore();
+/*	if (!this->_loaded)
 		return;
 
 	int dx = event->x() - this->_lastPos.x();
@@ -257,7 +210,7 @@ void GLWindow::mouseMoveEvent(QMouseEvent *event)
 
 	this->_lastPos = event->pos();
 	this->updateGL();
-}
+*/}
 
 void GLWindow::wheelEvent(QWheelEvent *event)
 {
@@ -308,3 +261,35 @@ void GLWindow::drawGradient(void)
 	glMatrixMode(GL_MODELVIEW);
 }
 
+void GLWindow::uiInputEvent(InputEvents::EventType type,float value)
+{
+	if (!this->_loaded)
+		return;
+
+	switch (type)
+	{
+	case InputEvents::kLiftCam:
+	  {
+		this->_camera.liftCam(value * this->_box.Diag());
+	  }
+		break;
+	case InputEvents::kStrafeCam:
+	  {
+		this->_camera.strafeCam(value * this->_box.Diag());
+	  }
+		break;
+	case InputEvents::kDistanceCam:
+	  {
+		this->_camera.changeDistance(value * this->_box.Diag());
+	  }
+		break;
+	case InputEvents::kFitCam:
+	  {
+		this->_camera.fitWidth(this->_box.Diag());
+	  }
+		break;
+	case InputEvents::kEventNoop:
+		break;
+	}
+	this->updateGL();
+}

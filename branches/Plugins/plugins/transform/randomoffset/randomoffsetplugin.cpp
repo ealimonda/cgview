@@ -40,6 +40,9 @@ void RandomOffsetPlugin::runTransform(CGMesh *mesh) const
 
 }
 
+void RandomOffsetPlugin::loaded(void) {
+}
+
 QT_BEGIN_NAMESPACE
 Q_EXPORT_PLUGIN2(transform_randomoffset, RandomOffsetPlugin)
 QT_END_NAMESPACE

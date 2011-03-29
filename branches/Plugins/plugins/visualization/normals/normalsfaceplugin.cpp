@@ -62,3 +62,6 @@ void NormalsFacePlugin::enable(bool state)
 	this->setEnabled(state);
 	emit(toggled());
 }
+
+void NormalsFacePlugin::loaded(void) {
+}

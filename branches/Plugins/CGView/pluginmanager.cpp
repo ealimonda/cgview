@@ -47,6 +47,7 @@ int PluginManager::loadPlugins_sub(QObjectList plugins, bool recursive)
 		case PluginManager::kTypeRender:
 		case PluginManager::kTypeTransform:
 		case PluginManager::kTypeVisualization:
+		case PluginManager::kTypeUIInput:
 			emit loadedPlugin(plugin, type);
 			++loadedCount;
 		}
@@ -95,6 +96,8 @@ PluginManager::PluginType PluginManager::getTypeForPlugin( QObject *plugin ) {
 		return PluginManager::kTypeRender;
 	if (qobject_cast<PluginVisualizationInterface *>(plugin))
 		return PluginManager::kTypeVisualization;
+	if (qobject_cast<PluginUIInputInterface *>(plugin))
+		return PluginManager::kTypeUIInput;
 	return PluginManager::kTypeInvalid;
 }
 
@@ -142,6 +145,13 @@ void PluginManager::setupPlugin(QObject *plugin, PluginManager::PluginType type)
 		PluginVisualizationInterface *thisPlugin = qobject_cast<PluginVisualizationInterface *>(plugin);
 		if (thisPlugin)
 			this->_visualizationPlugins.push_back(thisPlugin);
+	  }
+		return;
+	case PluginManager::kTypeUIInput:
+	  {
+		PluginUIInputInterface *thisPlugin = qobject_cast<PluginUIInputInterface *>(plugin);
+		if (thisPlugin)
+			this->_uiInputPlugins.push_back(thisPlugin);
 	  }
 		return;
 	case PluginManager::kTypeInvalid:

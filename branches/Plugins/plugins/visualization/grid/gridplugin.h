@@ -32,6 +32,7 @@ public:
 	// PluginVisualizationInterface
 	GridPlugin();
 	void doVisualize(CGMesh *mesh) const;
+	void loaded(void);
 
 public slots:
 	void enable(bool state);

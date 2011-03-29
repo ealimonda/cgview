@@ -64,6 +64,13 @@ void SamplePlugin::enable(bool state)
 	emit(toggled());
 }
 
+/** Post-initialization actions
+ * This is called after the plugin is loaded and all of its slots/signals
+ * are connected and set up
+ */
+void SamplePlugin::loaded(void) {
+}
+
 QT_BEGIN_NAMESPACE
 /** Edit the next line to match the plugin's name (as a convention, we use
  * the same name as the library's filename), followed by the plugin's class

@@ -5,18 +5,19 @@
 #*      CC          GG     GG      VVV      II   EE            WW W WW        *
 #*        CCCCCCC     GGGGGGG       V       II   EEEEEEEEE      W   W         *
 #******************************************************************************
-#* University of Cagliari, Italy - Computer Graphics Group                    *
-#* Filename: plugins.pro                                                      *
-#* Description: Plugins main project                                          *
+#* Università degli Studi di Cagliari - Gruppo di Informatica Grafica         *
+#* Filename: keyboard.pro                                                     *
+#* Description: Keyboard input plugin                                         *
 #******************************************************************************
 #* $Id::                                                       $: SVN Info    *
 #* $Date::                                                     $: Last date   *
 #* $Author::                                                   $: Last author *
 #* $Revision::                                                 $: Revision    *
 #******************************************************************************
-TEMPLATE =	subdirs
-SUBDIRS = \
-		transform \
-		render \
-		visualization \
-		uiinput
+! include( ../../plugins_common.pri ) {
+    error( Couldn't find the common.pri file! )
+}
+
+HEADERS +=	keyboardplugin.h
+SOURCES +=	keyboardplugin.cpp
+TARGET =	$$qtLibraryTarget(uiinput_keyboard)

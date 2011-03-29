@@ -256,6 +256,7 @@ public slots:
 	{
 		return &this->_camera;
 	}
+	void uiInputEvent(InputEvents::EventType type,float value);
 
 private:
 	/// OPENGL
@@ -290,8 +291,6 @@ private:
 	bool _loaded;
 
 	/// INTERACTION
-	/** Keyboard event handler */
-	void keyPressEvent(QKeyEvent *event);
 	/** Mouse event handler */
 	void mousePressEvent(QMouseEvent *event);
 	void mouseMoveEvent(QMouseEvent *event);

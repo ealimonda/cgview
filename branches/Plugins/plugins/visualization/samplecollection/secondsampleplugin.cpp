@@ -66,6 +66,13 @@ void SecondSamplePlugin::enable(bool state)
 	emit(toggled());
 }
 
+/** Post-initialization actions
+ * This is called after the plugin is loaded and all of its slots/signals
+ * are connected and set up
+ */
+void SecondSamplePlugin::loaded(void) {
+}
+
 /* Please note that there's no Q_EXPORT_PLUGIN2 here, since this is part of
  * a plugin collection and may not be loaded alone, as it's bundled in the
  * same library as other plugins.

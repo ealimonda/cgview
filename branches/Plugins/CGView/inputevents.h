@@ -5,33 +5,36 @@
  *      CC          GG     GG      VVV      II   EE            WW W WW        *
  *        CCCCCCC     GGGGGGG       V       II   EEEEEEEEE      W   W         *
  ******************************************************************************
- * University of Cagliari, Italy - Computer Graphics Group                    *
- * Filename: randomoffsetplugin.h                                             *
- * Description: Random Offset sample plugin                                   *
+ * Università degli Studi di Cagliari - Gruppo di Informatica Grafica         *
+ * Filename: inputevents.h                                                    *
+ * Description: UI Input Events                                               *
  ******************************************************************************
  * $Id::                                                       $: SVN Info    *
  * $Date::                                                     $: Last date   *
  * $Author::                                                   $: Last author *
  * $Revision::                                                 $: Revision    *
  ******************************************************************************/
-#ifndef CGVIEW_PLUGINS_TRANSFORM_RANDOMOFFSET_RANDOMOFFSETPLUGIN_H
-#define CGVIEW_PLUGINS_TRANSFORM_RANDOMOFFSET_RANDOMOFFSETPLUGIN_H
+#ifndef CGVIEW_INPUTEVENTS_H
+#define CGVIEW_INPUTEVENTS_H
 
-#include <QObject> // class QObject
-#include <interfaces.h> // class PluginTransformInterface
+#include <QtGlobal>
 
-class CGMesh;
-
-class RandomOffsetPlugin : public virtual PluginTransformInterface
+QT_BEGIN_NAMESPACE
+class QEvent;
+QT_END_NAMESPACE
+class InputEvents
 {
-	Q_OBJECT
-	Q_INTERFACES(PluginTransformInterface)
-
 public:
-	// PluginTransformInterface
-	RandomOffsetPlugin();
-	void runTransform(CGMesh *mesh) const;
-	void loaded(void);
+	typedef enum
+	{
+		kEventNoop = 0,
+		kLiftCam,
+		kStrafeCam,
+		kDistanceCam,
+		kFitCam,
+	} EventType;
+	InputEvents();
+	static bool DispatchEvent(QEvent *event);
 };
 
-#endif // CGVIEW_PLUGINS_TRANSFORM_RANDOMOFFSET_RANDOMOFFSETPLUGIN_H 
+#endif // CGVIEW_INPUTEVENTS_H

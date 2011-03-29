@@ -9,9 +9,9 @@
  * Filename: icon.rc                                                          *
  * Description: Windows resources include                                     *
  ******************************************************************************
- * $Id:: icon.rc 216 2011-03-13 11:46:28Z syao                 $: SVN Info    *
- * $Date:: 2011-03-13 12:46:28 +0100 (Sun, 13 Mar 2011)        $: Last date   *
- * $Author:: syao                                              $: Last author *
- * $Revision:: 216                                             $: Revision    *
+ * $Id::                                                       $: SVN Info    *
+ * $Date::                                                     $: Last date   *
+ * $Author::                                                   $: Last author *
+ * $Revision::                                                 $: Revision    *
  ******************************************************************************/
 IDI_ICON1 ICON DISCARDABLE "logo.ico"

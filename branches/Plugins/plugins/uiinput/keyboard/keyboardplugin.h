@@ -5,39 +5,36 @@
  *      CC          GG     GG      VVV      II   EE            WW W WW        *
  *        CCCCCCC     GGGGGGG       V       II   EEEEEEEEE      W   W         *
  ******************************************************************************
- * University of Cagliari, Italy - Computer Graphics Group                    *
- * Filename: firstsampleplugin.h                                              *
- * Description: Sample visualization plugin part of a collection              *
+ * Università degli Studi di Cagliari - Gruppo di Informatica Grafica         *
+ * Filename: keyboardplugin.h                                                 *
+ * Description: Keyboard Input Plugin                                         *
  ******************************************************************************
  * $Id::                                                       $: SVN Info    *
  * $Date::                                                     $: Last date   *
  * $Author::                                                   $: Last author *
  * $Revision::                                                 $: Revision    *
  ******************************************************************************/
-#ifndef CGVIEW_PLUGINS_VISUALIZATION_SAMPLECOLLECTION_FIRSTSAMPLEPLUGIN_H
-#define CGVIEW_PLUGINS_VISUALIZATION_SAMPLECOLLECTION_FIRSTSAMPLEPLUGIN_H
+#ifndef CGVIEW_PLUGINS_UIINPUT_KEYBOARD_KEYBOARDPLUGIN_H
+#define CGVIEW_PLUGINS_UIINPUT_KEYBOARD_KEYBOARDPLUGIN_H
 
 #include <QObject> // class QObject
 #include <interfaces.h> // class PluginVisualizationInterface
+QT_BEGIN_NAMESPACE
+class QEvent;
+QT_END_NAMESPACE
 
 //class GLMesh;
 //class GLWindow;
 
-/** The main plugin's class.
- * This must always implement the PluginVisualizationInterface, else it won't
- * be loaded properly as a visualization plugin.
- * All the following methods are required, but you're free to add your
- * own methods if you wish.
- */
-class FirstSamplePlugin : public virtual PluginVisualizationInterface
+class KeyboardPlugin : public virtual PluginUIInputInterface
 {
 	Q_OBJECT
-	Q_INTERFACES(PluginVisualizationInterface)
+	Q_INTERFACES(PluginUIInputInterface)
 
 public:
-	// PluginVisualizationInterface
-	FirstSamplePlugin();
-	void doVisualize(CGMesh *mesh) const;
+	// PluginUIInputInterface
+	KeyboardPlugin();
+	bool handleEvent(QEvent *event);
 	void loaded(void);
 
 public slots:
@@ -45,6 +42,7 @@ public slots:
 
 signals:
 	void toggled(void);
+	void receivedEvent(InputEvents::EventType, float value);
 };
 
-#endif // CGVIEW_PLUGINS_VISUALIZATION_SAMPLECOLLECTION_FIRSTSAMPLEPLUGIN_H
+#endif // CGVIEW_PLUGINS_UIINPUT_KEYBOARD_KEYBOARDPLUGIN_H

@@ -5,7 +5,7 @@
 #*      CC          GG     GG      VVV      II   EE            WW W WW        *
 #*        CCCCCCC     GGGGGGG       V       II   EEEEEEEEE      W   W         *
 #******************************************************************************
-#* Università degli Studi di Cagliari - Gruppo di Informatica Grafica         *
+#* University of Cagliari, Italy - Computer Graphics Group                    *
 #* Filename: keyboard.pro                                                     *
 #* Description: Keyboard input plugin                                         *
 #******************************************************************************

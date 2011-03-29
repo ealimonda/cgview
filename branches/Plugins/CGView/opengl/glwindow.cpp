@@ -34,7 +34,6 @@ GLWindow::GLWindow(QWidget *parent) : QGLWidget(parent)
 	this->_camera = GLCamera();
 	this->_camera.setAspect((float)this->width() / (float)this->height());
 
-	this->_mouseSens = 0.5f;
 	connect(PluginManager::sharedInstance(), SIGNAL(renderPluginToggled()), this, SLOT(updateGL()));
 	connect(PluginManager::sharedInstance(), SIGNAL(visualizationPluginToggled()), this, SLOT(updateWindow()));
 }
@@ -156,15 +155,10 @@ void GLWindow::resizeGL(int width, int height)
  */
 void GLWindow::mousePressEvent(QMouseEvent *event)
 {
-	if (event->buttons() & Qt::MidButton)
-	{
-		this->_camera.fitWidth(this->_box.Diag());
-		this->updateGL();
-	}
+	if (!InputEvents::DispatchEvent((QEvent *)event))
+		event->accept();
 	else
-	{
-		this->_lastPos = event->pos();
-	}
+		event->ignore();
 }
 
 void GLWindow::mouseMoveEvent(QMouseEvent *event)
@@ -173,54 +167,14 @@ void GLWindow::mouseMoveEvent(QMouseEvent *event)
 		event->accept();
 	else
 		event->ignore();
-/*	if (!this->_loaded)
-		return;
-
-	int dx = event->x() - this->_lastPos.x();
-	int dy = event->y() - this->_lastPos.y();
-
-	if (event->modifiers() & Qt::ShiftModifier)
-	{
-		this->_camera.rotateVR(vcg::math::ToRad((float)-dy * this->_mouseSens));
-	}
-	else if (event->modifiers() & Qt::ControlModifier)
-	{
-		this->_camera.changeDistance(vcg::math::ToRad((float)-dy * this->_mouseSens * this->_box.Diag()));
-	}
-	else if (event->modifiers() & Qt::AltModifier)
-	{
-		this->_camera.rotateVUp(vcg::math::ToRad((float)-dx * this->_mouseSens));
-	}
-	else if (event->modifiers() & Qt::MetaModifier)
-	{
-		this->_camera.rotateDir(vcg::math::ToRad((float)dx * this->_mouseSens));
-	}
-	else if (event->buttons() & Qt::LeftButton)
-	{
-		this->_camera.rotateVR(vcg::math::ToRad((float)-dy * this->_mouseSens));
-		this->_camera.rotateVUp(vcg::math::ToRad((float)-dx * this->_mouseSens));
-	}
-	else if (event->buttons() & Qt::RightButton)
-	{
-		this->_camera.rotateVR(vcg::math::ToRad((float)-dy * this->_mouseSens));
-		this->_camera.rotateDir(vcg::math::ToRad((float)dx * this->_mouseSens));
-	}
-	else
-		return;
-
-	this->_lastPos = event->pos();
-	this->updateGL();
-*/}
+}
 
 void GLWindow::wheelEvent(QWheelEvent *event)
 {
-	if (!this->_loaded)
-		return;
-
-	float rot = event->delta() / 8;
-	this->_camera.changeDistance(vcg::math::ToRad(rot * this->_mouseSens * this->_box.Diag()));
-	//this->_lastPos = event->pos();
-	this->updateGL();
+	if (!InputEvents::DispatchEvent((QEvent *)event))
+		event->accept();
+	else
+		event->ignore();
 }
 
 /**
@@ -288,6 +242,21 @@ void GLWindow::uiInputEvent(InputEvents::EventType type,float value)
 		this->_camera.fitWidth(this->_box.Diag());
 	  }
 		break;
+	case InputEvents::kRotateVRCam:
+	  {
+		this->_camera.rotateVR(value);
+		break;
+	  }
+	case InputEvents::kRotateVUpCam:
+	  {
+		this->_camera.rotateVUp(value);
+		break;
+	  }
+	case InputEvents::kRotateDirCam:
+	  {
+		this->_camera.rotateDir(value);
+		break;
+	  }
 	case InputEvents::kEventNoop:
 		break;
 	}

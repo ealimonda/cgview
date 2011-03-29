@@ -6,31 +6,38 @@
  *        CCCCCCC     GGGGGGG       V       II   EEEEEEEEE      W   W         *
  ******************************************************************************
  * University of Cagliari, Italy - Computer Graphics Group                    *
- * Filename: keyboardplugin.h                                                 *
- * Description: Keyboard Input Plugin                                         *
+ * Filename: sampleplugin.h                                                    *
+ * Description: Sample Input Plugin                                            *
  ******************************************************************************
  * $Id::                                                       $: SVN Info    *
  * $Date::                                                     $: Last date   *
  * $Author::                                                   $: Last author *
  * $Revision::                                                 $: Revision    *
  ******************************************************************************/
-#ifndef CGVIEW_PLUGINS_UIINPUT_KEYBOARD_KEYBOARDPLUGIN_H
-#define CGVIEW_PLUGINS_UIINPUT_KEYBOARD_KEYBOARDPLUGIN_H
+#ifndef CGVIEW_PLUGINS_UIINPUT_MOUSE_MOUSEPLUGIN_H
+#define CGVIEW_PLUGINS_UIINPUT_MOUSE_MOUSEPLUGIN_H
 
 #include <QObject> // class QObject
+#include <QPoint> // QPoint
 #include <interfaces.h> // class PluginUIInputInterface
 QT_BEGIN_NAMESPACE
 class QEvent;
 QT_END_NAMESPACE
 
-class KeyboardPlugin : public virtual PluginUIInputInterface
+/** The main plugin's class.
+ * This must always implement the PluginUIInterface, else it won't
+ * be loaded properly as an user interface input plugin.
+ * All the following methods are required, but you're free to add your
+ * own methods if you wish.
+ */
+class SamplePlugin : public virtual PluginUIInputInterface
 {
 	Q_OBJECT
 	Q_INTERFACES(PluginUIInputInterface)
 
 public:
 	// PluginUIInputInterface
-	KeyboardPlugin();
+	SamplePlugin();
 	bool handleEvent(QEvent *event);
 	void loaded(void);
 
@@ -42,4 +49,4 @@ signals:
 	void receivedEvent(InputEvents::EventType, float value);
 };
 
-#endif // CGVIEW_PLUGINS_UIINPUT_KEYBOARD_KEYBOARDPLUGIN_H
+#endif // CGVIEW_PLUGINS_UIINPUT_MOUSE_MOUSEPLUGIN_H

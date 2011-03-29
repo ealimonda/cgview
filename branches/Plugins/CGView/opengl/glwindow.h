@@ -280,12 +280,6 @@ private:
 	/// Scene light (if needed)
 	//GLLight _light;
 
-	/// MOUSE
-	/// Last position clicked
-	QPoint _lastPos;
-	/// Sensivity of the mouse
-	float _mouseSens;
-
 	/// FLAGS
 	/// Flag for knowing if a mesh is loaded or not
 	bool _loaded;

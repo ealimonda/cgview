@@ -14,8 +14,8 @@
  * $Author::                                                   $: Last author *
  * $Revision::                                                 $: Revision    *
  ******************************************************************************/
-#ifndef CGVIEW_PLUGINS_UIINPUT_MOUSE_MOUSEPLUGIN_H
-#define CGVIEW_PLUGINS_UIINPUT_MOUSE_MOUSEPLUGIN_H
+#ifndef CGVIEW_PLUGINS_UIINPUT_SAMPLE_SAMPLEPLUGIN_H
+#define CGVIEW_PLUGINS_UIINPUT_SAMPLE_SAMPLEPLUGIN_H
 
 #include <QObject> // class QObject
 #include <QPoint> // QPoint
@@ -49,4 +49,4 @@ signals:
 	void receivedEvent(InputEvents::EventType, float value);
 };
 
-#endif // CGVIEW_PLUGINS_UIINPUT_MOUSE_MOUSEPLUGIN_H
+#endif // CGVIEW_PLUGINS_UIINPUT_SAMPLE_SAMPLEPLUGIN_H

@@ -5,18 +5,24 @@
 #*      CC          GG     GG      VVV      II   EE            WW W WW        *
 #*        CCCCCCC     GGGGGGG       V       II   EEEEEEEEE      W   W         *
 #******************************************************************************
-#* Università degli Studi di Cagliari - Gruppo di Informatica Grafica         *
-#* Filename: uiinput.pro                                                      *
-#* Description: User Interface Input                                          *
+#* University of Cagliari, Italy - Computer Graphics Group                    *
+#* Filename: applemultitouchplugin.pro                                        *
+#* Description: Apple Multitouch input plugin                                 *
 #******************************************************************************
 #* $Id::                                                       $: SVN Info    *
 #* $Date::                                                     $: Last date   *
 #* $Author::                                                   $: Last author *
 #* $Revision::                                                 $: Revision    *
 #******************************************************************************
-TEMPLATE =	subdirs
-SUBDIRS =	keyboard
-SUBDIRS +=	mouse
-mac:SUBDIRS+=	applemultitouch
-# Add your plugins here
-#SUBDIRS +=	sample
+! include( ../../plugins_common.pri ) {
+    error( Couldn't find the common.pri file! )
+}
+
+HEADERS +=	applemultitouchplugin.h \
+    multitouch.h
+SOURCES +=	applemultitouchplugin.mm
+TARGET =	$$qtLibraryTarget(uiinput_applemultitouch)
+LIBS += \
+		/System/Library/Frameworks/CoreFoundation.framework/Versions/A/CoreFoundation \
+		-framework AppKit \
+		/System/Library/PrivateFrameworks/MultitouchSupport.framework/Versions/A/MultitouchSupport

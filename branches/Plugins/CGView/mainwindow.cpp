@@ -18,6 +18,7 @@
 
 #include <QtGlobal> // Q_OS_*
 #include <QtGui> // QScrollArea
+#include <QElapsedTimer> // class QElapsedTimer
 
 #include "engine.h" // class Engine
 #include "opengl/intro/glintro.h" // class GLIntro
@@ -57,8 +58,8 @@ MainWindow::MainWindow()
 	this->createViewer();
 
 	this->_area[kAreaIntro]->setVisible(true);
-	this->_area[kAreaStatus]->setVisible(false);
 	this->_area[kAreaViewer]->setVisible(false);
+	this->_statusBar->setVisible(false);
 
 	// Creating the layout
 	this->_layout = new QGridLayout();
@@ -66,7 +67,6 @@ MainWindow::MainWindow()
 
 	this->_layout->addWidget(this->_area[kAreaIntro], 0, 0);
 	this->_layout->addWidget(this->_area[kAreaViewer], 1, 0);
-	this->_layout->addWidget(this->_area[kAreaStatus], 2, 0);
 
 	this->_mainWidget->setLayout(this->_layout);
 
@@ -523,10 +523,6 @@ void MainWindow::createViewer(void)
 	// Creating the viewer
 	this->_glWindow = new GLWindow();
 	this->_glWindow->setMinimumSize(500, 500);
-//	this->_glWindow->grabKeyboard();
-//	this->_glWindow->installEventFilter(this);
-//	this->_glIntro->installEventFilter(this);
-//	this->_statusBar->installEventFilter(this);
 
 	// Creating the viewer area
 	this->_area[kAreaViewer] = new QScrollArea;
@@ -540,24 +536,14 @@ void MainWindow::createViewer(void)
 
 void MainWindow::createStatus(void)
 {
-	// Creating the viewer
 	this->_statusBar = new StatusBar();
-
-	// Creating the status bar
-	this->_area[kAreaStatus] = new QScrollArea;
-	this->_area[kAreaStatus]->setWidget(this->_statusBar);
-	this->_area[kAreaStatus]->setWidgetResizable(true);
-	this->_area[kAreaStatus]->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-	this->_area[kAreaStatus]->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-	this->_area[kAreaStatus]->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
-	this->_area[kAreaStatus]->setMinimumHeight(20);
-	this->_area[kAreaStatus]->setMaximumHeight(20);
+	this->setStatusBar(this->_statusBar);
 }
 
 /** Enable/Disable the status bar **/
 void MainWindow::toggleStatus(void)
 {
-	this->_area[kAreaStatus]->setVisible(this->_action[kActionWindowBarStatus]->isChecked());
+	this->_statusBar->setVisible(this->_action[kActionWindowBarStatus]->isChecked());
 }
 
 void MainWindow::endIntro(void)
@@ -565,7 +551,7 @@ void MainWindow::endIntro(void)
 	this->_area[kAreaIntro]->setVisible(false);
 	this->_glIntro->stopCube();
 	this->_area[kAreaViewer]->setVisible(true);
-	this->_area[kAreaStatus]->setVisible(true);
+	this->_statusBar->show();
 }
 
 void MainWindow::setupPlugin(QObject *plugin, PluginManager::PluginType type)
@@ -581,7 +567,7 @@ void MainWindow::setupPlugin(QObject *plugin, PluginManager::PluginType type)
 		if (thisPlugin)
 			addToMenu(plugin, thisPlugin->menuName(), this->_menu[MainWindow::kMenuTool/*Chaos*/],
 					SIGNAL(triggered()), this, SLOT(runTransformPlugin()),
-					NULL/*this->_actiongroup[MainWindow::kActiongroupToolChaos]*/, true);
+					NULL/*this->_actiongroup[MainWindow::kActiongroupToolChaos]*/, false);
 		thisPlugin->loaded();
 	  }
 		break;
@@ -643,7 +629,14 @@ void MainWindow::runTransformPlugin(void)
 	QAction *action = qobject_cast<QAction *>(sender());
 	PluginTransformInterface *plugin = qobject_cast<PluginTransformInterface *>(action->parent());
 
+	QElapsedTimer timer;
+	timer.start();
+
 	this->_glWindow->runTransformPlugin(plugin);
+
+	// Update the status bar
+	this->_statusBar->setTime(timer.elapsed());
+	timer.invalidate();
 }
 
 void MainWindow::uiInputPluginToggled(void)

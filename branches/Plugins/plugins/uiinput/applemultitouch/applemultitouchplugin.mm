@@ -17,6 +17,7 @@
 #include "applemultitouchplugin.h"
 //#define DEBUGGING_MULTITOUCH
 
+#include <CoreFoundation/CoreFoundation.h> // NSArray
 #include <QtPlugin> // Q_EXPORT_PLUGIN2
 #include <QKeyEvent> // QKeyEvent
 #ifdef DEBUGGING_MULTITOUCH
@@ -73,7 +74,7 @@ AppleMultitouchPlugin::AppleMultitouchPlugin()
 		mkDeviceInfo->dev_id = i;
 		mkDeviceInfo->state = false;
 		mkDeviceInfo->device = thisDevice;
-		for (unsigned int j = 0; j < 11; ++j)
+		for (int j = 0; j < kMultitouchMaxFingers; ++j)
 		{
 			mkDeviceInfo->fingers[j].last = 0;
 			mkDeviceInfo->fingers[j].state = false;
@@ -150,7 +151,7 @@ int AppleMultitouchPlugin::processCallback(int device, Touch *data, int nTouches
 void AppleMultitouchPlugin::processTouch(Touch *touch, MKDevice *deviceInfo) {
 	if (/*(touch->state != 7 && touch->state != 1) ||*/ !this->isEnabled())
 		return;
-	if( touch->identifier > 11/*kMultitouchFingers*/ || touch->identifier <= 0 ) // Sanity check
+	if( touch->identifier > kMultitouchMaxFingers || touch->identifier <= 0 ) // Sanity check
 		return;
 #if 0
 	qDebug() << "Frame " << touch->frame << ": TS:" << touch->timestamp << " ID:" << touch->identifier <<
@@ -184,7 +185,7 @@ void AppleMultitouchPlugin::processTouch(Touch *touch, MKDevice *deviceInfo) {
 		if( touch->timestamp < deviceInfo->fingers[touch->identifier-1].last + kSamplingInterval )
 			return;
 		int count = 0;
-		for (int i = 0; i < 11; ++i)
+		for (int i = 0; i < kMultitouchMaxFingers; ++i)
 		{
 			if (deviceInfo->fingers[i].state)
 				++count;
@@ -202,7 +203,7 @@ void AppleMultitouchPlugin::processTouch(Touch *touch, MKDevice *deviceInfo) {
 		  {
 			float olddist = 0.0f;
 			float newdist = 0.0f;
-			for (int i = 0; i < 11; ++i)
+			for (int i = 0; i < kMultitouchMaxFingers; ++i)
 			{
 				if (i == touch->identifier-1)
 					continue;
@@ -224,7 +225,7 @@ void AppleMultitouchPlugin::processTouch(Touch *touch, MKDevice *deviceInfo) {
 			float xdelta = 0.0f;
 			float ydelta = 0.0f;
 			bool done = false;
-			for (int i = 0; i < 11; ++i)
+			for (int i = 0; i < kMultitouchMaxFingers; ++i)
 			{
 				if (!deviceInfo->fingers[i].state)
 					continue;

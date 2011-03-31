@@ -18,36 +18,23 @@
 
 StatusBar::StatusBar()
 {
-	this->_layout = new QGridLayout;
-	this->_layout->setContentsMargins(10, 0, 0, 0);
-	this->_layout->setColumnStretch(0, 0);
-	this->_layout->setColumnStretch(1, 1);
-	this->_layout->setColumnStretch(2, 0);
-	this->_layout->setColumnStretch(3, 1);
-	this->_layout->setColumnStretch(4, 0);
-	this->_layout->setColumnStretch(5, 1);
-	this->_layout->setColumnStretch(6, 0);
-	this->_layout->setColumnStretch(7, 1);
-
-	this->_vertLabel = new QLabel("Vertex : ");
-	this->_faceLabel = new QLabel("Face : ");
-	this->_edgeLabel = new QLabel("Edge : ");
-	this->_timeLabel = new QLabel("Time(ms) : ");
+	this->_vertLabel = new QLabel("Vertexes: ");
+	this->_faceLabel = new QLabel("Faces: ");
+	this->_edgeLabel = new QLabel("Edges: ");
+	this->_timeLabel = new QLabel("Time(ms): ");
 	this->_v = new QLabel("");
 	this->_f = new QLabel("");
 	this->_e = new QLabel("");
 	this->_t = new QLabel("");
 
-	this->_layout->addWidget(this->_v, 0, 1);
-	this->_layout->addWidget(this->_f, 0, 3);
-	this->_layout->addWidget(this->_e, 0, 5);
-	this->_layout->addWidget(this->_t, 0, 7);
-	this->_layout->addWidget(this->_vertLabel, 0, 0);
-	this->_layout->addWidget(this->_faceLabel, 0, 2);
-	this->_layout->addWidget(this->_edgeLabel, 0, 4);
-	this->_layout->addWidget(this->_timeLabel, 0, 6);
-
-	this->setLayout(this->_layout);
+	this->addPermanentWidget(this->_vertLabel, 0);
+	this->addPermanentWidget(this->_v, 1);
+	this->addPermanentWidget(this->_faceLabel, 0);
+	this->addPermanentWidget(this->_f, 1);
+	this->addPermanentWidget(this->_edgeLabel, 0);
+	this->addPermanentWidget(this->_e, 1);
+	this->addPermanentWidget(this->_timeLabel, 0);
+	this->addPermanentWidget(this->_t, 1);
 	this->refreshInfo();
 }
 

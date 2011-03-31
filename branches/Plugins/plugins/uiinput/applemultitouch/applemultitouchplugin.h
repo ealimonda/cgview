@@ -51,6 +51,9 @@ signals:
 	void receivedEvent(InputEvents::EventType, float value);
 
 private:
+	static const double kSamplingInterval = 0.05;
+	static const int kMultitouchMaxFingers = 11;
+
 	typedef struct
 	{
 		bool state;
@@ -87,15 +90,15 @@ private:
 		bool state;
 		AppleMultitouchPlugin::MTDeviceX *device;
 		//std::vector<MKFinger> fingers;
-		MKFinger fingers[11];	/* Magic trackpad can currently track 11 fingers.  Magic Mouse 5.  I believe
-					 * the trackpad on unibody MBPs is the same as the Magic Trackpad */
+		MKFinger fingers[kMultitouchMaxFingers];	/* Magic trackpad can currently track 11 fingers.
+								 * Magic Mouse 5.  I believe the trackpad on unibody
+								 * MBPs is the same as the Magic Trackpad */
 	} MKDevice;
 
 	void processTouch(Touch *touch, MKDevice *deviceInfo);
 	static AppleMultitouchPlugin *_pluginInstance;
 
 	static const MTDeviceX kMultiTouchSampleDevice;
-	static const double kSamplingInterval = 0.05;
 
 	std::vector<MKDevice*> _devices;
 };

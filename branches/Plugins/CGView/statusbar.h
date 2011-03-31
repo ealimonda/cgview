@@ -19,7 +19,7 @@
 
 #include <QtGui> // QWidget
 
-class StatusBar : public QWidget
+class StatusBar : public QStatusBar
 {
 	Q_OBJECT
 
@@ -37,6 +37,11 @@ public slots:
 		this->_loaded = true;
 		this->refreshInfo();
 	}
+	inline void setTime(const unsigned int t)
+	{
+		this->_time = t;
+		this->refreshInfo();
+	}
 
 	inline void reset(void)
 	{
@@ -51,7 +56,6 @@ public slots:
 private:
 	void refreshInfo(void);
 
-	QGridLayout* _layout;
 	QLabel* _vertLabel;
 	QLabel* _faceLabel;
 	QLabel* _edgeLabel;

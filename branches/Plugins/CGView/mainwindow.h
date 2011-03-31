@@ -50,8 +50,7 @@ private:
 	{
 		kAreaIntro = 0,
 		kAreaViewer,
-		kAreaStatus,
-		kAreaPalette,
+//		kAreaPalette,
 		// Number of areas
 		kAreasMax
 	};

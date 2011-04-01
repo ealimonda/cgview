@@ -56,10 +56,12 @@ MainWindow::MainWindow()
 	this->createIntro();
 	this->createStatus();
 	this->createViewer();
+	this->createPalette();
 
 	this->_area[kAreaIntro]->setVisible(true);
 	this->_area[kAreaViewer]->setVisible(false);
 	this->_statusBar->setVisible(false);
+	this->_area[kAreaPalette]->setVisible(false);
 
 	// Creating the layout
 	this->_layout = new QGridLayout();
@@ -67,6 +69,7 @@ MainWindow::MainWindow()
 
 	this->_layout->addWidget(this->_area[kAreaIntro], 0, 0);
 	this->_layout->addWidget(this->_area[kAreaViewer], 1, 0);
+	this->_layout->addWidget(this->_area[kAreaPalette], 1, 1);
 
 	this->_mainWidget->setLayout(this->_layout);
 
@@ -210,6 +213,7 @@ void MainWindow::createMenus(void)
 	this->_menu[kMenuWindow]->addMenu(this->_menu[kMenuWindowBar]);
 
 	this->_menu[kMenuWindowBar]->addAction(this->_action[kActionWindowBarStatus]);
+	this->_menu[kMenuWindowBar]->addAction(this->_action[kActionWindowBarPalette]);
 
 	/// HELP ----------------------------------------------
 	this->_menu[kMenuHelp] = menuBar()->addMenu(tr("&?"));
@@ -404,6 +408,10 @@ void MainWindow::createActions(void)
 	this->_action[kActionWindowBarStatus]->setCheckable(true);
 	this->_action[kActionWindowBarStatus]->setChecked(true);
 	this->_actiongroup[kActiongroupWindowBar]->addAction(this->_action[kActionWindowBarStatus]);
+	this->_action[kActionWindowBarPalette]    = new QAction(tr("Palette"), this);
+	this->_action[kActionWindowBarPalette]->setCheckable(true);
+	this->_action[kActionWindowBarPalette]->setChecked(false);
+	this->_actiongroup[kActiongroupWindowBar]->addAction(this->_action[kActionWindowBarPalette]);
 	this->_actiongroup[kActiongroupWindowBar]->setExclusive(false);
 
 	/// HELP ----------------------------------------------
@@ -497,6 +505,7 @@ void MainWindow::createConnections(void)
 
 	// WINDOW SUBMENU
 	connect(this->_action[kActionWindowBarStatus],  SIGNAL(triggered()), this, SLOT(toggleStatus()));
+	connect(this->_action[kActionWindowBarPalette], SIGNAL(triggered()), this, SLOT(togglePalette()));
 
 	/// HELP ----------------------------------------------
 	//connect(_action[kActionHelpAbout], SIGNAL(triggered()), , SLOT());
@@ -540,10 +549,29 @@ void MainWindow::createStatus(void)
 	this->setStatusBar(this->_statusBar);
 }
 
+void MainWindow::createPalette(void)
+{
+	// Creating the palette bar
+	this->_area[kAreaPalette] = new QScrollArea;
+	//this->_area[kAreaPalette]->setWidget(Intro);
+	this->_area[kAreaPalette]->setWidgetResizable(true);
+	this->_area[kAreaPalette]->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	this->_area[kAreaPalette]->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+	this->_area[kAreaPalette]->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
+	this->_area[kAreaPalette]->setMinimumWidth(200);
+	this->_area[kAreaPalette]->setMaximumWidth(200);
+}
+
 /** Enable/Disable the status bar **/
 void MainWindow::toggleStatus(void)
 {
 	this->_statusBar->setVisible(this->_action[kActionWindowBarStatus]->isChecked());
+}
+
+/** Enable/Disable the palette bar **/
+void MainWindow::togglePalette(void)
+{
+	this->_area[kAreaPalette]->setVisible(this->_action[kActionWindowBarPalette]->isChecked());
 }
 
 void MainWindow::endIntro(void)
@@ -552,6 +580,7 @@ void MainWindow::endIntro(void)
 	this->_glIntro->stopCube();
 	this->_area[kAreaViewer]->setVisible(true);
 	this->_statusBar->show();
+	//this->_area[kAreaPalette]->setVisible(true);
 }
 
 void MainWindow::setupPlugin(QObject *plugin, PluginManager::PluginType type)

@@ -50,7 +50,7 @@ private:
 	{
 		kAreaIntro = 0,
 		kAreaViewer,
-//		kAreaPalette,
+		kAreaPalette,
 		// Number of areas
 		kAreasMax
 	};
@@ -158,7 +158,7 @@ private:
 
 		/// Window actions
 		kActionWindowBarStatus,
-//		kActionWindowBarPalette,
+		kActionWindowBarPalette,
 
 		/// About
 		kActionHelpAbout,
@@ -209,6 +209,8 @@ private:
 	void createViewer(void);
 	/** create the status bar **/
 	void createStatus(void);
+	/** Create the palette **/
+	void createPalette(void);
 	void addToMenu(QObject *plugin, const QString &name, QMenu *menu, const char *signal, QObject *target,
 			const char *member, QActionGroup *actionGroup, bool checkable);
 
@@ -243,6 +245,9 @@ private:
 private slots:
 	/** Enable/Disable the status bar */
 	void toggleStatus(void);
+
+	/** Enable/Disable the palette bar */
+	void togglePalette(void);
 
 	void endIntro(void);
 

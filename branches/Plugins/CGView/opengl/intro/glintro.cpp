@@ -21,7 +21,7 @@ QT_BEGIN_NAMESPACE
 class QWidget;
 QT_END_NAMESPACE
 
-GLIntro::GLIntro(QWidget *parent) : QGLWidget(parent)
+GLIntro::GLIntro(QWidget *parent, bool start) : QGLWidget(parent)
 {
 	this->_cube = 0;
 
@@ -40,7 +40,9 @@ GLIntro::GLIntro(QWidget *parent) : QGLWidget(parent)
 
 	this->_timer = new QTimer(this);
 	connect(this->_timer, SIGNAL(timeout()), this, SLOT(inertia()));
-	this->_timer->start(20);
+
+	if (start)
+		this->startCube();
 }
 
 GLIntro::~GLIntro()

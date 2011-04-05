@@ -29,7 +29,7 @@ HEADERS = \
 		opengl/glwindow.h \
 		opengl/scene/camera/glcamera.h \
 		opengl/scene/light/gllight.h \
-		mainwindow.h \
+		gui/mainwindow.h \
 		engine.h \
 		mesh_definition.h \
 		opengl/mesh/mode/visualmode.h \
@@ -38,11 +38,12 @@ HEADERS = \
 		opengl/scene/scene.h \
 		opengl/mesh/glmesh.h \
 		convex_hull/my_convhull.h \
-		statusbar.h \
+		gui/statusbar.h \
 		interfaces.h \
 		pluginmanager.h \
 		inputevents.h \
-		prefcontroller.h
+		prefcontroller.h \
+		gui/aboutwindow.h
 
 SOURCES = \
 		opengl/glwindow.cpp \
@@ -50,16 +51,17 @@ SOURCES = \
 		opengl/scene/light/gllight.cpp \
 		opengl/intro/glintro.cpp \
 		main.cpp \
-		mainwindow.cpp \
+		gui/mainwindow.cpp \
 		engine.cpp \
 		opengl/mesh/material/glmaterial.cpp \
 		opengl/mesh/glmesh.cpp \
-		statusbar.cpp \
+		gui/statusbar.cpp \
 		convex_hull/my_convhull.cpp \
 		pluginmanager.cpp \
 		inputevents.cpp \
 		../../../lib/vcglib/wrap/ply/plylib.cpp \
-		prefcontroller.cpp
+		prefcontroller.cpp \
+		gui/aboutwindow.cpp
 
 win32:RC_FILE =	icon.rc
 

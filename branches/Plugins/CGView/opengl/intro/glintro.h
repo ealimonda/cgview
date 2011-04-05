@@ -25,11 +25,12 @@ class GLIntro : public QGLWidget
 	Q_OBJECT
 
 public:
-	GLIntro(QWidget *parent = 0);
+	GLIntro(QWidget *parent = 0, bool start = true);
 	~GLIntro();
 
 public slots:
 	inline void stopCube(void) { this->_timer->stop(); }
+	inline void startCube(void) { this->_timer->start(20); }
 
 private:
 	static const float kMouseSensibility = 0.2f;

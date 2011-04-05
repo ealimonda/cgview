@@ -36,6 +36,7 @@ QT_END_NAMESPACE
 class GLIntro;
 class GLWindow;
 class StatusBar;
+class AboutWindow;
 
 class MainWindow : public QMainWindow
 {
@@ -237,7 +238,11 @@ private:
 	/// Areas
 	GLIntro *_glIntro;
 	GLWindow *_glWindow;
+
 	StatusBar *_statusBar;
+
+	// Windows
+	AboutWindow *_aboutWindow;
 
 	/// Engine
 	Engine *_engine;

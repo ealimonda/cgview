@@ -16,7 +16,7 @@
  ******************************************************************************/
 #include <QApplication>
 
-#include "mainwindow.h" // MainWindow
+#include "gui/mainwindow.h" // MainWindow
 
 /**
  * Il main si occupa semplicemente di creare l'applicazione e farla partire

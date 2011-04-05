@@ -23,7 +23,8 @@
 #include "engine.h" // class Engine
 #include "opengl/intro/glintro.h" // class GLIntro
 #include "opengl/glwindow.h" // class GLWindow
-#include "statusbar.h" // class StatusBar
+#include "gui/statusbar.h" // class StatusBar
+#include "gui/aboutwindow.h" // class AboutWindow
 #include "interfaces.h" // class PluginTransformInterface
 #include "pluginmanager.h" // class PluginManager
 
@@ -77,6 +78,8 @@ MainWindow::MainWindow()
 	this->createActions();
 	this->createMenus();
 	this->createToolBars();
+
+	this->_aboutWindow = new AboutWindow(this);
 
 	// Connessioni
 	this->createConnections();
@@ -508,7 +511,7 @@ void MainWindow::createConnections(void)
 	connect(this->_action[kActionWindowBarPalette], SIGNAL(triggered()), this, SLOT(togglePalette()));
 
 	/// HELP ----------------------------------------------
-	//connect(_action[kActionHelpAbout], SIGNAL(triggered()), , SLOT());
+	connect(this->_action[kActionHelpAbout], SIGNAL(triggered()), this->_aboutWindow, SLOT(show()));
 }
 
 void MainWindow::createIntro(void)

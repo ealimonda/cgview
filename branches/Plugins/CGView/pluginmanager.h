@@ -84,9 +84,6 @@ private:
 	PluginManager() {}
 	PluginType getTypeForPlugin(QObject *plugin);
 	int loadPlugins_sub(QObjectList plugins, bool recursive);
-#ifdef Q_OS_MAC
-	QString bundlePath(void);
-#endif // Q_OS_MAC
 	QStringList _pluginFileNames; // FIXME: Do we need this at all?
 	std::vector<PluginTransformInterface *> _transformPlugins;
 	std::vector<PluginRenderInterface *> _renderPlugins;

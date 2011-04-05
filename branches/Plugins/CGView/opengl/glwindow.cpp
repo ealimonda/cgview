@@ -19,6 +19,7 @@
 
 #include <QtOpenGL> // QGLWidget
 #include "pluginmanager.h" // PluginManager
+#include "prefcontroller.h" // PrefController
 #include "interfaces.h" // PluginTransformInterface
 QT_BEGIN_NAMESPACE
 class QWidget;
@@ -194,17 +195,13 @@ void GLWindow::drawGradient(void)
 	glDisable(GL_LIGHTING);
 
 	glBegin(GL_TRIANGLE_STRIP);
-	glColor4f(0.196f, 0.423f, 0.384f, 1.0f);
-	//glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+	glColor4fv(PrefController::sharedInstance()->gradientColors(0));
 	glVertex2f(-1.0f, 1.0f);
-	glColor4f(0.254f, 0.086f, 0.333f, 1.0f);
-	//glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+	glColor4fv(PrefController::sharedInstance()->gradientColors(1));
 	glVertex2f(-1.0f, -1.0f);
-	glColor4f(0.196f, 0.423f, 0.384f, 1.0f);
-	//glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+	glColor4fv(PrefController::sharedInstance()->gradientColors(2));
 	glVertex2f(1.0f, 1.0f);
-	glColor4f(0.254f, 0.086f, 0.333f, 1.0f);
-	//glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+	glColor4fv(PrefController::sharedInstance()->gradientColors(3));
 	glVertex2f(1.0f, -1.0f);
 	glEnd();
 

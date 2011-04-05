@@ -18,11 +18,8 @@
 #include <QObject>
 #include <QDir> // class QDir
 #include <QPluginLoader> // class QPluginLoader
-#ifdef Q_OS_MAC
-#include <CoreFoundation/CoreFoundation.h> // CF*
-#else // ! Q_OS_MAC
-#include <QApplication> // qApp
-#endif // Q_OS_MAC
+#include <assert.h>
+#include "prefcontroller.h" // class PrefController
 #include "interfaces.h" // class PluginTransformInterface
 
 PluginManager *PluginManager::_sharedInstance = NULL;
@@ -63,12 +60,8 @@ int PluginManager::loadPlugins(void)
 	this->_renderPlugins.clear();
 	this->_visualizationPlugins.clear();
 
-#ifdef Q_OS_MAC
-//	pluginsDir = QDir(this->getBundlePath() + "/Contents/Resources/Plugins");
-	pluginsDir = QDir(this->bundlePath() + "/../plugins");
-#else // ! Q_OS_MAC
-	pluginsDir = QDir(qApp->applicationDirPath() + "/plugins");
-#endif // !Q_OS_MAC
+	pluginsDir = QDir(PrefController::sharedInstance()->basePath() + "/plugins");
+//	pluginsDir = QDir(PrefController::sharedInstance()->bundlePath() + "/Contents/Resources/Plugins");
 
 	// Load static plugins
 	loadedCount += this->loadPlugins_sub(QPluginLoader::staticInstances(), true);
@@ -100,27 +93,6 @@ PluginManager::PluginType PluginManager::getTypeForPlugin( QObject *plugin ) {
 		return PluginManager::kTypeUIInput;
 	return PluginManager::kTypeInvalid;
 }
-
-#ifdef Q_OS_MAC
-/**
- * Get the path to the Application Bundle
- * \return	path
- */
-QString PluginManager::bundlePath(void)
-{
-	static QString *bundlePath = NULL;
-	if (!bundlePath)
-	{
-		CFURLRef appUrlRef = CFBundleCopyBundleURL(CFBundleGetMainBundle());
-		CFStringRef macPath = CFURLCopyFileSystemPath(appUrlRef, kCFURLPOSIXPathStyle);
-		const char *pathPtr = CFStringGetCStringPtr(macPath, CFStringGetSystemEncoding());
-		bundlePath = new QString(pathPtr);
-		CFRelease(appUrlRef);
-		CFRelease(macPath);
-	}
-	return *bundlePath;
-}
-#endif // Q_WS_MAC
 
 void PluginManager::setupPlugin(QObject *plugin, PluginManager::PluginType type)
 {

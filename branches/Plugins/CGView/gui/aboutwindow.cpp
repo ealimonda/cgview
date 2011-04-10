@@ -1,9 +1,24 @@
+/******************************************************************************
+ *        CCCCCCC     GGGGGGG   VV     VV   II   EEEEEEEEE   WW       WW      *
+ *      CC          GG           VV   VV    II   EE          WW       WW      *
+ *      CC          GG     GG     VV VV     II   EEEEEE       WW  W  WW       *
+ *      CC          GG     GG      VVV      II   EE            WW W WW        *
+ *        CCCCCCC     GGGGGGG       V       II   EEEEEEEEE      W   W         *
+ ******************************************************************************
+ * University of Cagliari, Italy - Computer Graphics Group                    *
+ * Filename: aboutwindow.cpp                                                  *
+ * Description: About Dialog                                                  *
+ ******************************************************************************
+ * $Id::                                                       $: SVN Info    *
+ * $Date::                                                     $: Last date   *
+ * $Author::                                                   $: Last author *
+ * $Revision::                                                 $: Revision    *
+ ******************************************************************************/
 #include "aboutwindow.h"
 
 #include <QBoxLayout>
 #include <QPushButton>
 #include "opengl/intro/glintro.h"
-#include <QDebug>
 
 AboutWindow::AboutWindow(QWidget *parent) : QDialog(parent)
 {
@@ -32,6 +47,7 @@ AboutWindow::AboutWindow(QWidget *parent) : QDialog(parent)
 	layout->addWidget(aboutLabel);
 	layout->addWidget(closeButton);
 	this->setLayout(layout);
+	this->setWindowTitle(tr("About CGView"));
 }
 
 void AboutWindow::showEvent(QShowEvent */*event*/)

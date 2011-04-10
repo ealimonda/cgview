@@ -6,72 +6,51 @@
  *        CCCCCCC     GGGGGGG       V       II   EEEEEEEEE      W   W         *
  ******************************************************************************
  * University of Cagliari, Italy - Computer Graphics Group                    *
- * Filename: statusbar.h                                                      *
- * Description: Status bar for the CGView application                         *
+ * Filename: prefwindow.h                                                     *
+ * Description: Preferences Dialog                                            *
  ******************************************************************************
  * $Id::                                                       $: SVN Info    *
  * $Date::                                                     $: Last date   *
  * $Author::                                                   $: Last author *
  * $Revision::                                                 $: Revision    *
  ******************************************************************************/
-#ifndef CGVIEW_GUI_STATUSBAR_H
-#define CGVIEW_GUI_STATUSBAR_H
+#ifndef CGVIEW_GUI_PREFWINDOW_H
+#define CGVIEW_GUI_PREFWINDOW_H
 
-#include <QStatusBar> // QStatusBar
+#include <QDialog>
 QT_BEGIN_NAMESPACE
-class QLabel;
+class QWidget;
+class QShowEvent;
+class QCloseEvent;
+class QLineEdit;
+class QGridLayout;
 QT_END_NAMESPACE
+class GLIntro;
+class PrefController;
 
-class StatusBar : public QStatusBar
+class PrefWindow : public QDialog
 {
 	Q_OBJECT
-
 public:
-	StatusBar();
+	explicit PrefWindow(QWidget *parent = 0);
 
-public slots:
-	inline void setInfo(const unsigned int v, const unsigned int f, const unsigned int t)
-	{
-		this->_vert = v;
-		this->_face = f;
-		this->_edge = (3 * _face) / 2;
-		this->_time = t;
-
-		this->_loaded = true;
-		this->refreshInfo();
-	}
-	inline void setTime(const unsigned int t)
-	{
-		this->_time = t;
-		this->refreshInfo();
-	}
-
-	inline void reset(void)
-	{
-		this->_vert = 0;
-		this->_face = 0;
-		this->_edge = 0;
-		this->_time = 0;
-		this->_loaded = false;
-		this->refreshInfo();
-	}
+protected:
+	void showEvent(QShowEvent *event);
+	void closeEvent(QCloseEvent *event);
 
 private:
-	void refreshInfo(void);
+	void setUI(void);
 
-	QLabel* _vertLabel;
-	QLabel* _faceLabel;
-	QLabel* _edgeLabel;
-	QLabel* _timeLabel;
-	QLabel* _v;
-	QLabel* _f;
-	QLabel* _e;
-	QLabel* _t;
-	unsigned int _vert;
-	unsigned int _face;
-	unsigned int _edge;
-	unsigned int _time;
-	bool _loaded;
+	QLineEdit *_generalBackgroundGradientTopLeftLine;
+	QLineEdit *_generalBackgroundGradientBottomLeftLine;
+	QLineEdit *_generalBackgroundGradientTopRightLine;
+	QLineEdit *_generalBackgroundGradientBottomRightLine;
+	QLineEdit *_generalDefaultDirectoryLine;
+
+	QGridLayout *_pluginsRenderingLayout;
+	QGridLayout *_pluginsVisualizationLayout;
+	QGridLayout *_pluginsTransformationLayout;
+	QGridLayout *_pluginsUIInputLayout;
 };
 
-#endif // CGVIEW_GUI_STATUSBAR_H
+#endif // CGVIEW_GUI_PREFWINDOW_H

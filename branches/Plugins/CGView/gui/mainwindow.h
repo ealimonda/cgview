@@ -14,8 +14,8 @@
  * $Author::                                                   $: Last author *
  * $Revision::                                                 $: Revision    *
  ******************************************************************************/
-#ifndef CGVIEW_MAINWINDOW_H
-#define CGVIEW_MAINWINDOW_H
+#ifndef CGVIEW_GUI_MAINWINDOW_H
+#define CGVIEW_GUI_MAINWINDOW_H
 
 /**
  * La classe MainWindow si occupa di creare la finestra del nostro programma
@@ -24,7 +24,6 @@
 
 #include <QMainWindow> // class QMainWindow
 #include "pluginmanager.h" // PluginManager
-class Engine;
 
 QT_BEGIN_NAMESPACE
 class QAction;
@@ -32,11 +31,18 @@ class QActionGroup;
 class QMenu;
 class QScrollArea;
 class QGridLayout;
+class QString;
+class QObject;
+class QKeyEvent;
+class QWidget;
+class QToolBar;
 QT_END_NAMESPACE
 class GLIntro;
 class GLWindow;
 class StatusBar;
 class AboutWindow;
+class PrefWindow;
+class Engine;
 
 class MainWindow : public QMainWindow
 {
@@ -108,6 +114,7 @@ private:
 		kActionFileAdd,
 
 		/// Edit actions
+		kActionEditPreferences,
 		kActionEditUpdateVertNormal,
 		kActionEditUpdateFaceNormal,
 		kActionEditUpdateAllNormal,
@@ -243,6 +250,7 @@ private:
 
 	// Windows
 	AboutWindow *_aboutWindow;
+	PrefWindow *_prefWindow;
 
 	/// Engine
 	Engine *_engine;
@@ -263,4 +271,4 @@ private slots:
 	void uiInputPluginToggled(void);
 };
 
-#endif // CGVIEW_MAINWINDOW_H
+#endif // CGVIEW_GUI_MAINWINDOW_H

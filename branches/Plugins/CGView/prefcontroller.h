@@ -56,6 +56,20 @@ public:
 			return this->_gradientColors[idx];
 		return NULL;
 	}
+	inline const unsigned int gradientColorComponent(unsigned int idx, unsigned int component) const
+	{
+		if (idx <= sizeof(this->_gradientColors)/sizeof(this->_gradientColors[0]))
+			return (int)(this->_gradientColors[idx][component] * 255);
+		return 0;
+	}
+	inline const QString defaultDirectory(void) const
+	{
+		return this->_defaultDirectory;
+	}
+
+public slots:
+	void load(void);
+	void save(void);
 
 private:
 	PrefController();
@@ -68,6 +82,7 @@ private:
 	static const GLfloat kDefaultGradientColors[4][GLLight::kChannelsRGBA];
 
 	GLfloat _gradientColors[4][GLLight::kChannelsRGBA];
+	QString _defaultDirectory;
 };
 
 #endif // CGVIEW_PREFCONTROLLER_H

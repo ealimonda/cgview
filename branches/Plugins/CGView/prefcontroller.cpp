@@ -15,6 +15,8 @@
  * $Revision::                                                 $: Revision    *
  ******************************************************************************/
 #include "prefcontroller.h"
+#include <QSettings>
+#include <QDir>
 #ifdef Q_OS_MAC
 #include <CoreFoundation/CoreFoundation.h> // CF*
 #else // ! Q_OS_MAC
@@ -33,7 +35,8 @@ const GLfloat PrefController::kDefaultGradientColors[4][GLLight::kChannelsRGBA] 
 
 PrefController::PrefController()
 {
-	memcpy(&this->_gradientColors[0][0], &this->kDefaultGradientColors[0][0], sizeof(this->_gradientColors));
+	this->load();
+	this->save();
 }
 
 /**
@@ -46,10 +49,11 @@ QString PrefController::basePath(void)
 	if (!basePath)
 	{
 #ifdef Q_OS_MAC
-		basePath = new QString(this->bundlePath() + "/..");
+		QDir pathDir(this->bundlePath() + "/..");
 #else // ! Q_OS_MAC
-		basePath = qApp->applicationDirPath();
+		static QDir pathDir(qApp->applicationDirPath());
 #endif
+		basePath = new QString(pathDir.canonicalPath());
 	}
 	return *basePath;
 }
@@ -74,3 +78,28 @@ QString PrefController::bundlePath(void)
 	return *bundlePath;
 }
 #endif // Q_WS_MAC
+
+void PrefController::load(void)
+{
+	QSettings settings(QString(this->basePath() + "/cgview.ini"), QSettings::IniFormat);
+	this->_defaultDirectory = settings.value("directories/defaultDirectory", this->basePath()).toString();
+	char kRGBALetters[4] = {'R', 'G', 'B', 'A'};
+	for (unsigned int i = 0; i < 4; ++i)
+		for (unsigned int j = 0; j < 4; ++j)
+			this->_gradientColors[i][j] = settings.value(
+					QString("colors/gradient%1_%2").arg(i).arg(kRGBALetters[j]),
+					(int)(255 * this->kDefaultGradientColors[i][j])).toInt() / 255.0f;
+}
+
+void PrefController::save(void)
+{
+	QSettings settings(QString(this->basePath() + "/cgview.ini"), QSettings::IniFormat);
+	settings.clear();
+	settings.setValue("directories/defaultDirectory", this->_defaultDirectory);
+	char kRGBALetters[4] = {'R', 'G', 'B', 'A'};
+	for (unsigned int i = 0; i < 4; ++i)
+		for (unsigned int j = 0; j < 4; ++j)
+			settings.setValue(QString("colors/gradient%1_%2").arg(i).arg(kRGBALetters[j]),
+					(int)(255 * this->_gradientColors[i][j]));
+	settings.sync();
+}

@@ -25,6 +25,7 @@
 #include "opengl/glwindow.h" // class GLWindow
 #include "gui/statusbar.h" // class StatusBar
 #include "gui/aboutwindow.h" // class AboutWindow
+#include "gui/prefwindow.h" // class PrefWindow
 #include "interfaces.h" // class PluginTransformInterface
 #include "pluginmanager.h" // class PluginManager
 
@@ -80,6 +81,7 @@ MainWindow::MainWindow()
 	this->createToolBars();
 
 	this->_aboutWindow = new AboutWindow(this);
+	this->_prefWindow = new PrefWindow(this);
 
 	// Connessioni
 	this->createConnections();
@@ -111,10 +113,13 @@ void MainWindow::createMenus(void)
 	this->_menu[kMenuFile]->addSeparator();
 	this->_menu[kMenuFile]->addAction(this->_action[kActionFileExit]);
 
-#if 0
 	/// EDIT ----------------------------------------------
+#ifndef Q_WS_WIN
 	this->_menu[kMenuEdit] = menuBar()->addMenu(tr("&Edit"));
+	this->_menu[kMenuEdit]->addAction(this->_action[kActionEditPreferences]);
+#endif // Q_WS_WIN
 
+#if 0
 	// EDIT SUBMENU
 	this->_menu[kMenuEditNormal]  = new QMenu("&Normals", this);
 	this->_menu[kMenuEditQuality] = new QMenu("&Quality", this);
@@ -186,6 +191,10 @@ void MainWindow::createMenus(void)
 
 	/// TOOL ----------------------------------------------
 	this->_menu[kMenuTool] = menuBar()->addMenu(tr("&Tool"));
+#ifdef Q_WS_WIN
+	this->_menu[kMenuTool]->addAction(this->_action[kActionEditPreferences]);
+	this->_menu[kMenuTool]->addSeparator();
+#endif // Q_WS_WIN
 
 	// TOOL SUBMENU
 	//this->_menu[kMenuToolChaos] = new QMenu("&Chaotic Maps", this);
@@ -289,6 +298,7 @@ void MainWindow::createActions(void)
 	/// EDIT ----------------------------------------------
 
 	// EDIT SUBMENU
+	this->_action[kActionEditPreferences]               = new QAction(tr("&Options"), this);
 #if 0
 	this->_action[kActionEditUpdateVertNormal]          = new QAction(tr("Update Vertex Normals"), this);
 	this->_action[kActionEditUpdateFaceNormal]          = new QAction(tr("Update Face Normals"), this);
@@ -454,6 +464,7 @@ void MainWindow::createConnections(void)
 	connect(this->_action[kActionFileNewCloud], SIGNAL(triggered()), this->_engine, SLOT(newObject()));
 
 	/// EDIT ----------------------------------------------
+	connect(this->_action[kActionEditPreferences], SIGNAL(triggered()), this->_prefWindow, SLOT(show()));
 
 	// EDIT SUBMENU
 	//connect(this->_action[kActionEditUpdateVertNormal],          SIGNAL(triggered()), , SLOT());

@@ -43,7 +43,8 @@ HEADERS = \
 		pluginmanager.h \
 		inputevents.h \
 		prefcontroller.h \
-		gui/aboutwindow.h
+		gui/aboutwindow.h \
+		gui/prefwindow.h
 
 SOURCES = \
 		opengl/glwindow.cpp \
@@ -61,7 +62,8 @@ SOURCES = \
 		inputevents.cpp \
 		../../../lib/vcglib/wrap/ply/plylib.cpp \
 		prefcontroller.cpp \
-		gui/aboutwindow.cpp
+		gui/aboutwindow.cpp \
+		gui/prefwindow.cpp
 
 win32:RC_FILE =	icon.rc
 

@@ -16,6 +16,8 @@
  ******************************************************************************/
 #include "statusbar.h"
 
+#include <QLabel> // QLabel
+
 StatusBar::StatusBar()
 {
 	this->_vertLabel = new QLabel("Vertexes: ");

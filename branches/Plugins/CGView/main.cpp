@@ -23,6 +23,9 @@
  */
 int main(int argc, char *argv[])
 {
+	QCoreApplication::setOrganizationName("UniCA");
+	QCoreApplication::setOrganizationDomain("informatica.unica.it");
+	QCoreApplication::setApplicationName("CGView");
 	QApplication app(argc, argv);
 	MainWindow mainWin;
 	mainWin.show();

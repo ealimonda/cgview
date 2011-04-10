@@ -30,6 +30,7 @@
 
 #include "convex_hull/my_convhull.h"
 #include "mesh_definition.h" // CG*
+#include "prefcontroller.h" // PrefController
 
 /**
  * Il costruttore della classe Engine
@@ -63,7 +64,8 @@ void Engine::loadFile(QString filename)
  */
 void Engine::openFile(void)
 {
-	QString filename = QFileDialog::getOpenFileName(NULL, "Apri mesh", "examples",
+	QString filename = QFileDialog::getOpenFileName(NULL, "Apri mesh",
+			PrefController::sharedInstance()->defaultDirectory(),
 			"3D Meshes (*.off *.ply);;"\
 			"Object File Format (*.off);;"\
 			"Stanford Polygon Fil Format (*.ply);;"\
@@ -87,7 +89,11 @@ void Engine::openFile(void)
  */
 void Engine::saveFile(void)
 {
-	QFileDialog saveDialog(NULL, "Salva mesh", "examples", "3D Meshes (*.off *.ply);;OFF (*.off);;PLY (*.ply)");
+	QFileDialog saveDialog(NULL, "Salva mesh", PrefController::sharedInstance()->defaultDirectory(),
+			"3D Meshes (*.off *.ply);;"\
+			"Object File Format (*.off);;"\
+			"Stanford Polygon Fil Format (*.ply)"
+	);
 	saveDialog.setDefaultSuffix("off");
 	saveDialog.setAcceptMode(QFileDialog::AcceptSave);
 	saveDialog.setConfirmOverwrite(true);

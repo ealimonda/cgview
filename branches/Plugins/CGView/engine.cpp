@@ -23,10 +23,10 @@
 //#include <wrap/io_trimesh/import_OFF.h>
 #include <wrap/io_trimesh/import_PLY.h> // vcg::tri::io::ImporterPLY
 #include <wrap/io_trimesh/export.h> // vcg::tri::io::Exporter
-#include <vcg/complex/trimesh/allocate.h> // vcg::tri::Allocator
-#include <vcg/complex/trimesh/update/normal.h> // vcg::tri::UpdateNormals
+#include <vcg/complex/allocate.h> // vcg::tri::Allocator
+#include <vcg/complex/algorithms/update/normal.h> // vcg::tri::UpdateNormals
 //#include <vcg/complex/trimesh/update/color.h>
-#include <vcg/complex/trimesh/update/bounding.h> // vcg::tri::UpdateBounding
+#include <vcg/complex/algorithms/update/bounding.h> // vcg::tri::UpdateBounding
 
 #include "convex_hull/my_convhull.h"
 #include "mesh_definition.h" // CG*

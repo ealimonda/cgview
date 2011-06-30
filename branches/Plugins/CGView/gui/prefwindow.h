@@ -40,17 +40,27 @@ protected:
 
 private:
 	void setUI(void);
+	void setUIGeneral(void);
+	void setUIPlugins(void);
+	void showColorPicker(int colorID);
 
-	QLineEdit *_generalBackgroundGradientTopLeftLine;
-	QLineEdit *_generalBackgroundGradientBottomLeftLine;
-	QLineEdit *_generalBackgroundGradientTopRightLine;
-	QLineEdit *_generalBackgroundGradientBottomRightLine;
+	QLineEdit *_generalBGGradientTopLeftLine;
+	QLineEdit *_generalBGGradientBottomLeftLine;
+	QLineEdit *_generalBGGradientTopRightLine;
+	QLineEdit *_generalBGGradientBottomRightLine;
 	QLineEdit *_generalDefaultDirectoryLine;
 
 	QGridLayout *_pluginsRenderingLayout;
 	QGridLayout *_pluginsVisualizationLayout;
 	QGridLayout *_pluginsTransformationLayout;
 	QGridLayout *_pluginsUIInputLayout;
+
+private slots:
+	void showGeneralBGGradientTopLeftLinePicker(void);
+	void showGeneralBGGradientBottomLeftLinePicker(void);
+	void showGeneralBGGradientTopRightLinePicker(void);
+	void showGeneralBGGradientBottomRightLinePicker(void);
+	void showGeneralDefaultDirectoryLineChooser(void);
 };
 
 #endif // CGVIEW_GUI_PREFWINDOW_H

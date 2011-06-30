@@ -105,8 +105,8 @@ void MainWindow::createMenus(void)
 	this->_menu[kMenuFile]->addSeparator();
 	this->_menu[kMenuFile]->addAction(this->_action[kActionFileOpen]);
 	this->_menu[kMenuFile]->addAction(this->_action[kActionFileAdd]);
-	this->_menu[kMenuFile]->addAction(this->_action[kActionFileSaveas]);
 	this->_menu[kMenuFile]->addAction(this->_action[kActionFileSave]);
+	this->_menu[kMenuFile]->addAction(this->_action[kActionFileSaveas]);
 	this->_menu[kMenuFile]->addSeparator();
 	this->_menu[kMenuFile]->addAction(this->_action[kActionFileClose]);
 	this->_menu[kMenuFile]->addAction(this->_action[kActionFileReset]);
@@ -175,12 +175,12 @@ void MainWindow::createMenus(void)
 	this->_menu[kMenuViewMesh]->addAction(this->_action[kActionViewMeshPoint]);
 	this->_menu[kMenuViewMesh]->addAction(this->_action[kActionViewMeshFlat]);
 	this->_menu[kMenuViewMesh]->addAction(this->_action[kActionViewMeshSmooth]);
-	this->_menu[kMenuViewMesh]->addAction(this->_action[kActionViewMeshVoxel]);
+//	this->_menu[kMenuViewMesh]->addAction(this->_action[kActionViewMeshVoxel]);
 	this->_menu[kMenuViewColor]->addAction(this->_action[kActionViewColorDisable]);
 	this->_menu[kMenuViewColor]->addSeparator();
 	this->_menu[kMenuViewColor]->addAction(this->_action[kActionViewColorVertex]);
 	this->_menu[kMenuViewColor]->addAction(this->_action[kActionViewColorFace]);
-	this->_menu[kMenuViewColor]->addAction(this->_action[kActionViewColorTexture]);
+//	this->_menu[kMenuViewColor]->addAction(this->_action[kActionViewColorTexture]);
 	this->_menu[kMenuViewColor]->addSeparator();
 	this->_menu[kMenuViewColor]->addAction(this->_action[kActionViewColorVertQuality]);
 	this->_menu[kMenuViewColor]->addAction(this->_action[kActionViewColorFaceQuality]);
@@ -261,12 +261,12 @@ void MainWindow::createToolBars(void)
 	this->_toolbar[kToolbarView]->addAction(this->_action[kActionViewMeshPoint]);
 	this->_toolbar[kToolbarView]->addAction(this->_action[kActionViewMeshFlat]);
 	this->_toolbar[kToolbarView]->addAction(this->_action[kActionViewMeshSmooth]);
-	this->_toolbar[kToolbarView]->addAction(this->_action[kActionViewMeshVoxel]);
+//	this->_toolbar[kToolbarView]->addAction(this->_action[kActionViewMeshVoxel]);
 	this->_toolbar[kToolbarView]->addSeparator();
 	this->_toolbar[kToolbarView]->addAction(this->_action[kActionViewColorDisable]);
 	this->_toolbar[kToolbarView]->addAction(this->_action[kActionViewColorVertex]);
 	this->_toolbar[kToolbarView]->addAction(this->_action[kActionViewColorFace]);
-	this->_toolbar[kToolbarView]->addAction(this->_action[kActionViewColorTexture]);
+//	this->_toolbar[kToolbarView]->addAction(this->_action[kActionViewColorTexture]);
 	this->_toolbar[kToolbarView]->addAction(this->_action[kActionViewColorVertQuality]);
 	this->_toolbar[kToolbarView]->addAction(this->_action[kActionViewColorFaceQuality]);
 	this->_toolbar[kToolbarView]->addAction(this->_action[kActionViewColorMaterial]);
@@ -358,10 +358,10 @@ void MainWindow::createActions(void)
 	this->_action[kActionViewMeshSmooth]->setIconText(tr("Smooth Sh."));
 	this->_action[kActionViewMeshSmooth]->setCheckable(true);
 	this->_actiongroup[kActiongroupViewMesh]->addAction(this->_action[kActionViewMeshSmooth]);
-	this->_action[kActionViewMeshVoxel]      = new QAction(tr("Voxels"), this);
-	this->_action[kActionViewMeshVoxel]->setIconText(tr("Vox"));
-	this->_action[kActionViewMeshVoxel]->setCheckable(true);
-	this->_actiongroup[kActiongroupViewMesh]->addAction(this->_action[kActionViewMeshVoxel]);
+//	this->_action[kActionViewMeshVoxel]      = new QAction(tr("Voxels"), this);
+//	this->_action[kActionViewMeshVoxel]->setIconText(tr("Vox"));
+//	this->_action[kActionViewMeshVoxel]->setCheckable(true);
+//	this->_actiongroup[kActiongroupViewMesh]->addAction(this->_action[kActionViewMeshVoxel]);
 	this->_actiongroup[kActiongroupViewMesh]->setExclusive(true);
 	this->_action[kActionViewMeshDisable]->setChecked(true);
 
@@ -378,10 +378,10 @@ void MainWindow::createActions(void)
 	this->_action[kActionViewColorFace]->setIconText(tr("Face Col."));
 	this->_action[kActionViewColorFace]->setCheckable(true);
 	this->_actiongroup[kActiongroupViewColor]->addAction(this->_action[kActionViewColorFace]);
-	this->_action[kActionViewColorTexture]     = new QAction(tr("Texture"), this);
-	this->_action[kActionViewColorTexture]->setIconText(tr("Txtr"));
-	this->_action[kActionViewColorTexture]->setCheckable(true);
-	this->_actiongroup[kActiongroupViewColor]->addAction(this->_action[kActionViewColorTexture]);
+//	this->_action[kActionViewColorTexture]     = new QAction(tr("Texture"), this);
+//	this->_action[kActionViewColorTexture]->setIconText(tr("Txtr"));
+//	this->_action[kActionViewColorTexture]->setCheckable(true);
+//	this->_actiongroup[kActiongroupViewColor]->addAction(this->_action[kActionViewColorTexture]);
 	this->_action[kActionViewColorVertQuality] = new QAction(tr("Vertex Quality Color"), this);
 	this->_action[kActionViewColorVertQuality]->setIconText(tr("Vert. Qlt. Col."));
 	this->_action[kActionViewColorVertQuality]->setCheckable(true);
@@ -504,7 +504,7 @@ void MainWindow::createConnections(void)
 	connect(this->_action[kActionViewColorDisable],     SIGNAL(triggered()), this->_glWindow, SLOT(disableColor()));
 	connect(this->_action[kActionViewColorVertex],      SIGNAL(triggered()), this->_glWindow, SLOT(enableVertexColor()));
 	connect(this->_action[kActionViewColorFace],        SIGNAL(triggered()), this->_glWindow, SLOT(enableFaceColor()));
-	connect(this->_action[kActionViewColorTexture],     SIGNAL(triggered()), this->_glWindow, SLOT(enableTexture()));
+//	connect(this->_action[kActionViewColorTexture],     SIGNAL(triggered()), this->_glWindow, SLOT(enableTexture()));
 	connect(this->_action[kActionViewColorVertQuality], SIGNAL(triggered()), this->_glWindow, SLOT(enableQualityVertex()));
 	connect(this->_action[kActionViewColorFaceQuality], SIGNAL(triggered()), this->_glWindow, SLOT(enableQualityFace()));
 	connect(this->_action[kActionViewColorMaterial],    SIGNAL(triggered()), this->_glWindow, SLOT(enableMaterial()));

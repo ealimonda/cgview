@@ -62,9 +62,19 @@ public:
 			return (int)(this->_gradientColors[idx][component] * 255);
 		return 0;
 	}
+	inline void setGradientColorComponent(unsigned int idx, unsigned int component, unsigned int value)
+	{
+		if (idx <= sizeof(this->_gradientColors)/sizeof(this->_gradientColors[0]))
+			this->_gradientColors[idx][component] = value / 255.;
+		return;
+	}
 	inline const QString defaultDirectory(void) const
 	{
 		return this->_defaultDirectory;
+	}
+	inline void setDefaultDirectory(QString directory)
+	{
+		this->_defaultDirectory = directory;
 	}
 
 public slots:

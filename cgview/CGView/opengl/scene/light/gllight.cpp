@@ -30,16 +30,16 @@ void GLLight::getLight(void)
 	//if(on) glEnable(GL_LIGHT0);
 	//else glDisable(GL_LIGHT0);
 
-	glLightfv(GL_LIGHT0, GL_AMBIENT,		this->_ambient);
-	glLightfv(GL_LIGHT0, GL_DIFFUSE,		this->_diffuse);
-	glLightfv(GL_LIGHT0, GL_SPECULAR,		this->_specular);
-	glLightfv(GL_LIGHT0, GL_POSITION,		this->_position);
-	glLightfv(GL_LIGHT0, GL_SPOT_DIRECTION,	this->_direction);
-	glLightfv(GL_LIGHT0, GL_SPOT_EXPONENT,		this->_exponent);
-	glLightfv(GL_LIGHT0, GL_SPOT_CUTOFF,		this->_cutoff);
-	glLightfv(GL_LIGHT0, GL_CONSTANT_ATTENUATION,	this->_att_const);
-	glLightfv(GL_LIGHT0, GL_LINEAR_ATTENUATION,	this->_att_lin);
-	glLightfv(GL_LIGHT0, GL_QUADRATIC_ATTENUATION,	this->_att_quad);
+	glLightfv(GL_LIGHT0, GL_AMBIENT,               this->_ambient);
+	glLightfv(GL_LIGHT0, GL_DIFFUSE,               this->_diffuse);
+	glLightfv(GL_LIGHT0, GL_SPECULAR,              this->_specular);
+	glLightfv(GL_LIGHT0, GL_POSITION,              this->_position);
+	glLightfv(GL_LIGHT0, GL_SPOT_DIRECTION,        this->_direction);
+	glLightfv(GL_LIGHT0, GL_SPOT_EXPONENT,         this->_exponent);
+	glLightfv(GL_LIGHT0, GL_SPOT_CUTOFF,           this->_cutoff);
+	glLightfv(GL_LIGHT0, GL_CONSTANT_ATTENUATION,  this->_att_const);
+	glLightfv(GL_LIGHT0, GL_LINEAR_ATTENUATION,    this->_att_lin);
+	glLightfv(GL_LIGHT0, GL_QUADRATIC_ATTENUATION, this->_att_quad);
 
 	glPopMatrix();
 }

@@ -202,7 +202,6 @@ bool Engine::createFromFile( QString filename ) {
 	return true;
 }
 
-
 /**
  * Il metodo dovrà calcolare il Convex Hull dei punti precedentemente caricati.
  * Il convex hull dovrà essere calcolato sotto forma di DCEL, verrà visualizzato in trasparenza

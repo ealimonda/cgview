@@ -18,7 +18,7 @@
 
 #include <QtGlobal> // Q_OS_*
 #include <QtGui> // QScrollArea
-#include <QElapsedTimer> // class QElapsedTimer
+//#include <QElapsedTimer> // class QElapsedTimer
 
 #include "engine.h" // class Engine
 #include "opengl/intro/glintro.h" // class GLIntro
@@ -672,14 +672,14 @@ void MainWindow::runTransformPlugin(void)
 	QAction *action = qobject_cast<QAction *>(sender());
 	PluginTransformInterface *plugin = qobject_cast<PluginTransformInterface *>(action->parent());
 
-	QElapsedTimer timer;
-	timer.start();
+//	QElapsedTimer timer;
+//	timer.start();
 
 	this->_glWindow->runTransformPlugin(plugin);
 
-	// Update the status bar
-	this->_statusBar->setTime(timer.elapsed());
-	timer.invalidate();
+//	// Update the status bar
+//	this->_statusBar->setTime(timer.elapsed());
+//	timer.invalidate();
 }
 
 void MainWindow::uiInputPluginToggled(void)

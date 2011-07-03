@@ -25,7 +25,7 @@
 #include <vcg/simplex/face/component.h>
 #include <vcg/simplex/face/component_ocf.h>
 
-#include <vcg/complex/complex.h>
+#include <vcg/complex/trimesh/base.h>
 
 //class CGEdge;
 class CGFace;

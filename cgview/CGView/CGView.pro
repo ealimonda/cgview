@@ -23,7 +23,7 @@ CONFIG += \
 QT +=		opengl
 
 INCLUDEPATH +=	. \
-		../../lib/vcglib
+                ../../../lib/vcglib
 
 HEADERS = \
 		opengl/glwindow.h \
@@ -60,7 +60,7 @@ SOURCES = \
 		convex_hull/my_convhull.cpp \
 		pluginmanager.cpp \
 		inputevents.cpp \
-		../../lib/vcglib/wrap/ply/plylib.cpp \
+                ../../../lib/vcglib/wrap/ply/plylib.cpp \
 		prefcontroller.cpp \
 		gui/aboutwindow.cpp \
 		gui/prefwindow.cpp

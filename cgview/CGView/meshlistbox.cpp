@@ -20,6 +20,7 @@ MeshListBox::~MeshListBox()
 
 void MeshListBox::addMeshListItem(MeshListItem* item) {
 	
+	this->show();
 	item->setParent(this);
 	item->setVisible(true);
 	item->update();
@@ -56,15 +57,17 @@ void MeshListBox::updateActiveMesh(void) {
 
 void MeshListBox::reset(void) {
 	
-	this->setMinimumHeight(30);
-	this->setMaximumHeight(60);
-	this->update();
-
 	QLayoutItem *item;
 	while ((item = _layout->takeAt(0)))
 		delete item;
 
+	for ( int i = 0; i < meshlist.size(); i ++)
+		delete meshlist[i];
+
 	meshlist.clear();
+
+	this->update();
+	this->hide();
 }
 
 

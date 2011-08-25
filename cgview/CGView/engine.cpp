@@ -215,7 +215,7 @@ bool Engine::createFromFile( QString filename ) {
 	this->_meshlist.push_back( mesh );
 	emit sendDcel(_meshlist.back());
 	emit loaded(true);
-	emit sendInfo(mesh->vn, mesh->fn, 0);
+	emit sendInfo(mesh->vn, mesh->fn, 0, true);
 	emit changeWindowTitle( QString( _meshlist.back()->getName().data() ) );
 
 	return true;
@@ -238,7 +238,7 @@ void Engine::calculateCH(void)
     conv_hull->apply();
 
     emit updateWindow();
-    emit sendInfo(_meshlist[_active]->vn, _meshlist[_active]->fn, t.elapsed());
+    emit sendInfo(_meshlist[_active]->vn, _meshlist[_active]->fn, t.elapsed(), true);
 }
 
 void Engine::faceToVertQ(void)
@@ -359,7 +359,7 @@ void Engine::newObject(void)
 	_meshlist.push_back( mesh );
 	emit sendDcel(_meshlist.back());
 	emit loaded(true);
-	emit sendInfo(_meshlist.back()->vn, _meshlist.back()->fn, 0);
+	emit sendInfo(_meshlist.back()->vn, _meshlist.back()->fn, 0, true);
 }
 
 void Engine::myFilter(void)
@@ -371,6 +371,7 @@ void Engine::setActiveMesh(int a)
 {
 	_active = a;
 	emit changeWindowTitle( QString( _meshlist[_active]->getName().data() ) );
+	emit sendInfo(_meshlist[_active]->vn, _meshlist[_active]->fn, 0, false);
 }
 
 int Engine::getActiveMesh(void)

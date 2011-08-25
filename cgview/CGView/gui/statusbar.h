@@ -30,12 +30,18 @@ public:
 	StatusBar();
 
 public slots:
-	inline void setInfo(const unsigned int v, const unsigned int f, const unsigned int t)
+	inline void setInfo(const unsigned int v, const unsigned int f, const unsigned int t, bool count)
 	{
 		this->_vert = v;
 		this->_face = f;
 		this->_edge = (3 * _face) / 2;
-		this->_time = t;
+		
+		if ( count ) {
+			this->_vert_total += v;
+			this->_face_total += f;
+			this->_edge_total += this->_edge;
+			this->_time = t;
+		}
 
 		this->_loaded = true;
 		this->refreshInfo();
@@ -51,6 +57,9 @@ public slots:
 		this->_vert = 0;
 		this->_face = 0;
 		this->_edge = 0;
+		this->_vert_total = 0;
+		this->_edge_total = 0;
+		this->_face_total = 0;
 		this->_time = 0;
 		this->_loaded = false;
 		this->refreshInfo();
@@ -67,10 +76,6 @@ private:
 	QLabel* _f;
 	QLabel* _e;
 	QLabel* _t;
-
-	QLabel* _vt;
-    QLabel* _ft;
-    QLabel* _et;
 
 	unsigned int _vert;
 	unsigned int _face;

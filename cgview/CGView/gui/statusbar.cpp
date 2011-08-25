@@ -29,6 +29,10 @@ StatusBar::StatusBar()
 	this->_e = new QLabel("");
 	this->_t = new QLabel("");
 
+	this->_vert_total = 0;
+	this->_edge_total = 0;
+	this->_face_total = 0;
+
 	this->addPermanentWidget(this->_vertLabel, 0);
 	this->addPermanentWidget(this->_v, 1);
 	this->addPermanentWidget(this->_faceLabel, 0);
@@ -49,9 +53,10 @@ void StatusBar::refreshInfo(void)
 		int e = this->_edge;
 		int t = this->_time;
 
-		this->_v->setNum(v);
-		this->_f->setNum(f);
-		this->_e->setNum(e);
+		//this->_v->setNum(v);
+		this->_v->setText(QString::number(v) + QString(" (") + QString::number(this->_vert_total) + QString(")"));
+		this->_f->setText(QString::number(f) + QString(" (") + QString::number(this->_face_total) + QString(")"));
+		this->_e->setText(QString::number(e) + QString(" (") + QString::number(this->_edge_total) + QString(")"));
 		this->_t->setNum(t);
 	}
 	else

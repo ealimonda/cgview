@@ -446,9 +446,9 @@ void MainWindow::createConnections(void)
 {
 	/// GENERAL -------------------------------------------
 	connect(this->_engine, SIGNAL(sendDcel(CGMesh*)), this->_glWindow, SLOT(addMesh(CGMesh*)));
-	connect(this->_engine, SIGNAL(sendDcel(CGMesh*)), this->_statusBar, SLOT(reset()));
-	connect(this->_engine, SIGNAL(sendInfo(const unsigned int, const unsigned int, const unsigned int)),
-			this->_statusBar, SLOT(setInfo(const unsigned int, const unsigned int, const unsigned int)));
+	//connect(this->_engine, SIGNAL(sendDcel(CGMesh*)), this->_statusBar, SLOT(reset()));
+	connect(this->_engine, SIGNAL(sendInfo(const unsigned int, const unsigned int, const unsigned int, bool)),
+			this->_statusBar, SLOT(setInfo(const unsigned int, const unsigned int, const unsigned int, bool)));
 	connect(this->_engine, SIGNAL(sendDcel(CGMesh*)), this, SLOT(endIntro()));
 	connect(this->_engine, SIGNAL(updateWindow()),	this->_glWindow, SLOT(updateWindow()));
     connect(this->_engine, SIGNAL(changeWindowTitle(QString)), this, SLOT(changeWindowTitle(QString)));
@@ -474,6 +474,7 @@ void MainWindow::createConnections(void)
 	connect(this->_action[kActionFileReset],   SIGNAL(triggered()), this->_engine,   SLOT(reset()));
 	connect(this->_action[kActionFileReset],   SIGNAL(triggered()), this->_glWindow, SLOT(reset()));
 	connect(this->_action[kActionFileReset],   SIGNAL(triggered()), this->_meshListBox,   SLOT(reset()));
+	connect(this->_action[kActionFileReset],   SIGNAL(triggered()), this->_statusBar,   SLOT(reset()));
 	connect(this->_action[kActionFileExit],    SIGNAL(triggered()), this,            SLOT(close()));
 
 	// FILE SUBMENU

@@ -83,7 +83,7 @@ public slots:
 signals:
 	/** Consente la visualizzazione della DCEL, inviandola al visualizzatore */
 	void sendDcel(CGMesh* dc);
-	void sendInfo(const unsigned int v, const unsigned int f, const unsigned int t);
+	void sendInfo(const unsigned int v, const unsigned int f, const unsigned int t, bool n);
 	void loaded(bool tf);
 	void updateWindow(void);
 	void changeWindowTitle(QString title);

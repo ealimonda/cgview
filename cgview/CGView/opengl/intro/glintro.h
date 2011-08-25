@@ -33,8 +33,8 @@ public slots:
 	inline void startCube(void) { this->_timer->start(20); }
 
 private:
-	static const float kMouseSensibility = 0.2f;
-	static const float kInertia = 0.2f;
+	float kMouseSensibility;
+	float kInertia;
 
 	static const unsigned int kDimensionX = 55;
 	static const unsigned int kDimensionY = 6;

@@ -1,6 +1,6 @@
 #include "my_convhull.h"
-//#include <vcg/complex/append.h>
-#include <vcg/complex/trimesh/append.h>
+#include <vcg/complex/append.h>
+//#include <vcg/complex/trimesh/append.h>
 
 My_ConvHull::My_ConvHull()
 {

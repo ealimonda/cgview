@@ -43,6 +43,9 @@ GLIntro::GLIntro(QWidget *parent, bool start) : QGLWidget(parent)
 
 	if (start)
 		this->startCube();
+
+	kMouseSensibility = 0.2f;
+	kInertia = 0.2f; 
 }
 
 GLIntro::~GLIntro()

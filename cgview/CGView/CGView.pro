@@ -23,7 +23,7 @@ CONFIG += \
 QT +=		opengl
 
 INCLUDEPATH +=	. \
-                ../../../lib/vcglib
+                ../../vcglib
 
 HEADERS = \
 		opengl/glwindow.h \
@@ -60,7 +60,7 @@ SOURCES = \
 		convex_hull/my_convhull.cpp \
 		pluginmanager.cpp \
 		inputevents.cpp \
-                ../../../lib/vcglib/wrap/ply/plylib.cpp \
+                ../../vcglib/wrap/ply/plylib.cpp \
 		prefcontroller.cpp \
 		gui/aboutwindow.cpp \
 		gui/prefwindow.cpp
@@ -78,9 +78,9 @@ mac {
 
 QMAKE_CXXFLAGS += \
 		-Wall \
-		-Wextra \
-		-Wswitch-enum \
-		-Wconversion
+		# -Wextra \
+		# -Wswitch-enum \
+		# -Wconversion
 
 DEFINES +=	NDEBUG
 DESTDIR =	../output

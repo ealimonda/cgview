@@ -59,6 +59,9 @@ public:
 	/** Carica un file dal nome specificato (noto a priori). **/
 	void loadFile(QString filename);
 
+	/** return index of active mesh **/
+	int getActiveMesh(void);
+
 public slots:
 	/** Reset dell'applicazione che torna allo stato iniziale. */
 	void reset(void);
@@ -75,21 +78,25 @@ public slots:
 
 	void newObject(void);
 
+	void setActiveMesh(int a);
+
 signals:
 	/** Consente la visualizzazione della DCEL, inviandola al visualizzatore */
 	void sendDcel(CGMesh* dc);
 	void sendInfo(const unsigned int v, const unsigned int f, const unsigned int t);
 	void loaded(bool tf);
 	void updateWindow(void);
+	void changeWindowTitle(QString title);
 
 private:
 	/** Crea la DCEL in base ai vertici inseriti dall'utente */
 	bool createFromFile( QString filename );
-
 	/// Lo stato dell'algoritmo
 	state _s;
-	/// La DCEL che verrà creata in seguito agli input dell'utente
-	CGMesh _d;
+	///index of the active mesh (default: 0)
+	int _active;
+	///List of pointers to the meshes
+	std::vector<CGMesh*> _meshlist;
 
 };
 

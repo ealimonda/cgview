@@ -67,10 +67,18 @@ private:
 	QLabel* _f;
 	QLabel* _e;
 	QLabel* _t;
+
+	QLabel* _vt;
+    QLabel* _ft;
+    QLabel* _et;
+
 	unsigned int _vert;
 	unsigned int _face;
 	unsigned int _edge;
 	unsigned int _time;
+    unsigned int _vert_total;
+    unsigned int _face_total;
+    unsigned int _edge_total;
 	bool _loaded;
 };
 

@@ -51,10 +51,6 @@ void GLWindow::runTransformPlugin(PluginTransformInterface *plugin)
 void GLWindow::addMesh(CGMesh* m)
 {
 	// If there is already a mesh, reset
-	if (this->_loaded)
-	{
-		this->reset();
-	}
 	this->_loaded = true;
 
 	this->_mesh.push_back(GLMesh(m));
@@ -67,6 +63,17 @@ void GLWindow::addMesh(CGMesh* m)
 
 	this->updateWindow();
 	this->updateWindow();
+
+	_meshlist.push_back(m);
+
+	//This can be revised in order to move those instruction to a different part of the code
+	QString name(m->getName().data());
+	//create item for the menus
+	MeshListItem *item = new MeshListItem(name, _mesh, _mesh.size()-1);
+	//connect the item to the window for updating view
+	connect(item, SIGNAL(updateMesh()), this, SLOT(updateGL()));
+	//send information
+	emit sendMeshInfo(item);
 }
 
 /**
@@ -258,4 +265,34 @@ void GLWindow::uiInputEvent(InputEvents::EventType type,float value)
 		break;
 	}
 	this->updateGL();
+}
+
+void GLWindow::getSnapshot() {
+	updateGL();
+
+    QImage snapshot( this->width(), this->height(), QImage::Format_RGB32);
+    snapshot.fill(0);
+
+	int w = snapshot.width();
+	int h = snapshot.height();
+
+    //read data from framebuffer
+    uchar* red = (uchar*) calloc (snapshot.width() * snapshot.height(), sizeof(uchar));
+    uchar* green = (uchar*) calloc (snapshot.width() * snapshot.height(), sizeof(uchar));
+    uchar* blue = (uchar*) calloc (snapshot.width() * snapshot.height(), sizeof(uchar));
+    glReadPixels( (GLint) 0, (GLint) 0, (GLint) snapshot.width(), (GLint) snapshot.height(), GL_RED, GL_UNSIGNED_BYTE, red );
+    glReadPixels( (GLint) 0, (GLint) 0, (GLint) snapshot.width(), (GLint) snapshot.height(), GL_GREEN, GL_UNSIGNED_BYTE, green );
+    glReadPixels( (GLint) 0, (GLint) 0, (GLint) snapshot.width(), (GLint) snapshot.height(), GL_BLUE, GL_UNSIGNED_BYTE, blue );
+
+    //save data in QImage
+    for(int x = 0; x < snapshot.width(); x++)   {      //col
+       for(int y = 0; y < snapshot.height(); y++)  {   //row
+           //save image
+           snapshot.setPixel(x, snapshot.height()-y-1, qRgb(red[y*snapshot.width()+x], green[y*snapshot.width()+x], blue[y*snapshot.width()+x]));
+       }
+    }
+
+    //save QImage on disk
+    QString filename = QFileDialog::getSaveFileName( NULL, "Save shapshot", "", "Image files (*.png *.jpg *.bmp);;png (*.png);;jpg (*.jpg);;bmp (*.bmp)");
+    if ( !filename.isNull() ) snapshot.save(filename);
 }

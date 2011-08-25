@@ -44,6 +44,7 @@ public:
 	/** Draws the mesh and its properties */
 	inline void drawMesh(void)
 	{
+		if ( !_visible ) return;
 		glPushMatrix();
 		if( this->_vis.isMeshEnabled() )      glCallList(this->_meshGL[kPropertyMesh]);
 		if( this->_vis.isWireframeEnabled() ) glCallList(this->_meshGL[kPropertyWireframe]);
@@ -73,6 +74,7 @@ public:
 
 		this->_loaded = false;
 		this->_selected = true;
+		this->_visible = true;
 	}
 	/** Set a mesh */
 	inline void setMesh(CGMesh* m)
@@ -296,6 +298,14 @@ public:
 		return this->_m;
 	}
 
+	inline void show() {
+		_visible = true;
+	}
+
+	inline void hide() {
+		_visible = false;
+	}
+
 private:
 	/** Identify the property of the mesh **/
 	enum MeshProperty {
@@ -330,6 +340,7 @@ private:
 
 	bool _loaded;
 	bool _selected;
+	bool _visible;
 };
 
 #endif // CGVIEW_OPENGL_MESH_GLMESH_H

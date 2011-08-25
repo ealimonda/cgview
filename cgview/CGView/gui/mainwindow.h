@@ -24,6 +24,7 @@
 
 #include <QMainWindow> // class QMainWindow
 #include "pluginmanager.h" // PluginManager
+#include "meshlistbox.h"	//meshListBox
 
 QT_BEGIN_NAMESPACE
 class QAction;
@@ -58,6 +59,7 @@ private:
 		kAreaIntro = 0,
 		kAreaViewer,
 		kAreaPalette,
+		kAreaMeshList,
 		// Number of areas
 		kAreasMax
 	};
@@ -153,6 +155,7 @@ private:
 
 		/// Tool actions
 		kActionToolConvexhull,
+		kActionToolSnapshot,
 //		kActionToolChaosArnoldcat,
 //		kActionToolChaosIkeda,
 //		kActionToolChaosDuffing,
@@ -219,11 +222,20 @@ private:
 	void createStatus(void);
 	/** Create the palette **/
 	void createPalette(void);
+	/** create the meshlistbox **/
+	void createMeshList(void);
+
 	void addToMenu(QObject *plugin, const QString &name, QMenu *menu, const char *signal, QObject *target,
 			const char *member, QActionGroup *actionGroup, bool checkable);
 
 	/** Keyboard listener */
 	void keyPressEvent(QKeyEvent *event);
+
+	/** drag and drop events **/
+    void dragEnterEvent(QDragEnterEvent * event);
+    void dragMoveEvent(QDragMoveEvent * event);
+    void dragLeaveEvent(QDragLeaveEvent * event);
+    void dropEvent(QDropEvent * event);
 
 	/// Main widget
 	QWidget *_mainWidget;
@@ -245,6 +257,7 @@ private:
 	/// Areas
 	GLIntro *_glIntro;
 	GLWindow *_glWindow;
+	MeshListBox *_meshListBox;
 
 	StatusBar *_statusBar;
 
@@ -269,6 +282,8 @@ private slots:
 	void runTransformPlugin(void);
 
 	void uiInputPluginToggled(void);
+
+	void changeWindowTitle(QString title);
 };
 
 #endif // CGVIEW_GUI_MAINWINDOW_H

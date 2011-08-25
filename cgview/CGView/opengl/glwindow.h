@@ -20,6 +20,7 @@
 #include <QtOpenGL> // QGLWidget
 #include "opengl/scene/scene.h" // GLCamera, GLLight, GLMesh
 #include "pluginmanager.h" // PluginManager
+#include "meshlistbox.h"
 
 class PluginTransformInterface;
 class PluginRenderInterface;
@@ -240,6 +241,9 @@ public slots:
 		}
 	}
 
+	/** take a snapshot **/
+	void getSnapshot();
+
 	/** Add a mesh to the scene */
 	void addMesh(CGMesh* m);
 	/** Update the GLWindow **/
@@ -270,17 +274,19 @@ private:
 	/// SCENE
 	/** Draws the background gradient */
 	void drawGradient(void);
-	/// Mesh inside the scene
+	/// Mesh inside the scene (drawing meshes)
 	std::vector<GLMesh> _mesh;
+	//Mesh inside the scene (actual meshes)
+	std::vector<CGMesh*> _meshlist;
 	/// Bounding box of the entire scene
 	vcg::Box3<double> _box;
 
 	/// Scene camera
 	GLCamera _camera;
-	/// Scene light (if needed)
+	/// Scene light (if neededFLAGS
 	//GLLight _light;
 
-	/// FLAGS
+	/// 
 	/// Flag for knowing if a mesh is loaded or not
 	bool _loaded;
 
@@ -292,6 +298,7 @@ private:
 
 signals:
 	void hasReset(void);
+	void sendMeshInfo(MeshListItem*);
 };
 
 #endif // CGVIEW_OPENGL_GLWINDOW_H

@@ -238,11 +238,11 @@ private:
 	float _specular[kChannelsRGBA];
 	float _position[kCoordsXYZW];
 	float _direction[kCoordsXYZ];
-	float _exponent[0];
-	float _cutoff[0];
-	float _att_const[0];
-	float _att_lin[0];
-	float _att_quad[0];
+	float _exponent[1];
+	float _cutoff[1];
+	float _att_const[1];
+	float _att_lin[1];
+	float _att_quad[1];
 };
 
 #endif // CGVIEW_OPENGL_SCENE_LIGHT_GLLIGHT_H

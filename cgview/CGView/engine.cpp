@@ -24,16 +24,16 @@
 #include <wrap/io_trimesh/import_PLY.h> // vcg::tri::io::ImporterPLY
 #include <wrap/io_trimesh/export.h> // vcg::tri::io::Exporter
 
-//#include <vcg/complex/allocate.h> // vcg::tri::Allocator
-#include <vcg/complex/trimesh/allocate.h>
+#include <vcg/complex/allocate.h> // vcg::tri::Allocator
+//#include <vcg/complex/trimesh/allocate.h>
 
-//#include <vcg/complex/algorithms/update/normal.h> // vcg::tri::UpdateNormals
-#include <vcg/complex/trimesh/update/normal.h>
+#include <vcg/complex/algorithms/update/normal.h> // vcg::tri::UpdateNormals
+//#include <vcg/complex/trimesh/update/normal.h>
 
 //#include <vcg/complex/trimesh/update/color.h>
 
-//#include <vcg/complex/algorithms/update/bounding.h> // vcg::tri::UpdateBounding
-#include <vcg/complex/trimesh/update/bounding.h>
+#include <vcg/complex/algorithms/update/bounding.h> // vcg::tri::UpdateBounding
+//#include <vcg/complex/trimesh/update/bounding.h>
 
 #include "convex_hull/my_convhull.h"
 #include "mesh_definition.h" // CG*
@@ -67,25 +67,29 @@ void Engine::loadFile(QString filename)
  *********************************************************************/
 
 /** 
- * Apre un file e carica una DCEL
+ * Open one or more files
  */
 void Engine::openFile(void)
 {
-	QString filename = QFileDialog::getOpenFileName(NULL, "Apri mesh",
+	QStringList files = QFileDialog::getOpenFileNames(NULL, "Apri mesh",
 			PrefController::sharedInstance()->defaultDirectory(),
 			"3D Meshes (*.off *.ply);;"\
 			"Object File Format (*.off);;"\
 			"Stanford Polygon Fil Format (*.ply);;"\
-			"Any file (*.*)"
-	);
-
-	if (filename.isNull())
-		return;
-
-	if (!this->createFromFile(filename))
-		return;
-
-	this->_s = Engine::kStateComputed;
+			"Any file (*.*)");
+	QStringList::Iterator it = files.begin();
+	
+	while( it != files.end() ) { 
+		if( !(*it).isNull() )
+		{
+			if(!createFromFile( *it ))
+			{
+				return;
+			}
+			_s = Engine::kStateComputed;
+		}
+		++it;
+	}
 }
 
 /**
@@ -112,9 +116,9 @@ void Engine::saveFile(void)
 	QString filename = saveDialog.selectedFiles().takeFirst();
 	int err = -1;
 	if (vcg::tri::io::Exporter<CGMesh>::FileExtension(filename.toStdString().c_str(),"off"))
-		err = vcg::tri::io::ExporterOFF<CGMesh>::Save(this->_d, filename.toStdString().c_str());
+		err = vcg::tri::io::ExporterOFF<CGMesh>::Save(*(this->_meshlist[_active]), filename.toStdString().c_str());
 	else if (vcg::tri::io::Importer<CGMesh>::FileExtension(filename.toStdString().c_str(),"ply"))
-		err = vcg::tri::io::ExporterPLY<CGMesh>::Save(this->_d, filename.toStdString().c_str());
+		err = vcg::tri::io::ExporterPLY<CGMesh>::Save(*(this->_meshlist[_active]), filename.toStdString().c_str());
 	if (err)
 	{
 		printf("Error in saving %s: '%s'\n", filename.toStdString().c_str(),
@@ -130,7 +134,8 @@ void Engine::saveFile(void)
 void Engine::reset(void)
 {
 	this->_s = Engine::kStateInput;
-	this->_d.Clear();
+	for (int i = 0; i < this->_meshlist.size(); i ++) this->_meshlist[i]->Clear();
+	this->_meshlist.clear();
 	this->loaded(false);
 }
 
@@ -141,16 +146,21 @@ void Engine::reset(void)
  * Inoltre (bonus) effettua il calcolo delle normali dei vertici e delle facce.
  */
 bool Engine::createFromFile( QString filename ) {
-	//CGMesh tmp_d;
+	
+	CGMesh* mesh = new CGMesh();
+	//set mesh name
+	size_t found = filename.toStdString().find_last_of("/\\");
+	mesh->setName( filename.toStdString().substr(found+1) );
+
 	// Decommentare le due righe seguenti se si vuole dare la possibilità di caricare più mesh
 	int err = -1;
 	if (vcg::tri::io::Importer<CGMesh>::FileExtension(filename.toStdString().c_str(),"off") )
 	{
-		err = vcg::tri::io::ImporterOFF<CGMesh>::Open(this->_d, filename.toStdString().c_str());
+		err = vcg::tri::io::ImporterOFF<CGMesh>::Open(*mesh, filename.toStdString().c_str());
 	}
 	else if (vcg::tri::io::Importer<CGMesh>::FileExtension(filename.toStdString().c_str(),"ply"))
 	{
-		err = vcg::tri::io::ImporterPLY<CGMesh>::Open(this->_d, filename.toStdString().c_str());
+		err = vcg::tri::io::ImporterPLY<CGMesh>::Open(*mesh, filename.toStdString().c_str());
 	}
 
 	if (err)
@@ -160,51 +170,53 @@ bool Engine::createFromFile( QString filename ) {
 				vcg::tri::io::Importer<CGMesh>::ErrorMsg(err));
 		return false;
 	}
-	vcg::tri::UpdateBounding<CGMesh>::Box(this->_d);
-	for (int i = 0; i < this->_d.vn; ++i)
+	vcg::tri::UpdateBounding<CGMesh>::Box(*mesh);
+	for (int i = 0; i < mesh->vn; ++i)
 	{
-		this->_d.vert[i].P() = this->_d.vert[i].P() - this->_d.bbox.Center();
-		this->_d.vert[i].Q() = -1;
+		mesh->vert[i].P() = mesh->vert[i].P() - mesh->bbox.Center();
+		mesh->vert[i].Q() = -1;
 	}
-	for (int i = 0; i < this->_d.fn; ++i)
+	for (int i = 0; i < mesh->fn; ++i)
 	{
-		this->_d.face[i].Q() = -1;
+		mesh->face[i].Q() = -1;
 	}
-	vcg::tri::UpdateBounding<CGMesh>::Box(this->_d);
-	vcg::tri::UpdateTopology<CGMesh>::FaceFace(this->_d);
-	vcg::tri::UpdateNormals<CGMesh>::PerFace(this->_d);
-	//vcg::tri::UpdateNormals<CGMesh>::PerVertex(this->_d);
-	for (int i = 0; i < this->_d.vn; ++i)
+	vcg::tri::UpdateBounding<CGMesh>::Box(*mesh);
+	vcg::tri::UpdateTopology<CGMesh>::FaceFace(*mesh);
+	vcg::tri::UpdateNormals<CGMesh>::PerFace(*mesh);
+	//vcg::tri::UpdateNormals<CGMesh>::PerVertex(*_meshlist[_active]);
+	for (int i = 0; i < mesh->vn; ++i)
 	{
-		this->_d.vert[i].N() = CGPoint(0, 0, 0);
+		mesh->vert[i].N() = CGPoint(0, 0, 0);
 	}
-	for (int i = 0; i < this->_d.fn; ++i)
+	for (int i = 0; i < mesh->fn; ++i)
 	{
 		for (int j = 0; j < 3; ++j)
 		{
 			if (
-					(this->_d.face[i].V(j)->N()[0] == 0)
-					&& (this->_d.face[i].V(j)->N()[1] == 0)
-					&& (this->_d.face[i].V(j)->N()[2] == 0)
+					(mesh->face[i].V(j)->N()[0] == 0)
+					&& (mesh->face[i].V(j)->N()[1] == 0)
+					&& (mesh->face[i].V(j)->N()[2] == 0)
 			)
 			{
-				this->_d.face[i].V(j)->N() = this->_d.face[i].N();
+				mesh->face[i].V(j)->N() = mesh->face[i].N();
 			}
 			else
 			{
-				this->_d.face[i].V(j)->N()[0] = (this->_d.face[i].V(j)->N()[0] + this->_d.face[i].N()[0]) / 2.0;
-				this->_d.face[i].V(j)->N()[1] = (this->_d.face[i].V(j)->N()[1] + this->_d.face[i].N()[1]) / 2.0;
-				this->_d.face[i].V(j)->N()[2] = (this->_d.face[i].V(j)->N()[2] + this->_d.face[i].N()[2]) / 2.0;
+				mesh->face[i].V(j)->N()[0] = (mesh->face[i].V(j)->N()[0] + mesh->face[i].N()[0]) / 2.0;
+				mesh->face[i].V(j)->N()[1] = (mesh->face[i].V(j)->N()[1] + mesh->face[i].N()[1]) / 2.0;
+				mesh->face[i].V(j)->N()[2] = (mesh->face[i].V(j)->N()[2] + mesh->face[i].N()[2]) / 2.0;
 			}
 		}
 	}
-	vcg::tri::UpdateNormals<CGMesh>::NormalizeVertex(this->_d);
-	vcg::tri::UpdateNormals<CGMesh>::NormalizeFace(this->_d);
+	vcg::tri::UpdateNormals<CGMesh>::NormalizeVertex(*mesh);
+	vcg::tri::UpdateNormals<CGMesh>::NormalizeFace(*mesh);
 
-
-	emit sendDcel(&this->_d);
+	//store the mesh
+	this->_meshlist.push_back( mesh );
+	emit sendDcel(_meshlist.back());
 	emit loaded(true);
-	emit sendInfo(this->_d.vn, this->_d.fn, 0);
+	emit sendInfo(mesh->vn, mesh->fn, 0);
+	emit changeWindowTitle( QString( _meshlist.back()->getName().data() ) );
 
 	return true;
 }
@@ -221,31 +233,31 @@ void Engine::calculateCH(void)
     t.start();
 
     My_ConvHull* conv_hull = new My_ConvHull();
-    conv_hull->setMesh(&this->_d);
+    conv_hull->setMesh(_meshlist[_active]);
 
     conv_hull->apply();
 
     emit updateWindow();
-    emit sendInfo(this->_d.vn, this->_d.fn, t.elapsed());
+    emit sendInfo(_meshlist[_active]->vn, _meshlist[_active]->fn, t.elapsed());
 }
 
 void Engine::faceToVertQ(void)
 {
-	for (int i = 0; i < this->_d.vn; ++i)
+	for (int i = 0; i < _meshlist[_active]->vn; ++i)
 	{
-		this->_d.vert[i].Q() = -1;
+		_meshlist[_active]->vert[i].Q() = -1;
 	}
-	for (int i = 0; i < this->_d.fn; ++i)
+	for (int i = 0; i < _meshlist[_active]->fn; ++i)
 	{
 		for (int j = 0; j < 3; ++j)
 		{
-			if (this->_d.face[i].V(j)->Q() == -1)
+			if (_meshlist[_active]->face[i].V(j)->Q() == -1)
 			{
-				this->_d.face[i].V(j)->Q() = this->_d.face[i].Q();
+				_meshlist[_active]->face[i].V(j)->Q() = _meshlist[_active]->face[i].Q();
 			}
 			else
 			{
-				this->_d.face[i].V(j)->Q() = (this->_d.face[i].V(j)->Q() + this->_d.face[i].Q()) / 2;
+				_meshlist[_active]->face[i].V(j)->Q() = (_meshlist[_active]->face[i].V(j)->Q() + _meshlist[_active]->face[i].Q()) / 2;
 			}
 		}
 	}
@@ -257,12 +269,12 @@ void Engine::newObject(void)
 	//int X = 2;
 	//int Y = 1;
 
-	this->_d.Clear();
+	CGMesh* mesh = new CGMesh();
 
-	//vcg::tri::Allocator<CGMesh>::AddVertices(this->_d, X*Y);
-	//vcg::tri::Allocator<CGMesh>::AddVertices(this->_d, 3);
-	//vcg::tri::Allocator<CGMesh>::AddFaces(this->_d, 2*X*Y);
-	//vcg::tri::Allocator<CGMesh>::AddFaces(this->_d, 1);
+	//vcg::tri::Allocator<CGMesh>::AddVertices(*_meshlist[_active], X*Y);
+	//vcg::tri::Allocator<CGMesh>::AddVertices(*_meshlist[_active], 3);
+	//vcg::tri::Allocator<CGMesh>::AddFaces(*_meshlist[_active], 2*X*Y);
+	//vcg::tri::Allocator<CGMesh>::AddFaces(*_meshlist[_active], 1);
 
 	switch (t)
 	{
@@ -270,9 +282,9 @@ void Engine::newObject(void)
 	  {
 		time(NULL);
 
-		vcg::tri::Allocator<CGMesh>::AddVertices(this->_d, 100);
+		vcg::tri::Allocator<CGMesh>::AddVertices(*mesh, 100);
 		CGMesh::VertexPointer ivp[100];
-		CGMesh::VertexIterator vi = this->_d.vert.begin();
+		CGMesh::VertexIterator vi = mesh->vert.begin();
 		for (int i = 0; i < 100; i++)
 		{
 			ivp[i] = &*vi;
@@ -282,7 +294,7 @@ void Engine::newObject(void)
 
 #if 0
 		CGMesh::VertexPointer ivp[3];
-		CGMesh::VertexIterator vi = this->_d.vert.begin();
+		CGMesh::VertexIterator vi = _meshlist[_active]->vert.begin();
 		for (int i = 0; i < X; ++i)
 		{
 			for (int j = 0; j < Y; ++j)
@@ -296,7 +308,7 @@ void Engine::newObject(void)
 #endif // 0
 
 #if 0
-		CGMesh::FaceIterator fi = this->_d.face.begin();
+		CGMesh::FaceIterator fi = _meshlist[_active]->face.begin();
 		for (int i = 0; i < (X - 1); ++i)
 		{
 			for (int j = 0; j < Y; j++)
@@ -316,7 +328,7 @@ void Engine::newObject(void)
 #endif // 0
 
 #if 0
-		CGMesh::FaceIterator fi = this->_d.face.begin();
+		CGMesh::FaceIterator fi = _meshlist[_active]->face.begin();
 		(*fi).V(0) = ivp[0];
 		(*fi).V(1) = ivp[1];
 		(*fi).V(2) = ivp[2];
@@ -325,31 +337,43 @@ void Engine::newObject(void)
 		break;
 	}
 
-	vcg::tri::UpdateBounding<CGMesh>::Box(this->_d);
-	for (int i = 0; i < this->_d.vn; ++i)
+	vcg::tri::UpdateBounding<CGMesh>::Box(*mesh);
+	for (int i = 0; i < mesh->vn; ++i)
 	{
-		this->_d.vert[i].P() = this->_d.vert[i].P() - this->_d.bbox.Center();
-		this->_d.vert[i].Q() = -1;
+		mesh->vert[i].P() = mesh->vert[i].P() - mesh->bbox.Center();
+		mesh->vert[i].Q() = -1;
 	}
-	vcg::tri::UpdateBounding<CGMesh>::Box(this->_d);
+	vcg::tri::UpdateBounding<CGMesh>::Box(*mesh);
 
-	vcg::tri::UpdateTopology<CGMesh>::FaceFace(this->_d);
-	vcg::tri::UpdateNormals<CGMesh>::PerFace(this->_d);
-	//vcg::tri::UpdateNormals<CGMesh>::PerVertex(this->_d);
-	vcg::tri::UpdateNormals<CGMesh>::NormalizeVertex(this->_d);
-	vcg::tri::UpdateNormals<CGMesh>::NormalizeFace(this->_d);
+	vcg::tri::UpdateTopology<CGMesh>::FaceFace(*mesh);
+	vcg::tri::UpdateNormals<CGMesh>::PerFace(*mesh);
+	//vcg::tri::UpdateNormals<CGMesh>::PerVertex(*_meshlist[_active]);
+	vcg::tri::UpdateNormals<CGMesh>::NormalizeVertex(*mesh);
+	vcg::tri::UpdateNormals<CGMesh>::NormalizeFace(*mesh);
 
-	for (int i = 0; i < this->_d.fn; ++i)
+	for (int i = 0; i < mesh->fn; ++i)
 	{
-		this->_d.face[i].Q() = -1;
+		mesh->face[i].Q() = -1;
 	}
-
-	emit sendDcel(&this->_d);
+	
+	_meshlist.push_back( mesh );
+	emit sendDcel(_meshlist.back());
 	emit loaded(true);
-	emit sendInfo(this->_d.vn, this->_d.fn, 0);
+	emit sendInfo(_meshlist.back()->vn, _meshlist.back()->fn, 0);
 }
 
 void Engine::myFilter(void)
 {
 
+}
+
+void Engine::setActiveMesh(int a) 
+{
+	_active = a;
+	emit changeWindowTitle( QString( _meshlist[_active]->getName().data() ) );
+}
+
+int Engine::getActiveMesh(void)
+{
+	return _active;
 }

@@ -20,11 +20,11 @@ TEMPLATE =	lib
 #CONFIG +=	plugin static
 CONFIG +=	plugin
 INCLUDEPATH +=	../../../CGView \
-		../../../../../lib/vcglib
+		../../../../vcglib
 DESTDIR =	../../../output/plugins
 
 # Don't remove -W* cflags unless strictly necessary.
 QMAKE_CXXFLAGS +=	-Wall \
-			-Wextra \
-			-Wswitch-enum \
-			-Wconversion
+			# -Wextra \
+			# -Wswitch-enum \
+			# -Wconversion

@@ -51,6 +51,9 @@ MainWindow::MainWindow()
 
 	this->setContentsMargins(0, 0, 0, 0);
 
+	//accept drops
+	this->setAcceptDrops(true);
+
 	// Creating the central widget
 	this->_mainWidget = new QWidget;
 	this->setCentralWidget(this->_mainWidget);
@@ -59,19 +62,22 @@ MainWindow::MainWindow()
 	this->createStatus();
 	this->createViewer();
 	this->createPalette();
+	this->createMeshList();
 
 	this->_area[kAreaIntro]->setVisible(true);
 	this->_area[kAreaViewer]->setVisible(false);
 	this->_statusBar->setVisible(false);
 	this->_area[kAreaPalette]->setVisible(false);
+	this->_area[kAreaMeshList]->setVisible(false);
 
 	// Creating the layout
 	this->_layout = new QGridLayout();
 	this->_layout->setSpacing(0);
 
-	this->_layout->addWidget(this->_area[kAreaIntro], 0, 0);
-	this->_layout->addWidget(this->_area[kAreaViewer], 1, 0);
-	this->_layout->addWidget(this->_area[kAreaPalette], 1, 1);
+	this->_layout->addWidget(this->_area[kAreaIntro], 0, 0, -1, -1);
+	this->_layout->addWidget(this->_area[kAreaViewer], 0, 0, -1, 5);
+	//this->_layout->addWidget(this->_area[kAreaPalette], 1, 1);
+	this->_layout->addWidget(this->_area[kAreaMeshList], 0, 5, 3, 1);
 
 	this->_mainWidget->setLayout(this->_layout);
 
@@ -203,6 +209,7 @@ void MainWindow::createMenus(void)
 
 	// Adding submenus and action
 	this->_menu[kMenuTool]->addAction(this->_action[kActionToolConvexhull]);
+	this->_menu[kMenuTool]->addAction(this->_action[kActionToolSnapshot]);
 
 	this->_menu[kMenuTool]->addMenu(this->_menu[kMenuToolInput]);
 #if 0
@@ -406,6 +413,7 @@ void MainWindow::createActions(void)
 
 	/// TOOL ----------------------------------------------
 	this->_action[kActionToolConvexhull] = new QAction(tr("Convex Hull"), this);
+	this->_action[kActionToolSnapshot] = new QAction(tr("Snapshot"), this);
 
 #if 0
 	this->_action[kActionToolVoxelDisable] = new QAction(tr("Delete Voxels"), this);
@@ -443,11 +451,18 @@ void MainWindow::createConnections(void)
 			this->_statusBar, SLOT(setInfo(const unsigned int, const unsigned int, const unsigned int)));
 	connect(this->_engine, SIGNAL(sendDcel(CGMesh*)), this, SLOT(endIntro()));
 	connect(this->_engine, SIGNAL(updateWindow()),	this->_glWindow, SLOT(updateWindow()));
+    connect(this->_engine, SIGNAL(changeWindowTitle(QString)), this, SLOT(changeWindowTitle(QString)));
 
 	connect(PluginManager::sharedInstance(), SIGNAL(loadedPlugin(QObject*, PluginManager::PluginType)),
 			this, SLOT(setupPlugin(QObject*, PluginManager::PluginType)));
 	connect(PluginManager::sharedInstance(), SIGNAL(loadedPlugin(QObject*, PluginManager::PluginType)),
 			PluginManager::sharedInstance(), SLOT(setupPlugin(QObject*, PluginManager::PluginType)));
+
+	/// MESHLISTBOX --------------------------------------
+	connect(this->_glWindow, SIGNAL(sendMeshInfo(MeshListItem*)), 
+			this->_meshListBox, SLOT(addMeshListItem(MeshListItem*)));
+	connect(this->_meshListBox, SIGNAL(changeActiveMesh(int)), 
+			this->_engine, SLOT(setActiveMesh(int)));
 
 	/// FILE ----------------------------------------------
 	connect(this->_action[kActionFileOpen],    SIGNAL(triggered()), this->_engine,   SLOT(openFile()));
@@ -458,6 +473,7 @@ void MainWindow::createConnections(void)
 	//connect(this->_action[kActionFileClose], SIGNAL(triggered()), this,            SLOT(prova()));
 	connect(this->_action[kActionFileReset],   SIGNAL(triggered()), this->_engine,   SLOT(reset()));
 	connect(this->_action[kActionFileReset],   SIGNAL(triggered()), this->_glWindow, SLOT(reset()));
+	connect(this->_action[kActionFileReset],   SIGNAL(triggered()), this->_meshListBox,   SLOT(reset()));
 	connect(this->_action[kActionFileExit],    SIGNAL(triggered()), this,            SLOT(close()));
 
 	// FILE SUBMENU
@@ -512,6 +528,7 @@ void MainWindow::createConnections(void)
 
 	/// TOOL ----------------------------------------------
 	connect(this->_action[kActionToolConvexhull], SIGNAL(triggered()), this->_engine, SLOT(calculateCH()));
+	connect(this->_action[kActionToolSnapshot],  SIGNAL(triggered()), this->_glWindow, SLOT(getSnapshot()));
 
 	// TOOL SUBMENU
 
@@ -595,6 +612,7 @@ void MainWindow::endIntro(void)
 	this->_area[kAreaViewer]->setVisible(true);
 	this->_statusBar->show();
 	//this->_area[kAreaPalette]->setVisible(true);
+	_area[kAreaMeshList]->setVisible(true);
 }
 
 void MainWindow::setupPlugin(QObject *plugin, PluginManager::PluginType type)
@@ -704,4 +722,76 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
 		event->accept();
 	else
 		event->ignore();
+}
+
+
+//create the meshlistbox
+void MainWindow::createMeshList() {
+
+	_meshListBox = new MeshListBox();
+	_meshListBox->setFrameStyle(QFrame::Box|QFrame::Raised);
+	_meshListBox->setLineWidth(2);
+	_meshListBox->setMinimumSize(300,800);
+	_meshListBox->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
+
+	_area[kAreaMeshList] = new QScrollArea(this);
+	_area[kAreaMeshList]->setWidget(_meshListBox);
+	_area[kAreaMeshList]->setWidgetResizable(false);
+	_area[kAreaMeshList]->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+    _area[kAreaMeshList]->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+	_area[kAreaMeshList]->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::MinimumExpanding);
+	_area[kAreaMeshList]->setBackgroundRole(QPalette::Light);
+	_area[kAreaMeshList]->setMinimumSize(100, 100);
+	_area[kAreaMeshList]->setMaximumWidth(310);
+}
+
+void MainWindow::dragEnterEvent(QDragEnterEvent * event)
+{
+    QList<QUrl> urls = event->mimeData()->urls();
+
+    if (urls.isEmpty())
+        return;
+
+    QString filename = urls.first().toLocalFile();
+
+    if (filename.isEmpty())
+        return;
+
+    if (filename.endsWith("off") || filename.endsWith("ply"))
+        event->acceptProposedAction();
+}
+
+void MainWindow::dragMoveEvent(QDragMoveEvent * event)
+{
+    event->acceptProposedAction();
+}
+
+void MainWindow::dragLeaveEvent(QDragLeaveEvent * event)
+{
+    event->accept();
+}
+
+void MainWindow::dropEvent(QDropEvent * event)
+{
+	endIntro();
+
+    QList<QUrl> urls = event->mimeData()->urls();
+
+    if (urls.isEmpty())
+        return;
+
+	for (int i = 0; i < urls.size(); ++i) {
+		
+		QString filename = urls[i].toLocalFile();
+
+		if (filename.isEmpty()) continue;
+
+		_engine->loadFile(filename);
+	}
+}
+
+
+void MainWindow::changeWindowTitle(QString title)
+{
+    this->setWindowTitle(tr("CGView - %1").arg(title));
 }

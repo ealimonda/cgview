@@ -18,14 +18,28 @@
 #define CGVIEW_MESH_DEFINITION_H
 
 #include <vector> // std::vector
+#include <string> // std::string
 
+// VCG headers
 #include <vcg/simplex/vertex/base.h>
 #include <vcg/simplex/vertex/component.h>
+
 #include <vcg/simplex/face/base.h>
 #include <vcg/simplex/face/component.h>
-#include <vcg/simplex/face/component_ocf.h>
 
-#include <vcg/complex/trimesh/base.h>
+#include <vcg/complex/complex.h>
+#include <vcg/complex/algorithms/update/topology.h>
+#include <vcg/complex/algorithms/update/edges.h>
+#include <vcg/complex/algorithms/update/bounding.h>
+#include <vcg/complex/algorithms/update/flag.h>
+#include <vcg/complex/algorithms/clean.h>
+
+#include <wrap/io_trimesh/import.h>
+#include <wrap/io_trimesh/export.h>
+
+#include <vcg/simplex/face/pos.h> 
+
+//#include <vcg/complex/trimesh/base.h>
 
 //class CGEdge;
 class CGFace;
@@ -52,7 +66,15 @@ class CGFace: public vcg::Face<CGTypes,
 		vcg::vertex::Qualityf> {};
 
 class CGMesh : public vcg::tri::TriMesh<
-		std::vector<CGVertex>, std::vector<CGFace> > {};
+		std::vector<CGVertex>, std::vector<CGFace> > {
+public:
+	//each mesh has its own name
+	std::string getName(void)   { return name; }
+	void setName(std::string n) { name = n; }
+
+private:
+	std::string name;
+};
 
 typedef CGMesh::CoordType CGPoint;
 

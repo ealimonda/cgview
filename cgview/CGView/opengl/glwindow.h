@@ -20,7 +20,7 @@
 #include <QtOpenGL> // QGLWidget
 #include "opengl/scene/scene.h" // GLCamera, GLLight, GLMesh
 #include "pluginmanager.h" // PluginManager
-#include "meshlistbox.h"
+#include "gui/meshlistbox.h"
 
 class PluginTransformInterface;
 class PluginRenderInterface;

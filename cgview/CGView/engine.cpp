@@ -21,7 +21,7 @@
 
 #include <wrap/io_trimesh/import.h> // vcg::tri::io
 //#include <wrap/io_trimesh/import_OFF.h>
-#include <wrap/io_trimesh/import_PLY.h> // vcg::tri::io::ImporterPLY
+#include <wrap/io_trimesh/import_ply.h> // vcg::tri::io::ImporterPLY
 #include <wrap/io_trimesh/export.h> // vcg::tri::io::Exporter
 
 #include <vcg/complex/allocate.h> // vcg::tri::Allocator

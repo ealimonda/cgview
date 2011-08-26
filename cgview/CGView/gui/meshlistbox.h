@@ -1,7 +1,7 @@
 #ifndef MESHLISTBOX_H
 #define MESHLISTBOX_H
 
-#include "opengl\mesh\glmesh.h"
+#include "opengl/mesh/glmesh.h"
 
 #include <QFrame>
 #include <QRadioButton>

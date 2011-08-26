@@ -44,7 +44,8 @@ HEADERS = \
 		inputevents.h \
 		prefcontroller.h \
 		gui/aboutwindow.h \
-		gui/prefwindow.h
+		gui/prefwindow.h \
+		gui/meshlistbox.h
 
 SOURCES = \
 		opengl/glwindow.cpp \
@@ -63,7 +64,8 @@ SOURCES = \
                 ../../vcglib/wrap/ply/plylib.cpp \
 		prefcontroller.cpp \
 		gui/aboutwindow.cpp \
-		gui/prefwindow.cpp
+		gui/prefwindow.cpp \
+		gui/meshlistbox.cpp
 
 win32:RC_FILE =	icon.rc
 

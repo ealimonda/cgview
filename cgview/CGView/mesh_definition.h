@@ -39,8 +39,6 @@
 
 #include <vcg/simplex/face/pos.h> 
 
-//#include <vcg/complex/trimesh/base.h>
-
 //class CGEdge;
 class CGFace;
 class CGVertex;

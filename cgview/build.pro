@@ -22,4 +22,4 @@ CONFIG +=	ordered
 
 SUBDIRS = \
 		plugins \
-		CGView
+                CGView

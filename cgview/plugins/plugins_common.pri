@@ -20,7 +20,7 @@ TEMPLATE =	lib
 #CONFIG +=	plugin static
 CONFIG +=	plugin
 INCLUDEPATH +=	../../../CGView \
-		../../../../vcglib
+                ../../../../lib/vcglib
 DESTDIR =	../../../output/plugins
 
 # Don't remove -W* cflags unless strictly necessary.
